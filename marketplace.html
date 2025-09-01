@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalist Creative | Marketplace</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Solana Web3.js for Phantom Wallet Integration -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #facc15 0%, #d946ef 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #d946ef;
+            transition: width .3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nft-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .nft-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .nft-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .filter-btn.active {
+            background-color: #facc15;
+            color: #1e1b4b;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 1% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 95vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @media (min-width: 640px) {
+            .modal-content {
+                margin: 2% auto;
+                border-radius: 20px;
+                width: 90%;
+                max-height: 90vh;
+            }
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            z-index: 1001;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        @media (min-width: 640px) {
+            .close {
+                right: 20px;
+                top: 20px;
+                font-size: 28px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        .close:hover {
+            color: #000;
+            background: white;
+            transform: scale(1.1);
+        }
+        
+        .price-chart {
+            height: 200px;
+        }
+        
+        @media (min-width: 640px) {
+            .price-chart {
+                height: 300px;
+            }
+        }
+        
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-white font-sans text-gray-800">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <img src="logo.png" alt="Catalist Creative Logo" class="h-10 w-auto mr-3">
+                    <a href="index.html" class="text-2xl font-display font-bold gradient-text">Catalist Creative</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
+                        <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
+                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
+                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
+                        
+                        <!-- Wallet Connection UI -->
+                        <div id="wallet-section">
+                            <!-- Connect Button (shown when not connected) -->
+                            <button id="connect-wallet-btn" class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 flex items-center">
+                                <i data-feather="wallet" class="w-4 h-4 mr-2"></i>Connect Wallet
+                            </button>
+                            
+                            <!-- Wallet Info (shown when connected) -->
+                            <div id="wallet-info" class="hidden flex items-center space-x-4">
+                                <div class="bg-gray-100 rounded-full px-4 py-2 flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span id="wallet-balance" class="text-sm font-medium">0 SOL</span>
+                                </div>
+                                <div class="bg-gray-100 rounded-full px-4 py-2">
+                                    <span id="wallet-address" class="text-sm font-mono">Not Connected</span>
+                                </div>
+                                <button id="disconnect-wallet-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 flex items-center">
+                                    <i data-feather="log-out" class="w-4 h-4 mr-1"></i>
+                                    Disconnect
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-dark focus:outline-none">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white pb-4 px-4 shadow-lg">
+            <div class="flex flex-col space-y-3">
+                <a href="index.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
+                <a href="marketplace.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
+                <a href="profiles.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
+                <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
+                <!-- Mobile Wallet Section -->
+                <div id="mobile-wallet-section">
+                    <button id="mobile-connect-wallet-btn" class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 w-full flex items-center justify-center">
+                        <i data-feather="wallet" class="w-4 h-4 mr-2"></i>
+            Connect Wallet
+                    </button>
+                    
+                    <div id="mobile-wallet-info" class="hidden space-y-2">
+                        <div class="bg-gray-100 rounded-full px-4 py-2 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span id="mobile-wallet-balance" class="text-sm font-medium">0 SOL</span>
+                            </div>
+                            <span id="mobile-wallet-address" class="text-sm font-mono">Not Connected</span>
+                        </div>
+                        <button id="mobile-disconnect-wallet-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 w-full flex items-center justify-center">
+                            <i data-feather="log-out" class="w-4 h-4 mr-2"></i>
+                            Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Marketplace Hero -->
+    <section class="pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8 sm:gap-12 items-center mb-8 sm:mb-12">
+            <div class="text-center md:text-left">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 leading-tight">Discover <span class="gradient-text">Digital Art</span></h1>
+                <p class="text-gray-600 max-w-2xl text-sm sm:text-base">Explore unique digital collectibles on the Solana blockchain. Buy, sell, and discover exclusive assets.</p>
+            </div>
+            <div class="relative order-first md:order-last">
+                <div class="absolute -top-2 sm:-top-4 -left-2 sm:-left-4 w-20 sm:w-32 h-20 sm:h-32 bg-primary rounded-2xl opacity-20 -z-10"></div>
+                <div class="absolute -bottom-2 sm:-bottom-4 -right-2 sm:-right-4 w-20 sm:w-32 h-20 sm:h-32 bg-secondary rounded-2xl opacity-20 -z-10"></div>
+                <img src="hero2.png" alt="Marketplace Hero" class="rounded-2xl shadow-xl w-full h-auto max-h-64 sm:max-h-none object-cover">
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
+            <button class="filter-btn active px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">All Items</button>
+            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Art</button>
+            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Photography</button>
+            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Collectibles</button>
+            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Music</button>
+            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base hidden sm:block">Virtual Worlds</button>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <div class="flex items-center w-full sm:w-auto">
+                <span class="mr-2 text-sm sm:text-base">Sort by:</span>
+                <select class="bg-gray-100 border-0 rounded-full px-3 sm:px-4 py-2 focus:ring-2 focus:ring-primary text-sm sm:text-base flex-1 sm:flex-none">
+                    <option>Recently Added</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Most Viewed</option>
+                </select>
+            </div>
+            <div class="w-full sm:w-auto">
+                <div class="relative">
+                    <input type="text" placeholder="Search items, collections..." class="bg-gray-100 border-0 rounded-full px-6 py-2 pl-10 w-full sm:w-64 focus:ring-2 focus:ring-primary text-sm sm:text-base">
+                    <i data-feather="search" class="absolute left-3 top-2.5 text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NFT Grid -->
+    <section class="pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            <!-- NFT Item 1 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" onclick="openModal('modal1')">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Digital Dreams #124</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">2.5 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @creativeartist</span>
+                        <span class="whitespace-nowrap">3/10 minted</span>
+                    </div>
+                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal1')">
+                        Lihat Detail
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 2 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="100" onclick="openModal('modal2')">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Abstract Thoughts #42</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">1.8 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @visualcreator</span>
+                        <span class="whitespace-nowrap">7/10 minted</span>
+                    </div>
+                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal2')">
+                        Lihat Detail
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 3 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="200" onclick="openModal('modal3')">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Color Burst #78</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">3.2 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @digitalpainter</span>
+                        <span class="whitespace-nowrap">1/1 minted</span>
+                    </div>
+                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal3')">
+                        Lihat Detail
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 4 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="300" onclick="openModal('modal4')">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Neon Dreams #56</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">4.5 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @cyberartist</span>
+                        <span class="whitespace-nowrap">5/10 minted</span>
+                    </div>
+                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal4')">
+                        Lihat Detail
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 5 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Surreal Visions #89</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">2.1 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @dreamweaver</span>
+                        <span class="whitespace-nowrap">9/10 minted</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 6 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="NFT" class="nft-image">
+                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
+                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">Pixel Universe #33</h3>
+                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">1.5 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span>By @pixelmaster</span>
+                        <span>4/10 minted</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 7 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="NFT" class="nft-image">
+                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
+                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">Digital Essence #67</h3>
+                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">3.8 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span>By @essencecreator</span>
+                        <span>2/10 minted</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+            
+            <!-- NFT Item 8 -->
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="NFT" class="nft-image">
+                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
+                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">Cosmic Harmony #91</h3>
+                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">5.2 SOL</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span>By @spaceartist</span>
+                        <span>1/1 minted</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-center mt-12">
+            <button class="bg-dark hover:bg-gray-900 text-white font-bold px-8 py-3 rounded-full transition duration-300 flex items-center">
+                Load More
+                <i data-feather="arrow-down" class="ml-2 w-5 h-5"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div>
+                <h3 class="text-2xl font-display font-bold gradient-text mb-4">Catalist Creative</h3>
+                <p class="text-gray-400">Empowering creators with blockchain technology and innovative tools.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Quick Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="text-gray-400 hover:text-white transition">Home</a></li>
+                    <li><a href="marketplace.html" class="text-gray-400 hover:text-white transition">Marketplace</a></li>
+                    <li><a href="profiles.html" class="text-gray-400 hover:text-white transition">Profiles</a></li>
+                    <li><a href="about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Resources</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition">Documentation</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition">Guides</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Connect</h4>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="discord"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="github"></i></a>
+                </div>
+                <p class="text-gray-400 mt-4">hello@catalistcreative.com</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+            <p>© 2023 Catalist Creative. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Detail Produk 1 -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal1')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
+                         alt="Digital Dreams #124" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #124
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Digital Dreams #124</h2>
+                        <p class="text-gray-600 mb-4">Karya seni digital yang memukau dengan perpaduan warna-warna cerah dan bentuk abstrak yang menciptakan suasana mimpi yang surreal.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@creativeartist</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">1920 x 1080 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, JPG</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">3/10</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart1"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">2.5 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $62.50 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">3.2 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft1', 2.5)">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Beli Sekarang
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft1', 2.5)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft1')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detail Produk 2 -->
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal2')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="Abstract Thoughts #42" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #42
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Abstract Thoughts #42</h2>
+                        <p class="text-gray-600 mb-4">Eksplorasi visual dari pemikiran abstrak yang dituangkan dalam bentuk geometris dan warna-warna kontras yang menciptakan kedalaman emosi.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@visualcreator</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">2048 x 2048 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, SVG</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">7/10</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart2"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">1.8 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $45.00 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">2.4 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft2', 1.8)">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Beli Sekarang
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft2', 1.8)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft2')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detail Produk 3 -->
+    <div id="modal3" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal3')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Cosmic Journey #89" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #89
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Cosmic Journey #89</h2>
+                        <p class="text-gray-600 mb-4">Perjalanan kosmik yang menggambarkan keindahan alam semesta dengan detail yang memukau dan warna-warna galaksi yang menawan.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/men/15.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@spaceartist</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">3000 x 3000 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, GIF</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">1/1</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart3"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">3.2 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $80.00 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">4.1 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft3', 3.2)">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Beli Sekarang
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft3', 3.2)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft3')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detail Produk 4 -->
+    <div id="modal4" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal4')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Neon Dreams #156" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #156
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Neon Dreams #156</h2>
+                        <p class="text-gray-600 mb-4">Mimpi neon yang menggabungkan elemen futuristik dengan sentuhan artistik modern, menciptakan visual yang memukau mata.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@neonmaster</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">2560 x 1440 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, MP4</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">5/10</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart4"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">1.9 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $47.50 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">2.8 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft4', 4.7)">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Beli Sekarang
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft4', 4.7)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft4')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            feather.replace();
+        });
+        
+        // Filter button functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        feather.replace();
+        
+        // Initialize price charts
+        initializePriceCharts();
+        
+        // Phantom Wallet Integration
+        let walletConnected = false;
+        let walletPublicKey = null;
+        let connection = null;
+        
+        // Initialize Solana connection
+        if (typeof solanaWeb3 !== 'undefined') {
+            connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com');
+        }
+        
+        // Connect Wallet Function
+         async function connectWallet() {
+             try {
+                 // Check if Phantom wallet is installed
+                 if (!window.solana || !window.solana.isPhantom) {
+                     showNotification('Phantom wallet tidak terdeteksi! Silakan install Phantom wallet terlebih dahulu.', 'error');
+                     setTimeout(() => {
+                         window.open('https://phantom.app/', '_blank');
+                     }, 2000);
+                     return;
+                 }
+                 
+                 // Check if already connecting
+                 if (walletConnected) {
+                     showNotification('Wallet sudah terhubung!', 'info');
+                     return;
+                 }
+                 
+                 // Show connecting notification
+                 showNotification('Menghubungkan ke Phantom wallet...', 'info');
+                 
+                 // Connect to Phantom with timeout
+                 const connectPromise = window.solana.connect();
+                 const timeoutPromise = new Promise((_, reject) => 
+                     setTimeout(() => reject(new Error('Connection timeout')), 30000)
+                 );
+                 
+                 const response = await Promise.race([connectPromise, timeoutPromise]);
+                 
+                 // Validate response
+                 if (!response || !response.publicKey) {
+                     throw new Error('Invalid response from wallet');
+                 }
+                 
+                 walletPublicKey = response.publicKey.toString();
+                 walletConnected = true;
+                 
+                 // Validate public key format
+                 if (!isValidSolanaAddress(walletPublicKey)) {
+                     throw new Error('Invalid wallet address format');
+                 }
+                 
+                 // Update UI
+                 updateWalletUI();
+                 
+                 // Get wallet balance
+                 await updateWalletBalance();
+                 
+                 console.log('Wallet connected:', walletPublicKey);
+                 showNotification('Wallet berhasil terhubung!', 'success');
+                 
+             } catch (error) {
+                 console.error('Error connecting wallet:', error);
+                 walletConnected = false;
+                 walletPublicKey = null;
+                 updateWalletUI();
+                 
+                 let errorMessage = 'Gagal menghubungkan wallet: ';
+                 if (error.message.includes('User rejected')) {
+                     errorMessage += 'Koneksi ditolak oleh pengguna';
+                 } else if (error.message.includes('timeout')) {
+                     errorMessage += 'Koneksi timeout, silakan coba lagi';
+                 } else if (error.message.includes('Invalid')) {
+                     errorMessage += 'Format wallet tidak valid';
+                 } else {
+                     errorMessage += error.message;
+                 }
+                 
+                 showNotification(errorMessage, 'error');
+             }
+         }
+        
+        // Disconnect Wallet Function
+        async function disconnectWallet() {
+            try {
+                if (window.solana && window.solana.isPhantom) {
+                    await window.solana.disconnect();
+                }
+                
+                walletConnected = false;
+                walletPublicKey = null;
+                
+                // Update UI
+                updateWalletUI();
+                
+                console.log('Wallet disconnected');
+                showNotification('Wallet berhasil diputuskan!', 'info');
+                
+            } catch (error) {
+                console.error('Error disconnecting wallet:', error);
+                showNotification('Gagal memutuskan wallet: ' + error.message, 'error');
+            }
+        }
+        
+        // Update Wallet UI
+        function updateWalletUI() {
+            const connectBtn = document.getElementById('connect-wallet-btn');
+            const walletInfo = document.getElementById('wallet-info');
+            const mobileConnectBtn = document.getElementById('mobile-connect-wallet-btn');
+            const mobileWalletInfo = document.getElementById('mobile-wallet-info');
+            
+            if (walletConnected && walletPublicKey) {
+                // Desktop UI
+                connectBtn.classList.add('hidden');
+                walletInfo.classList.remove('hidden');
+                
+                // Mobile UI
+                mobileConnectBtn.classList.add('hidden');
+                mobileWalletInfo.classList.remove('hidden');
+                
+                // Update wallet address display (shortened)
+                const shortAddress = walletPublicKey.slice(0, 4) + '...' + walletPublicKey.slice(-4);
+                document.getElementById('wallet-address').textContent = shortAddress;
+                document.getElementById('mobile-wallet-address').textContent = shortAddress;
+                
+            } else {
+                // Desktop UI
+                connectBtn.classList.remove('hidden');
+                walletInfo.classList.add('hidden');
+                
+                // Mobile UI
+                mobileConnectBtn.classList.remove('hidden');
+                mobileWalletInfo.classList.add('hidden');
+                
+                // Reset displays
+                document.getElementById('wallet-balance').textContent = '0 SOL';
+                document.getElementById('wallet-address').textContent = 'Not Connected';
+                document.getElementById('mobile-wallet-balance').textContent = '0 SOL';
+                document.getElementById('mobile-wallet-address').textContent = 'Not Connected';
+            }
+            
+            // Refresh feather icons
+            feather.replace();
+        }
+        
+        // Update Wallet Balance
+        async function updateWalletBalance() {
+            if (!walletConnected || !walletPublicKey || !connection) return;
+            
+            try {
+                const publicKey = new solanaWeb3.PublicKey(walletPublicKey);
+                const balance = await connection.getBalance(publicKey);
+                const solBalance = (balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4);
+                
+                document.getElementById('wallet-balance').textContent = solBalance + ' SOL';
+                document.getElementById('mobile-wallet-balance').textContent = solBalance + ' SOL';
+                
+            } catch (error) {
+                console.error('Error getting wallet balance:', error);
+                document.getElementById('wallet-balance').textContent = 'Error';
+                document.getElementById('mobile-wallet-balance').textContent = 'Error';
+            }
+        }
+        
+        // Show Notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+            
+            // Set notification style based on type
+            switch(type) {
+                case 'success':
+                    notification.className += ' bg-green-500 text-white';
+                    break;
+                case 'error':
+                    notification.className += ' bg-red-500 text-white';
+                    break;
+                case 'info':
+                    notification.className += ' bg-blue-500 text-white';
+                    break;
+                default:
+                    notification.className += ' bg-gray-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            feather.replace();
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+        
+        // Event Listeners for Wallet Buttons
+        document.getElementById('connect-wallet-btn').addEventListener('click', connectWallet);
+        document.getElementById('disconnect-wallet-btn').addEventListener('click', disconnectWallet);
+        document.getElementById('mobile-connect-wallet-btn').addEventListener('click', connectWallet);
+        document.getElementById('mobile-disconnect-wallet-btn').addEventListener('click', disconnectWallet);
+        
+        // Check if wallet is already connected on page load
+         window.addEventListener('load', async () => {
+             if (window.solana && window.solana.isPhantom) {
+                 try {
+                     const response = await window.solana.connect({ onlyIfTrusted: true });
+                     if (response.publicKey) {
+                         walletPublicKey = response.publicKey.toString();
+                         walletConnected = true;
+                         updateWalletUI();
+                         await updateWalletBalance();
+                     }
+                 } catch (error) {
+                     // User hasn't approved connection yet
+                     console.log('Wallet not auto-connected');
+                 }
+             }
+         });
+         
+         // Validate Solana Address
+          function isValidSolanaAddress(address) {
+              try {
+                  new solanaWeb3.PublicKey(address);
+                  return address.length >= 32 && address.length <= 44;
+              } catch {
+                  return false;
+              }
+          }
+          
+          // Check wallet balance before transaction
+          async function checkSufficientBalance(requiredSOL) {
+              if (!walletConnected || !walletPublicKey || !connection) {
+                  return false;
+              }
+              
+              try {
+                  const publicKey = new solanaWeb3.PublicKey(walletPublicKey);
+                  const balance = await connection.getBalance(publicKey);
+                  const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+                  
+                  // Add 0.01 SOL buffer for transaction fees
+                  return solBalance >= (requiredSOL + 0.01);
+              } catch (error) {
+                  console.error('Error checking balance:', error);
+                  return false;
+              }
+          }
+          
+          // Buy NFT Function
+          async function buyNFT(nftId, priceInSOL) {
+              // Input validation
+              if (!nftId || typeof priceInSOL !== 'number' || priceInSOL <= 0) {
+                  showNotification('Parameter transaksi tidak valid!', 'error');
+                  return;
+              }
+              
+              // Check if wallet is connected
+              if (!walletConnected || !walletPublicKey) {
+                  showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                  return;
+              }
+              
+              // Check connection
+              if (!connection) {
+                  showNotification('Koneksi ke jaringan Solana tidak tersedia!', 'error');
+                  return;
+              }
+              
+              try {
+                  // Show loading notification
+                  showNotification('Memeriksa saldo wallet...', 'info');
+                  
+                  // Check sufficient balance
+                  const hasSufficientBalance = await checkSufficientBalance(priceInSOL);
+                  if (!hasSufficientBalance) {
+                      showNotification(`Saldo tidak mencukupi! Diperlukan minimal ${priceInSOL + 0.01} SOL (termasuk biaya transaksi).`, 'error');
+                      return;
+                  }
+                  
+                  // Show processing notification
+                  showNotification('Memproses transaksi...', 'info');
+                  
+                  // Create transaction with validation
+                  const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+                  
+                  // For demo, we'll create a simple transfer transaction to a marketplace wallet
+                  // In production, this would be replaced with actual NFT purchase logic
+                  const marketplaceWallet = new solanaWeb3.PublicKey('11111111111111111111111111111112'); // System program for demo
+                  
+                  const transaction = new solanaWeb3.Transaction().add(
+                      solanaWeb3.SystemProgram.transfer({
+                          fromPubkey: fromPubkey,
+                          toPubkey: marketplaceWallet,
+                          lamports: Math.floor(priceInSOL * solanaWeb3.LAMPORTS_PER_SOL)
+                      })
+                  );
+                  
+                  // Get recent blockhash with retry
+                  let blockhash;
+                  let retries = 3;
+                  while (retries > 0) {
+                      try {
+                          const result = await connection.getRecentBlockhash('confirmed');
+                          blockhash = result.blockhash;
+                          break;
+                      } catch (error) {
+                          retries--;
+                          if (retries === 0) throw error;
+                          await new Promise(resolve => setTimeout(resolve, 1000));
+                      }
+                  }
+                  
+                  transaction.recentBlockhash = blockhash;
+                  transaction.feePayer = fromPubkey;
+                  
+                  // Sign transaction with timeout
+                  const signPromise = window.solana.signTransaction(transaction);
+                  const timeoutPromise = new Promise((_, reject) => 
+                      setTimeout(() => reject(new Error('Signing timeout')), 60000)
+                  );
+                  
+                  const signedTransaction = await Promise.race([signPromise, timeoutPromise]);
+                  
+                  // Send transaction with confirmation
+                  const signature = await connection.sendRawTransaction(
+                      signedTransaction.serialize(),
+                      {
+                          skipPreflight: false,
+                          preflightCommitment: 'confirmed'
+                      }
+                  );
+                  
+                  // Wait for confirmation with timeout
+                  showNotification('Menunggu konfirmasi transaksi...', 'info');
+                  
+                  const confirmPromise = connection.confirmTransaction(signature, 'confirmed');
+                  const confirmTimeoutPromise = new Promise((_, reject) => 
+                      setTimeout(() => reject(new Error('Confirmation timeout')), 120000)
+                  );
+                  
+                  await Promise.race([confirmPromise, confirmTimeoutPromise]);
+                  
+                  // Update wallet balance
+                  await updateWalletBalance();
+                  
+                  // Show success notification
+                  showNotification(`NFT ${nftId.toUpperCase()} berhasil dibeli! Signature: ${signature.slice(0, 8)}...`, 'success');
+                  
+                  // Close modal
+                  const openModal = document.querySelector('.modal[style*="block"]');
+                  if (openModal) {
+                      openModal.style.display = 'none';
+                  }
+                  
+                  console.log('Transaction successful:', signature);
+                  
+              } catch (error) {
+                  console.error('Transaction failed:', error);
+                  
+                  let errorMessage = 'Transaksi gagal: ';
+                  if (error.message.includes('User rejected') || error.message.includes('User cancelled')) {
+                      errorMessage += 'Transaksi dibatalkan oleh pengguna';
+                  } else if (error.message.includes('insufficient funds') || error.message.includes('Insufficient')) {
+                      errorMessage += 'Saldo tidak mencukupi';
+                  } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+                      errorMessage += 'Transaksi timeout, silakan coba lagi';
+                  } else if (error.message.includes('blockhash')) {
+                      errorMessage += 'Gagal mendapatkan blockhash, silakan coba lagi';
+                  } else if (error.message.includes('network')) {
+                      errorMessage += 'Masalah jaringan, silakan coba lagi';
+                  } else {
+                      errorMessage += error.message || 'Kesalahan tidak diketahui';
+                  }
+                  
+                  showNotification(errorMessage, 'error');
+              }
+          }
+         
+         // Bid on NFT Function with validation
+         async function bidNFT(nftId, bidAmount) {
+             // Input validation
+             if (!nftId || typeof bidAmount !== 'number' || bidAmount <= 0) {
+                 showNotification('Parameter bid tidak valid!', 'error');
+                 return;
+             }
+             
+             if (!walletConnected || !walletPublicKey) {
+                 showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                 return;
+             }
+             
+             // Validate wallet address
+             if (!isValidSolanaAddress(walletPublicKey)) {
+                 showNotification('Alamat wallet tidak valid!', 'error');
+                 return;
+             }
+             
+             // Rate limiting check
+             if (!transactionRateLimit.canProceed()) {
+                 const remaining = transactionRateLimit.getRemainingTime();
+                 showNotification(`Harap tunggu ${remaining} detik sebelum melakukan transaksi lagi!`, 'error');
+                 return;
+             }
+             
+             try {
+                 // Check sufficient balance for bid
+                 const hasSufficientBalance = await checkSufficientBalance(bidAmount);
+                 if (!hasSufficientBalance) {
+                     showNotification(`Saldo tidak mencukupi untuk bid ${bidAmount} SOL!`, 'error');
+                     return;
+                 }
+                 
+                 // Validate transaction parameters
+                 const validation = validateTransactionParams({
+                     nftId: nftId,
+                     amount: bidAmount,
+                     walletAddress: walletPublicKey
+                 });
+                 
+                 if (!validation.valid) {
+                     showNotification(validation.error, 'error');
+                     return;
+                 }
+                 
+                 // Simulate bid validation (in real app, this would check against current highest bid)
+                 if (bidAmount < 0.1) {
+                     showNotification('Bid minimum adalah 0.1 SOL!', 'error');
+                     return;
+                 }
+                 
+                 // Store bid in localStorage (placeholder for real bid system)
+                 const bidData = {
+                     nftId: nftId,
+                     bidAmount: bidAmount,
+                     walletAddress: walletPublicKey,
+                     timestamp: new Date().toISOString()
+                 };
+                 
+                 const existingBids = JSON.parse(localStorage.getItem('userBids') || '[]');
+                 existingBids.push(bidData);
+                 localStorage.setItem('userBids', JSON.stringify(existingBids));
+                 
+                 showNotification(`Bid ${bidAmount} SOL untuk NFT ${nftId.toUpperCase()} berhasil ditempatkan!`, 'success');
+                 console.log(`Bid placed for ${nftId} with amount ${bidAmount} SOL`);
+                 
+             } catch (error) {
+                 console.error('Bid failed:', error);
+                 showNotification('Gagal menempatkan bid: ' + (error.message || 'Kesalahan tidak diketahui'), 'error');
+             }
+         }
+         
+         // Save NFT Function with validation
+         function saveNFT(nftId) {
+             // Input validation
+             if (!nftId || typeof nftId !== 'string') {
+                 showNotification('ID NFT tidak valid!', 'error');
+                 return;
+             }
+             
+             if (!walletConnected || !walletPublicKey) {
+                 showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                 return;
+             }
+             
+             // Validate wallet address
+             if (!isValidSolanaAddress(walletPublicKey)) {
+                 showNotification('Alamat wallet tidak valid!', 'error');
+                 return;
+             }
+             
+             try {
+                 // Get existing saved NFTs
+                 const savedNFTs = JSON.parse(localStorage.getItem('savedNFTs') || '[]');
+                 
+                 // Check if NFT is already saved
+                 const isAlreadySaved = savedNFTs.some(item => 
+                     item.nftId === nftId && item.walletAddress === walletPublicKey
+                 );
+                 
+                 if (isAlreadySaved) {
+                     showNotification(`NFT ${nftId.toUpperCase()} sudah ada di wishlist!`, 'info');
+                     return;
+                 }
+                 
+                 // Add NFT to saved list
+                 const saveData = {
+                     nftId: nftId,
+                     walletAddress: walletPublicKey,
+                     timestamp: new Date().toISOString()
+                 };
+                 
+                 savedNFTs.push(saveData);
+                 localStorage.setItem('savedNFTs', JSON.stringify(savedNFTs));
+                 
+                 showNotification(`NFT ${nftId.toUpperCase()} berhasil disimpan ke wishlist!`, 'success');
+                 console.log(`NFT ${nftId} saved to wishlist`);
+                 
+             } catch (error) {
+                 console.error('Save failed:', error);
+                 showNotification('Gagal menyimpan NFT: ' + (error.message || 'Kesalahan tidak diketahui'), 'error');
+             }
+         }
+         
+         // Security function to validate transaction parameters
+         function validateTransactionParams(params) {
+             const { nftId, amount, walletAddress } = params;
+             
+             // Check required parameters
+             if (!nftId || !amount || !walletAddress) {
+                 return { valid: false, error: 'Parameter transaksi tidak lengkap' };
+             }
+             
+             // Validate NFT ID format
+             if (typeof nftId !== 'string' || nftId.length < 2) {
+                 return { valid: false, error: 'Format ID NFT tidak valid' };
+             }
+             
+             // Validate amount
+             if (typeof amount !== 'number' || amount <= 0 || amount > 1000) {
+                 return { valid: false, error: 'Jumlah transaksi tidak valid (0-1000 SOL)' };
+             }
+             
+             // Validate wallet address
+             if (!isValidSolanaAddress(walletAddress)) {
+                 return { valid: false, error: 'Alamat wallet tidak valid' };
+             }
+             
+             return { valid: true };
+         }
+         
+         // Rate limiting for transactions
+         const transactionRateLimit = {
+             lastTransaction: 0,
+             minInterval: 5000, // 5 seconds between transactions
+             
+             canProceed() {
+                 const now = Date.now();
+                 if (now - this.lastTransaction < this.minInterval) {
+                     return false;
+                 }
+                 this.lastTransaction = now;
+                 return true;
+             },
+             
+             getRemainingTime() {
+                 const now = Date.now();
+                 const remaining = this.minInterval - (now - this.lastTransaction);
+                 return Math.max(0, Math.ceil(remaining / 1000));
+             }
+         };
+        
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+                setTimeout(() => {
+                    event.target.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Initialize price charts
+        function initializePriceCharts() {
+            // Chart 1 - Digital Dreams #124
+            const ctx1 = document.getElementById('priceChart1');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                        datasets: [{
+                            label: 'Harga (SOL)',
+                            data: [1.2, 1.8, 2.1, 2.8, 3.2, 2.5],
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Chart 2 - Abstract Thoughts #42
+            const ctx2 = document.getElementById('priceChart2');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                        datasets: [{
+                            label: 'Harga (SOL)',
+                            data: [0.8, 1.2, 1.5, 2.4, 2.1, 1.8],
+                            borderColor: '#EC4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+             }
+             
+             // Chart 3 - Cosmic Journey #89
+             const ctx3 = document.getElementById('priceChart3');
+             if (ctx3) {
+                 new Chart(ctx3, {
+                     type: 'line',
+                     data: {
+                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                         datasets: [{
+                             label: 'Harga (SOL)',
+                             data: [2.1, 2.8, 3.5, 4.1, 3.8, 3.2],
+                             borderColor: '#8B5CF6',
+                             backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                             borderWidth: 3,
+                             fill: true,
+                             tension: 0.4
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                             legend: {
+                                 display: false
+                             }
+                         },
+                         scales: {
+                             y: {
+                                 beginAtZero: false,
+                                 grid: {
+                                     color: 'rgba(0,0,0,0.1)'
+                                 }
+                             },
+                             x: {
+                                 grid: {
+                                     display: false
+                                 }
+                             }
+                         }
+                     }
+                 });
+             }
+             
+             // Chart 4 - Neon Dreams #156
+             const ctx4 = document.getElementById('priceChart4');
+             if (ctx4) {
+                 new Chart(ctx4, {
+                     type: 'line',
+                     data: {
+                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                         datasets: [{
+                             label: 'Harga (SOL)',
+                             data: [1.1, 1.6, 2.2, 2.8, 2.3, 1.9],
+                             borderColor: '#10B981',
+                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                             borderWidth: 3,
+                             fill: true,
+                             tension: 0.4
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                             legend: {
+                                 display: false
+                             }
+                         },
+                         scales: {
+                             y: {
+                                 beginAtZero: false,
+                                 grid: {
+                                     color: 'rgba(0,0,0,0.1)'
+                                 }
+                             },
+                             x: {
+                                 grid: {
+                                     display: false
+                                 }
+                             }
+                         }
+                     }
+                 });
+             }
+         }
+    </script>
+</body>
+</html>
