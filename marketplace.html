@@ -202,6 +202,17 @@
                         <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
                         <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
                         
+                        <!-- Shopping Cart -->
+                        <button onclick="toggleCart()" class="relative p-2 text-dark hover:text-secondary transition duration-300">
+                            <i data-feather="shopping-cart" class="w-6 h-6"></i>
+                            <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-dark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                        </button>
+                        
+                        <!-- Purchase History -->
+                        <button onclick="toggleHistory()" class="relative p-2 text-dark hover:text-secondary transition duration-300">
+                            <i data-feather="clock" class="w-6 h-6"></i>
+                        </button>
+                        
                         <!-- Wallet Connection UI -->
                         <div id="wallet-section">
                             <!-- Connect Button (shown when not connected) -->
@@ -328,9 +339,14 @@
                         <span class="truncate">By @creativeartist</span>
                         <span class="whitespace-nowrap">3/10 minted</span>
                     </div>
-                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal1')">
-                        Lihat Detail
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal1')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('1', 'Digital Dreams #124', '2.5', 'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -352,9 +368,14 @@
                         <span class="truncate">By @visualcreator</span>
                         <span class="whitespace-nowrap">7/10 minted</span>
                     </div>
-                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal2')">
-                        Lihat Detail
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal2')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('2', 'Abstract Thoughts #42', '1.8', 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -376,9 +397,14 @@
                         <span class="truncate">By @digitalpainter</span>
                         <span class="whitespace-nowrap">1/1 minted</span>
                     </div>
-                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal3')">
-                        Lihat Detail
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal3')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('3', 'Color Burst #78', '3.2', 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -400,14 +426,19 @@
                         <span class="truncate">By @cyberartist</span>
                         <span class="whitespace-nowrap">5/10 minted</span>
                     </div>
-                    <button class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal4')">
-                        Lihat Detail
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal4')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('4', 'Neon Dreams #56', '4.5', 'https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <!-- NFT Item 5 -->
-            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up">
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" onclick="openModal('modal5')">
                 <div class="relative">
                     <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
                          alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
@@ -424,81 +455,101 @@
                         <span class="truncate">By @dreamweaver</span>
                         <span class="whitespace-nowrap">9/10 minted</span>
                     </div>
-                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
-                        Buy Now
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal5')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('5', 'Surreal Visions #89', '2.1', 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <!-- NFT Item 6 -->
-            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="100" onclick="openModal('modal6')">
                 <div class="relative">
                     <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
-                         alt="NFT" class="nft-image">
-                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
-                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-3 sm:p-4">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg">Pixel Universe #33</h3>
-                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">1.5 SOL</span>
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Pixel Universe #33</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">1.5 SOL</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm text-gray-500">
-                        <span>By @pixelmaster</span>
-                        <span>4/10 minted</span>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @pixelmaster</span>
+                        <span class="whitespace-nowrap">4/10 minted</span>
                     </div>
-                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
-                        Buy Now
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal6')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('6', 'Pixel Universe #33', '1.5', 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <!-- NFT Item 7 -->
-            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="200" onclick="openModal('modal7')">
                 <div class="relative">
                     <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                         alt="NFT" class="nft-image">
-                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
-                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-3 sm:p-4">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg">Digital Essence #67</h3>
-                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">3.8 SOL</span>
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Digital Essence #67</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">3.8 SOL</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm text-gray-500">
-                        <span>By @essencecreator</span>
-                        <span>2/10 minted</span>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @essencecreator</span>
+                        <span class="whitespace-nowrap">2/10 minted</span>
                     </div>
-                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
-                        Buy Now
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal7')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('7', 'Digital Essence #67', '3.8', 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <!-- NFT Item 8 -->
-            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="300" onclick="openModal('modal8')">
                 <div class="relative">
                     <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                         alt="NFT" class="nft-image">
-                    <div class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2">
-                        <i data-feather="heart" class="w-5 h-5 text-secondary"></i>
+                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
+                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
                     </div>
                 </div>
-                <div class="p-4">
+                <div class="p-3 sm:p-4">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg">Cosmic Harmony #91</h3>
-                        <span class="bg-primary/10 text-primary text-sm px-2 py-1 rounded">5.2 SOL</span>
+                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Cosmic Harmony #91</h3>
+                        <span class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap">5.2 SOL</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm text-gray-500">
-                        <span>By @spaceartist</span>
-                        <span>1/1 minted</span>
+                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
+                        <span class="truncate">By @spaceartist</span>
+                        <span class="whitespace-nowrap">1/1 minted</span>
                     </div>
-                    <button class="w-full mt-4 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 rounded-lg transition">
-                        Buy Now
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal8')">
+                            Lihat Detail
+                        </button>
+                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('8', 'Cosmic Harmony #91', '5.2', 'https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -510,6 +561,190 @@
             </button>
         </div>
     </section>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Keranjang Belanja</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6">
+            <div id="empty-cart" class="text-center py-12">
+                <i data-feather="shopping-cart" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Keranjang belanja kosong</p>
+            </div>
+        </div>
+        <div id="cart-footer" class="border-t p-6 hidden">
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold">Total:</span>
+                    <span id="cart-total" class="text-2xl font-bold text-primary">Rp 0</span>
+                </div>
+            </div>
+            <button onclick="proceedToCheckout()" class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition duration-300">
+                Lanjut ke Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Purchase History Sidebar -->
+    <div id="history-sidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Riwayat Pembelian</h2>
+                <button onclick="toggleHistory()" class="text-gray-500 hover:text-gray-700">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        <div id="history-items" class="flex-1 overflow-y-auto p-6">
+            <div id="empty-history" class="text-center py-12">
+                <i data-feather="clock" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Belum ada riwayat pembelian</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <span class="close" onclick="closeCheckout()">&times;</span>
+            <div class="p-8">
+                <h2 class="text-3xl font-bold mb-6">Checkout</h2>
+                
+                <!-- Order Summary -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Ringkasan Pesanan</h3>
+                    <div id="checkout-items" class="space-y-4 mb-4">
+                        <!-- Items will be populated here -->
+                    </div>
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center text-xl font-bold">
+                            <span>Total:</span>
+                            <span id="checkout-total" class="text-primary">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Metode Pembayaran</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="crypto" class="mr-3" checked>
+                            <i data-feather="dollar-sign" class="w-5 h-5 mr-3"></i>
+                            <span>Cryptocurrency (SOL)</span>
+                        </label>
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="credit" class="mr-3">
+                            <i data-feather="credit-card" class="w-5 h-5 mr-3"></i>
+                            <span>Kartu Kredit</span>
+                        </label>
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="bank" class="mr-3">
+                            <i data-feather="home" class="w-5 h-5 mr-3"></i>
+                            <span>Transfer Bank</span>
+                        </label>
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="payment" value="ewallet" class="mr-3">
+                            <i data-feather="smartphone" class="w-5 h-5 mr-3"></i>
+                            <span>E-Wallet</span>
+                        </label>
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50" onclick="selectQRIS()">
+                            <input type="radio" name="payment" value="qris" class="mr-3">
+                            <i data-feather="grid" class="w-5 h-5 mr-3"></i>
+                            <span>QRIS (Quick Response Code Indonesian Standard)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                <div id="payment-details" class="mb-8">
+                    <!-- QRIS Payment Section -->
+                    <div id="qris-section" class="hidden">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <h4 class="text-lg font-semibold mb-4 text-center">Pembayaran QRIS</h4>
+                            
+                            <!-- QR Code Display -->
+                            <div class="text-center mb-6">
+                                <div id="qr-code-container" class="inline-block p-4 bg-white rounded-lg shadow-md">
+                                    <div id="qr-code-placeholder" class="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                                        <div class="text-center">
+                                            <i data-feather="loader" class="w-8 h-8 mx-auto mb-2 animate-spin"></i>
+                                            <p class="text-sm text-gray-500">Generating QR Code...</p>
+                                        </div>
+                                    </div>
+                                    <canvas id="qr-code-canvas" class="hidden w-48 h-48"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Instructions -->
+                            <div class="text-center mb-6">
+                                <h5 class="font-semibold mb-2">Cara Pembayaran:</h5>
+                                <ol class="text-sm text-gray-600 text-left max-w-md mx-auto space-y-1">
+                                    <li>1. Buka aplikasi pembayaran yang mendukung QRIS</li>
+                                    <li>2. Pilih menu "Scan QR" atau "Bayar"</li>
+                                    <li>3. Arahkan kamera ke kode QR di atas</li>
+                                    <li>4. Konfirmasi pembayaran di aplikasi Anda</li>
+                                    <li>5. Tunggu notifikasi pembayaran berhasil</li>
+                                </ol>
+                            </div>
+                            
+                            <!-- Payment Status -->
+                            <div id="qris-status" class="text-center">
+                                <div id="payment-waiting" class="flex items-center justify-center space-x-2">
+                                    <i data-feather="clock" class="w-5 h-5 text-blue-500"></i>
+                                    <span class="text-blue-600 font-medium">Menunggu pembayaran...</span>
+                                </div>
+                                <div id="payment-success" class="hidden flex items-center justify-center space-x-2">
+                                    <i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>
+                                    <span class="text-green-600 font-medium">Pembayaran berhasil!</span>
+                                </div>
+                                <div id="payment-failed" class="hidden flex items-center justify-center space-x-2">
+                                    <i data-feather="x-circle" class="w-5 h-5 text-red-500"></i>
+                                    <span class="text-red-600 font-medium">Pembayaran gagal atau dibatalkan</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Transaction Info -->
+                            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between text-sm">
+                                    <span>ID Transaksi:</span>
+                                    <span id="transaction-id" class="font-mono">-</span>
+                                </div>
+                                <div class="flex justify-between text-sm mt-1">
+                                    <span>Waktu Kadaluarsa:</span>
+                                    <span id="expiry-time" class="font-mono">-</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Timer -->
+                            <div class="mt-4 text-center">
+                                <div id="payment-timer" class="text-lg font-bold text-orange-600">
+                                    <span id="timer-minutes">15</span>:<span id="timer-seconds">00</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Waktu tersisa untuk menyelesaikan pembayaran</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-4">
+                    <button onclick="closeCheckout()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg transition duration-300">
+                        Batal
+                    </button>
+                    <button onclick="processPayment()" class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition duration-300">
+                        Bayar Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-12 px-4 sm:px-6 lg:px-8">
@@ -623,9 +858,9 @@
                         </div>
                         
                         <div class="grid grid-cols-3 gap-3">
-                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft1', 2.5)">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft1', 'Digital Dreams #124', 2.5, 'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80')">
                                 <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
-                                Beli Sekarang
+                                Checkout
                             </button>
                             <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft1', 2.5)">
                                 <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
@@ -713,9 +948,9 @@
                         </div>
                         
                         <div class="grid grid-cols-3 gap-3">
-                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft2', 1.8)">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft2', 'Abstract Thoughts #42', 1.8, 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
                                 <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
-                                Beli Sekarang
+                                Checkout
                             </button>
                             <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft2', 1.8)">
                                 <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
@@ -803,9 +1038,9 @@
                         </div>
                         
                         <div class="grid grid-cols-3 gap-3">
-                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft3', 3.2)">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft3', 'Cosmic Journey #88', 3.2, 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1635&q=80')">
                                 <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
-                                Beli Sekarang
+                                Checkout
                             </button>
                             <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft3', 3.2)">
                                 <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
@@ -893,9 +1128,9 @@
                         </div>
                         
                         <div class="grid grid-cols-3 gap-3">
-                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="buyNFT('nft4', 4.7)">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft4', 'Neon Nights #156', 1.9, 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80')">
                                 <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
-                                Beli Sekarang
+                                Checkout
                             </button>
                             <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft4', 4.7)">
                                 <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
@@ -912,11 +1147,1091 @@
         </div>
     </div>
 
+    <!-- Modal Detail Produk 5 -->
+    <div id="modal5" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal5')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="Surreal Visions #89" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #89
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Surreal Visions #89</h2>
+                        <p class="text-gray-600 mb-4">Karya seni digital yang menggabungkan elemen surreal dengan visi futuristik, menciptakan pengalaman visual yang memukau dan penuh imajinasi.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@dreamweaver</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">1920 x 1080 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, JPG</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">9/10</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart5"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">2.1 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $52.50 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">2.8 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft5', 'Surreal Visions #89', 2.1, 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Checkout
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft5', 2.1)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft5')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Produk 6 -->
+    <div id="modal6" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal6')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                         alt="Pixel Universe #33" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #33
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Pixel Universe #33</h2>
+                        <p class="text-gray-600 mb-4">By @pixelmaster</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-2xl font-bold text-primary">1.5 SOL</span>
+                            <span class="text-sm text-gray-500">4/10 minted</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="font-bold mb-3">Price History</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <canvas id="priceChart6" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Tombol Aksi -->
+                    <div class="space-y-3">
+                        <button class="w-full bg-secondary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition" onclick="addToCart('6', 'Pixel Universe #33', '1.5', 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                            <i data-feather="shopping-cart" class="w-5 h-5 inline mr-2"></i>
+                            Checkout
+                        </button>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Produk 7 -->
+    <div id="modal7" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal7')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Digital Essence #67" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #67
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Digital Essence #67</h2>
+                        <p class="text-gray-600 mb-4">By @essencecreator</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-2xl font-bold text-primary">3.8 SOL</span>
+                            <span class="text-sm text-gray-500">2/10 minted</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="font-bold mb-3">Price History</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <canvas id="priceChart7" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Tombol Aksi -->
+                    <div class="space-y-3">
+                        <button class="w-full bg-secondary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition" onclick="addToCart('7', 'Digital Essence #67', '3.8', 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                            <i data-feather="shopping-cart" class="w-5 h-5 inline mr-2"></i>
+                            Checkout
+                        </button>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Produk 8 -->
+    <div id="modal8" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal8')">&times;</span>
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- Gambar Produk -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Cosmic Harmony #91" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                    <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                        #91
+                    </div>
+                </div>
+                
+                <!-- Detail Produk -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold mb-2">Cosmic Harmony #91</h2>
+                        <p class="text-gray-600 mb-4">Karya seni digital yang menggambarkan harmoni kosmik dengan perpaduan warna-warna galaksi yang memukau, menciptakan keseimbangan sempurna antara chaos dan order.</p>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-semibold">@spaceartist</p>
+                                <p class="text-sm text-gray-500">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informasi Karya -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Ukuran</p>
+                            <p class="font-semibold">2048 x 2048 px</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Format</p>
+                            <p class="font-semibold">PNG, SVG</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Minted</p>
+                            <p class="font-semibold">1/1</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Blockchain</p>
+                            <p class="font-semibold">Solana</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafik Harga -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                        <div class="price-chart">
+                            <canvas id="priceChart8"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Harga dan Tombol Aksi -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                <p class="text-3xl font-bold text-primary">5.2 SOL</p>
+                                <p class="text-sm text-gray-500">≈ $130.00 USD</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                <p class="text-lg font-semibold">6.8 SOL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition" onclick="addToCart('nft8', 'Cosmic Harmony #91', 5.2, 'https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                                <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                Checkout
+                            </button>
+                            <button class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition" onclick="bidNFT('nft8', 5.2)">
+                                <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                Tawar
+                            </button>
+                            <button class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition" onclick="saveNFT('nft8')">
+                                <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
             once: true
+        });
+        
+        // Shopping Cart Functionality
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let purchaseHistory = JSON.parse(localStorage.getItem('purchaseHistory')) || [];
+        
+        function updateCartCount() {
+            const cartCount = document.getElementById('cart-count');
+            if (cart.length > 0) {
+                cartCount.textContent = cart.length;
+                cartCount.classList.remove('hidden');
+            } else {
+                cartCount.classList.add('hidden');
+            }
+        }
+        
+        function addToCart(id, name, price, image) {
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: id,
+                    name: name,
+                    price: parseFloat(price),
+                    image: image,
+                    quantity: 1
+                });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+            
+            // Show success message
+            showNotification('Item berhasil ditambahkan ke keranjang!', 'success');
+        }
+        
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+        }
+        
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                } else {
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartDisplay();
+                }
+            }
+        }
+        
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const cartFooter = document.getElementById('cart-footer');
+            const emptyCart = document.getElementById('empty-cart');
+            
+            if (cart.length === 0) {
+                emptyCart.style.display = 'block';
+                cartFooter.classList.add('hidden');
+                return;
+            }
+            
+            emptyCart.style.display = 'none';
+            cartFooter.classList.remove('hidden');
+            
+            let total = 0;
+            cartItems.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="flex items-center space-x-4 p-4 border-b">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-primary font-bold">${item.price} SOL</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity('${item.id}', -1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">-</button>
+                            <span class="w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', 1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">+</button>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700">
+                            <i data-feather="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('cart-total').textContent = `${total.toFixed(1)} SOL`;
+            feather.replace();
+        }
+        
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const historySidebar = document.getElementById('history-sidebar');
+            
+            // Close history sidebar if open
+            historySidebar.classList.add('translate-x-full');
+            
+            // Toggle cart sidebar
+            cartSidebar.classList.toggle('translate-x-full');
+            updateCartDisplay();
+        }
+        
+        function toggleHistory() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const historySidebar = document.getElementById('history-sidebar');
+            
+            // Close cart sidebar if open
+            cartSidebar.classList.add('translate-x-full');
+            
+            // Toggle history sidebar
+            historySidebar.classList.toggle('translate-x-full');
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+             const historyItems = document.getElementById('history-items');
+             const emptyHistory = document.getElementById('empty-history');
+             
+             if (purchaseHistory.length === 0) {
+                 emptyHistory.style.display = 'block';
+                 return;
+             }
+             
+             emptyHistory.style.display = 'none';
+             
+             historyItems.innerHTML = purchaseHistory.map(order => {
+                 const statusColor = order.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                   order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                                   order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                                   'bg-gray-100 text-gray-800';
+                 
+                 const statusText = order.status === 'completed' ? 'Selesai' : 
+                                  order.status === 'processing' ? 'Diproses' :
+                                  order.status === 'shipped' ? 'Dikirim' :
+                                  'Pending';
+                 
+                 return `
+                     <div class="border-b pb-4 mb-4">
+                         <div class="flex justify-between items-start mb-2">
+                             <div>
+                                 <h4 class="font-semibold">Order #${order.id}</h4>
+                                 <p class="text-sm text-gray-500">${new Date(order.date).toLocaleDateString('id-ID')}</p>
+                                 <p class="text-xs text-gray-400">Metode: ${getPaymentMethodName(order.paymentMethod)}</p>
+                             </div>
+                             <span class="text-primary font-bold">${order.total} SOL</span>
+                         </div>
+                         <div class="space-y-2">
+                             ${order.items.map(item => `
+                                 <div class="flex items-center space-x-3">
+                                     <img src="${item.image}" alt="${item.name}" class="w-10 h-10 object-cover rounded">
+                                     <div class="flex-1">
+                                         <p class="text-sm font-medium">${item.name}</p>
+                                         <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
+                                     </div>
+                                 </div>
+                             `).join('')}
+                         </div>
+                         <div class="mt-3 flex justify-between items-center">
+                             <span class="inline-block px-2 py-1 text-xs rounded-full ${statusColor}">
+                                 ${statusText}
+                             </span>
+                             <div class="flex space-x-2">
+                                 <button onclick="trackOrder('${order.id}')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                                     Lacak
+                                 </button>
+                                 ${order.status === 'completed' ? `
+                                     <button onclick="reorderItems('${order.id}')" class="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                                         Pesan Lagi
+                                     </button>
+                                 ` : ''}
+                             </div>
+                         </div>
+                     </div>
+                 `;
+             }).join('');
+         }
+         
+         function getPaymentMethodName(method) {
+             const methods = {
+                 'crypto': 'Cryptocurrency',
+                 'credit': 'Kartu Kredit',
+                 'bank': 'Transfer Bank',
+                 'ewallet': 'E-Wallet'
+             };
+             return methods[method] || method;
+         }
+         
+         function trackOrder(orderId) {
+             const order = purchaseHistory.find(o => o.id === orderId);
+             if (order) {
+                 const trackingSteps = [
+                     { status: 'Order Confirmed', completed: true, date: order.date },
+                     { status: 'Processing', completed: order.status !== 'pending', date: order.date },
+                     { status: 'Shipped', completed: order.status === 'shipped' || order.status === 'completed', date: order.status === 'shipped' || order.status === 'completed' ? order.date : null },
+                     { status: 'Delivered', completed: order.status === 'completed', date: order.status === 'completed' ? order.date : null }
+                 ];
+                 
+                 let trackingHtml = `
+                     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                         <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                             <div class="flex justify-between items-center mb-4">
+                                 <h3 class="text-lg font-semibold">Lacak Pesanan #${orderId}</h3>
+                                 <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700">
+                                     <i data-feather="x" class="w-5 h-5"></i>
+                                 </button>
+                             </div>
+                             <div class="space-y-4">
+                                 ${trackingSteps.map((step, index) => `
+                                     <div class="flex items-center space-x-3">
+                                         <div class="w-4 h-4 rounded-full ${step.completed ? 'bg-green-500' : 'bg-gray-300'}"></div>
+                                         <div class="flex-1">
+                                             <p class="font-medium ${step.completed ? 'text-green-600' : 'text-gray-500'}">${step.status}</p>
+                                             ${step.date ? `<p class="text-xs text-gray-400">${new Date(step.date).toLocaleDateString('id-ID')}</p>` : ''}
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
+                     </div>
+                 `;
+                 
+                 document.body.insertAdjacentHTML('beforeend', trackingHtml);
+                 feather.replace();
+             }
+         }
+         
+         function reorderItems(orderId) {
+             const order = purchaseHistory.find(o => o.id === orderId);
+             if (order) {
+                 order.items.forEach(item => {
+                     addToCart(item.id, item.name, item.price, item.image);
+                 });
+                 showNotification('Item berhasil ditambahkan ke keranjang!', 'success');
+             }
+         }
+        
+        function proceedToCheckout() {
+            if (cart.length === 0) return;
+            
+            const checkoutModal = document.getElementById('checkout-modal');
+            const checkoutItems = document.getElementById('checkout-items');
+            const checkoutTotal = document.getElementById('checkout-total');
+            
+            let total = 0;
+            checkoutItems.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded">
+                        <div class="flex-1">
+                            <h5 class="font-medium">${item.name}</h5>
+                            <p class="text-sm text-gray-500">Qty: ${item.quantity} × ${item.price} SOL</p>
+                        </div>
+                        <span class="font-bold">${(item.price * item.quantity).toFixed(1)} SOL</span>
+                    </div>
+                `;
+            }).join('');
+            
+            checkoutTotal.textContent = `${total.toFixed(1)} SOL`;
+            checkoutModal.style.display = 'block';
+            
+            // Close cart sidebar
+            document.getElementById('cart-sidebar').classList.add('translate-x-full');
+        }
+        
+        function closeCheckout() {
+            document.getElementById('checkout-modal').style.display = 'none';
+        }
+        
+        function processPayment() {
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            
+            // Simulate payment processing
+            showNotification('Memproses pembayaran...', 'info');
+            
+            setTimeout(() => {
+                // Create order
+                const order = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString(),
+                    items: [...cart],
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(1),
+                    paymentMethod: paymentMethod,
+                    status: 'completed'
+                };
+                
+                // Add to purchase history
+                purchaseHistory.unshift(order);
+                localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                
+                // Clear cart
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                
+                // Close checkout modal
+                closeCheckout();
+                
+                // Show success message
+                showNotification('Pembayaran berhasil! Terima kasih atas pembelian Anda.', 'success');
+                
+            }, 2000);
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Initialize cart count on page load
+        updateCartCount();
+        
+        // QRIS Payment System
+        let currentQRISTransaction = null;
+        let qrisTimer = null;
+        let paymentPolling = null;
+        
+        function selectQRIS() {
+            const qrisSection = document.getElementById('qris-section');
+            qrisSection.classList.remove('hidden');
+            
+            // Generate QR code when QRIS is selected
+            generateQRISCode();
+        }
+        
+        function generateQRISCode() {
+            const transactionId = 'TXN' + Date.now();
+            const amount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const expiryTime = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+            
+            currentQRISTransaction = {
+                id: transactionId,
+                amount: amount,
+                expiryTime: expiryTime,
+                status: 'pending'
+            };
+            
+            // Update transaction info
+            document.getElementById('transaction-id').textContent = transactionId;
+            document.getElementById('expiry-time').textContent = expiryTime.toLocaleTimeString('id-ID');
+            
+            // Generate QR Code using QR.js library (simulated)
+            generateQRCode(transactionId, amount);
+            
+            // Start timer
+            startPaymentTimer();
+            
+            // Start polling for payment status
+            startPaymentPolling();
+        }
+        
+        function generateQRCode(transactionId, amount) {
+            // Simulate QR code generation
+            const qrData = `00020101021226580014ID.CO.QRIS.WWW0118ID${transactionId}0214${amount.toFixed(2)}5204539953033605802ID5925CATALIST CREATIVE STORE6007JAKARTA61051234562070703A016304`;
+            
+            setTimeout(() => {
+                const placeholder = document.getElementById('qr-code-placeholder');
+                const canvas = document.getElementById('qr-code-canvas');
+                
+                // Hide placeholder and show canvas
+                placeholder.classList.add('hidden');
+                canvas.classList.remove('hidden');
+                
+                // Draw QR code pattern (simplified representation)
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000000';
+                
+                // Draw a simple QR-like pattern
+                const size = 192; // 48 * 4
+                const moduleSize = 8;
+                const modules = size / moduleSize;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, size, size);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = '#000000';
+                
+                // Generate pseudo-random pattern based on transaction data
+                const seed = transactionId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+                let random = seed;
+                
+                for (let i = 0; i < modules; i++) {
+                    for (let j = 0; j < modules; j++) {
+                        random = (random * 9301 + 49297) % 233280;
+                        if (random / 233280 > 0.5) {
+                            ctx.fillRect(i * moduleSize, j * moduleSize, moduleSize, moduleSize);
+                        }
+                    }
+                }
+                
+                // Draw finder patterns (corners)
+                drawFinderPattern(ctx, 0, 0, moduleSize);
+                drawFinderPattern(ctx, (modules - 7) * moduleSize, 0, moduleSize);
+                drawFinderPattern(ctx, 0, (modules - 7) * moduleSize, moduleSize);
+                
+                feather.replace();
+            }, 1500);
+        }
+        
+        function drawFinderPattern(ctx, x, y, moduleSize) {
+            // Draw 7x7 finder pattern
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(x, y, 7 * moduleSize, 7 * moduleSize);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x + moduleSize, y + moduleSize, 5 * moduleSize, 5 * moduleSize);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(x + 2 * moduleSize, y + 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+        }
+        
+        function startPaymentTimer() {
+            let timeLeft = 15 * 60; // 15 minutes in seconds
+            
+            qrisTimer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                document.getElementById('timer-minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('timer-seconds').textContent = seconds.toString().padStart(2, '0');
+                
+                timeLeft--;
+                
+                if (timeLeft < 0) {
+                    clearInterval(qrisTimer);
+                    handlePaymentTimeout();
+                }
+            }, 1000);
+        }
+        
+        function startPaymentPolling() {
+            paymentPolling = setInterval(() => {
+                checkPaymentStatus();
+            }, 3000); // Check every 3 seconds
+        }
+        
+        function checkPaymentStatus() {
+            if (!currentQRISTransaction) return;
+            
+            try {
+                // Validate transaction is still active
+                if (currentQRISTransaction.status !== 'pending') {
+                    clearInterval(paymentPolling);
+                    return;
+                }
+                
+                // Check if transaction has expired
+                if (new Date() > currentQRISTransaction.expiryTime) {
+                    handlePaymentTimeout();
+                    return;
+                }
+                
+                // Simulate payment status check with security validation
+                // In real implementation, this would call your payment gateway API with proper authentication
+                const random = Math.random();
+                
+                // Enhanced security: validate transaction integrity
+                if (!validateTransactionIntegrity()) {
+                    handlePaymentError('Transaction integrity check failed');
+                    return;
+                }
+                
+                // Simulate 10% chance of payment success after 10 seconds
+                if (Date.now() - parseInt(currentQRISTransaction.id.replace('TXN', '')) > 10000 && random < 0.1) {
+                    // Additional security check before confirming payment
+                    if (validatePaymentSecurity()) {
+                        handlePaymentSuccess();
+                    } else {
+                        handlePaymentError('Payment security validation failed');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking payment status:', error);
+                handlePaymentError('System error occurred during payment verification');
+            }
+        }
+        
+        function validateTransactionIntegrity() {
+            // Validate transaction data integrity
+            if (!currentQRISTransaction || !currentQRISTransaction.id || !currentQRISTransaction.amount) {
+                return false;
+            }
+            
+            // Check if transaction ID format is valid
+            const idPattern = /^TXN\d{13}$/;
+            if (!idPattern.test(currentQRISTransaction.id)) {
+                return false;
+            }
+            
+            // Validate amount is positive and reasonable
+            if (currentQRISTransaction.amount <= 0 || currentQRISTransaction.amount > 100000000) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function validatePaymentSecurity() {
+            // Additional security validations
+            try {
+                // Check if cart still has items
+                if (!cart || cart.length === 0) {
+                    return false;
+                }
+                
+                // Verify amount matches current cart total
+                const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                if (Math.abs(currentTotal - currentQRISTransaction.amount) > 0.01) {
+                    return false;
+                }
+                
+                // Check for suspicious activity (multiple rapid transactions)
+                const recentTransactions = JSON.parse(localStorage.getItem('recentQRISTransactions') || '[]');
+                const now = Date.now();
+                const recentCount = recentTransactions.filter(t => now - t < 60000).length; // Last minute
+                
+                if (recentCount > 5) {
+                    return false; // Too many transactions in short time
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Security validation error:', error);
+                return false;
+            }
+        }
+        
+        function handlePaymentError(errorMessage) {
+            clearInterval(qrisTimer);
+            clearInterval(paymentPolling);
+            
+            // Log error securely (without sensitive data)
+            console.error('QRIS Payment Error:', {
+                transactionId: currentQRISTransaction?.id,
+                timestamp: new Date().toISOString(),
+                error: errorMessage
+            });
+            
+            // Update UI
+            document.getElementById('payment-waiting').classList.add('hidden');
+            document.getElementById('payment-failed').classList.remove('hidden');
+            
+            // Show user-friendly error message
+            showNotification('Terjadi kesalahan dalam proses pembayaran. Silakan coba lagi.', 'error');
+            
+            // Reset transaction state
+            currentQRISTransaction = null;
+        }
+        
+        function handlePaymentSuccess() {
+            clearInterval(qrisTimer);
+            clearInterval(paymentPolling);
+            
+            // Update UI
+            document.getElementById('payment-waiting').classList.add('hidden');
+            document.getElementById('payment-success').classList.remove('hidden');
+            
+            // Show enhanced success notification
+            showQRISNotification('Pembayaran QRIS berhasil dikonfirmasi!', 'success');
+            
+            // Process the order
+            setTimeout(() => {
+                processQRISOrder();
+            }, 2000);
+        }
+        
+        function handlePaymentTimeout() {
+            clearInterval(paymentPolling);
+            
+            // Update UI
+            document.getElementById('payment-waiting').classList.add('hidden');
+            document.getElementById('payment-failed').classList.remove('hidden');
+            
+            showQRISNotification('Waktu pembayaran habis. Silakan coba lagi.', 'error');
+        }
+        
+        function processQRISOrder() {
+            try {
+                // Final security validation before processing order
+                if (!validateTransactionIntegrity() || !validatePaymentSecurity()) {
+                    handlePaymentError('Final validation failed');
+                    return;
+                }
+                
+                // Record transaction for security tracking
+                recordQRISTransaction();
+                
+                // Create order with enhanced security
+                const order = {
+                    id: currentQRISTransaction.id,
+                    date: new Date().toISOString(),
+                    items: [...cart],
+                    total: currentQRISTransaction.amount.toFixed(1),
+                    paymentMethod: 'qris',
+                    status: 'completed',
+                    securityHash: generateOrderHash(currentQRISTransaction.id, currentQRISTransaction.amount)
+                };
+                
+                // Add to purchase history
+                purchaseHistory.unshift(order);
+                localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                
+                // Clear cart
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                
+                // Close checkout modal
+                closeCheckout();
+                
+                // Reset QRIS state
+                currentQRISTransaction = null;
+                document.getElementById('qris-section').classList.add('hidden');
+                
+                // Send confirmation notification
+                showNotification('Pesanan berhasil diproses! Terima kasih atas pembelian Anda.', 'success');
+                
+            } catch (error) {
+                console.error('Error processing QRIS order:', error);
+                handlePaymentError('Order processing failed');
+            }
+        }
+        
+        function recordQRISTransaction() {
+            // Record transaction timestamp for security monitoring
+            const recentTransactions = JSON.parse(localStorage.getItem('recentQRISTransactions') || '[]');
+            recentTransactions.push(Date.now());
+            
+            // Keep only last 10 transactions
+            if (recentTransactions.length > 10) {
+                recentTransactions.splice(0, recentTransactions.length - 10);
+            }
+            
+            localStorage.setItem('recentQRISTransactions', JSON.stringify(recentTransactions));
+        }
+        
+        function generateOrderHash(transactionId, amount) {
+            // Simple hash generation for order verification (in production, use proper cryptographic hash)
+            const data = transactionId + amount.toString() + Date.now().toString();
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) {
+                const char = data.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            return Math.abs(hash).toString(16);
+        }
+        
+        // Enhanced notification system for QRIS payments
+        function showQRISNotification(message, type, duration = 5000) {
+            // Create enhanced notification with QRIS branding
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            // Set notification style based on type
+            switch (type) {
+                case 'success':
+                    notification.className += ' bg-green-500 text-white';
+                    break;
+                case 'error':
+                    notification.className += ' bg-red-500 text-white';
+                    break;
+                case 'info':
+                    notification.className += ' bg-blue-500 text-white';
+                    break;
+                default:
+                    notification.className += ' bg-gray-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <i data-feather="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">QRIS Payment</p>
+                        <p class="text-sm opacity-90">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 opacity-70 hover:opacity-100">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            feather.replace();
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        // Update payment method name function
+        function getPaymentMethodName(method) {
+            const methods = {
+                'crypto': 'Cryptocurrency',
+                'credit': 'Kartu Kredit',
+                'bank': 'Transfer Bank',
+                'ewallet': 'E-Wallet',
+                'qris': 'QRIS'
+            };
+            return methods[method] || method;
+        }
+        
+        // Update process payment to handle QRIS
+        function processPayment() {
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            
+            if (paymentMethod === 'qris') {
+                // QRIS payment is handled separately
+                return;
+            }
+            
+            // Simulate payment processing for other methods
+            showNotification('Memproses pembayaran...', 'info');
+            
+            setTimeout(() => {
+                // Create order
+                const order = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString(),
+                    items: [...cart],
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(1),
+                    paymentMethod: paymentMethod,
+                    status: 'completed'
+                };
+                
+                // Add to purchase history
+                purchaseHistory.unshift(order);
+                localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                
+                // Clear cart
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                
+                // Close checkout modal
+                closeCheckout();
+                
+                // Show success message
+                showNotification('Pembayaran berhasil! Terima kasih atas pembelian Anda.', 'success');
+                
+            }, 2000);
+        }
+        
+        // Add event listeners for payment method selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentRadios = document.querySelectorAll('input[name="payment"]');
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const qrisSection = document.getElementById('qris-section');
+                    if (this.value === 'qris') {
+                        qrisSection.classList.remove('hidden');
+                        generateQRISCode();
+                    } else {
+                        qrisSection.classList.add('hidden');
+                        // Clear QRIS timers if switching away
+                        if (qrisTimer) clearInterval(qrisTimer);
+                        if (paymentPolling) clearInterval(paymentPolling);
+                    }
+                });
+            });
         });
         
         document.getElementById('menu-toggle').addEventListener('click', function() {
