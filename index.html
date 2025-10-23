@@ -61,57 +61,25 @@
             width: 100%;
         }
     </style>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Auth dan Navbar JS -->
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/navbar.js"></script>
 </head>
 <body class="bg-white font-sans text-gray-800">
-    <!-- Navigation -->
-    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex-shrink-0 flex items-center">
-                    <img src="logo.png" alt="Catalist Creative Logo" class="h-10 w-auto mr-3">
-                    <a href="index.html" class="text-2xl font-display font-bold gradient-text">Catalist Creative</a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-center space-x-8">
-                        <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
-                        <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
-                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
-                        <button class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300">
-                            Connect Wallet
-                        </button>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button id="menu-toggle" class="text-dark focus:outline-none">
-                        <i data-feather="menu"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white pb-4 px-4 shadow-lg">
-            <div class="flex flex-col space-y-3">
-                <a href="index.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
-                <a href="marketplace.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                <a href="profiles.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
-                <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
-                <button class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 w-full">
-                    Connect Wallet
-                </button>
-            </div>
-        </div>
-    </nav>
+    <!-- Container untuk navbar -->
+    <div id="navbar-container"></div>
 
     <!-- Hero Section -->
     <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <div data-aos="fade-right">
                 <h1 class="text-5xl md:text-6xl font-display font-bold leading-tight mb-6">
-                    Creative Agency <span class="gradient-text">Teman</span> Kreatifmu
+                    Unleash Your <span class="gradient-text">Creative</span> Potential
                 </h1>
                 <p class="text-lg text-gray-600 mb-8">
-                    Katalisator perubahan untuk UMKM Indonesia.
+                    Catalist Creative bridges imagination and technology. We empower creators with cutting-edge tools on the Solana blockchain.
                 </p>
                 <div class="flex flex-wrap gap-4">
                     <button class="gradient-bg hover:opacity-90 text-white font-bold px-8 py-3 rounded-full transition duration-300">
@@ -498,5 +466,4 @@
         feather.replace();
     </script>
 </body>
-
 </html>
