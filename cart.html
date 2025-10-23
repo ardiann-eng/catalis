@@ -1,0 +1,21 @@
+<!-- Shopping Cart -->
+<div id="shopping-cart" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-end">
+    <div class="bg-white w-full max-w-md h-full shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Keranjang Belanja</h2>
+            <button id="close-cart" class="text-gray-500 hover:text-gray-800">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="overflow-y-auto h-full max-h-[calc(100vh-200px)]">
+            <!-- Cart items will be injected here by JavaScript -->
+        </div>
+        <div class="border-t pt-6 mt-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Total</h3>
+                <p id="cart-total" class="text-lg font-bold text-gray-800">Rp 0</p>
+            </div>
+            <a href="/checkout.html" class="w-full bg-gray-800 text-white py-3 px-4 rounded-md text-center font-semibold hover:bg-gray-900 transition-colors">Checkout</a>
+        </div>
+    </div>
+</div>
