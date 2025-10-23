@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Catalis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+        }
+        .form-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border: 2px solid #facc15;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+        }
+        .input-field {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .label-text {
+            color: #1e1b4b;
+            font-weight: 600;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    </style>
+</head>
+<body class="bg-white font-sans text-gray-800">
+    <!-- Header/Navbar -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <img src="logo.png" alt="Catalis Logo" class="h-10 w-auto mr-3">
+                    <div class="text-2xl font-display font-bold gradient-text">Catalist Creative</div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="text-dark hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a href="marketplace.html" class="text-dark hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Marketplace</a>
+                        <a href="about.html" class="text-dark hover:text-primary px-3 py-2 rounded-md text-sm font-medium">About</a>
+                        <a href="profiles.html" class="text-dark hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profiles</a>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <a href="register.html" class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 flex items-center">
+                                Register
+                            </a>
+                </div>
+                <div class="md:hidden">
+                    <button class="text-dark hover:text-primary">
+                        <!-- Hamburger icon -->
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="flex items-center justify-center min-h-screen pt-20 pb-10">
+        <div class="bg-white/95 backdrop-blur-md p-10 rounded-3xl shadow-xl max-w-lg w-full card-hover border border-gray-200/50 relative overflow-hidden form-card">
+            <h2 class="text-3xl font-display font-bold text-center mb-8 gradient-text tracking-tight">Login to Catalist Creative</h2>
+            <form id="loginForm">
+                <div class="mb-6">
+                    <label for="email" class="block text-base font-medium text-dark mb-2 label-text">Email</label>
+                    <input type="email" id="email" class="mt-1 block w-full rounded-xl border-gray-300 shadow-md focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-50 py-3 px-4 text-lg input-focus input-field" required>
+                </div>
+                <div class="mb-8">
+                    <label for="password" class="block text-base font-medium text-dark mb-2 label-text">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full rounded-xl border-gray-300 shadow-md focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-50 py-3 px-4 text-lg input-focus input-field" required>
+                </div>
+                <button type="submit" class="w-full gradient-bg hover:opacity-90 text-white font-bold py-4 rounded-full transition duration-300 text-lg shadow-lg hover:shadow-xl btn-hover">Login</button>
+            </form>
+            <div class="mt-4 text-center">
+                <div class="mt-6 flex justify-center space-x-4">
+                <a href="forgot-password.html" class="text-sm text-primary hover:text-secondary hover:underline transition duration-300">Forgot Password?</a>
+                <a href="register.html" class="text-sm text-primary hover:text-secondary hover:underline transition duration-300">Don't have an account? Register</a>
+            </div>
+            <div class="mt-8">
+                <a href="http://localhost:3000/auth/google" class="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold py-4 rounded-full transition duration-300 block text-center text-lg shadow-lg hover:shadow-xl btn-hover">Login with Google</a>
+            </div>
+            <p id="errorMessage" class="mt-4 text-red-500 text-center"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = 'index.html';
+                } else {
+                    document.getElementById('errorMessage').textContent = data.error;
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'An error occurred';
+            }
+        });
+        document.querySelectorAll('.input-focus').forEach(input => {
+            input.addEventListener('focus', () => {
+                anime({
+                    targets: input,
+                    scale: 1.02,
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+            });
+            input.addEventListener('blur', () => {
+                anime({
+                    targets: input,
+                    scale: 1,
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
