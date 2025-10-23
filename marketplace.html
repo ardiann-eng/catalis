@@ -12,8 +12,12 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Solana Web3.js for Phantom Wallet Integration -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Auth dan Navbar JS -->
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/cart.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -187,101 +191,21 @@
     </style>
 </head>
 <body class="bg-white font-sans text-gray-800">
-    <!-- Navigation -->
-    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex-shrink-0 flex items-center">
-                    <img src="logo.png" alt="Catalist Creative Logo" class="h-10 w-auto mr-3">
-                    <a href="index.html" class="text-2xl font-display font-bold gradient-text">Catalist Creative</a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-center space-x-8">
-                        <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
-                        <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
-                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
-                        
-                        <!-- Shopping Cart -->
-                        <button onclick="toggleCart()" class="relative p-2 text-dark hover:text-secondary transition duration-300">
-                            <i data-feather="shopping-cart" class="w-6 h-6"></i>
-                            <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-dark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                        </button>
-                        
-                        <!-- Purchase History -->
-                        <button onclick="toggleHistory()" class="relative p-2 text-dark hover:text-secondary transition duration-300">
-                            <i data-feather="clock" class="w-6 h-6"></i>
-                        </button>
-                        
-                        <!-- Wallet Connection UI -->
-                        <div id="wallet-section">
-                            <!-- Connect Button (shown when not connected) -->
-                            <button id="connect-wallet-btn" class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 flex items-center">
-                                <i data-feather="wallet" class="w-4 h-4 mr-2"></i>Connect Wallet
-                            </button>
-                            
-                            <!-- Wallet Info (shown when connected) -->
-                            <div id="wallet-info" class="hidden flex items-center space-x-4">
-                                <div class="bg-gray-100 rounded-full px-4 py-2 flex items-center space-x-2">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span id="wallet-balance" class="text-sm font-medium">0 SOL</span>
-                                </div>
-                                <div class="bg-gray-100 rounded-full px-4 py-2">
-                                    <span id="wallet-address" class="text-sm font-mono">Not Connected</span>
-                                </div>
-                                <button id="disconnect-wallet-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 flex items-center">
-                                    <i data-feather="log-out" class="w-4 h-4 mr-1"></i>
-                                    Disconnect
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button id="menu-toggle" class="text-dark focus:outline-none">
-                        <i data-feather="menu"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white pb-4 px-4 shadow-lg">
-            <div class="flex flex-col space-y-3">
-                <a href="index.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
-                <a href="marketplace.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                <a href="profiles.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
-                <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
-                <!-- Mobile Wallet Section -->
-                <div id="mobile-wallet-section">
-                    <button id="mobile-connect-wallet-btn" class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 w-full flex items-center justify-center">
-                        <i data-feather="wallet" class="w-4 h-4 mr-2"></i>
-            Connect Wallet
-                    </button>
-                    
-                    <div id="mobile-wallet-info" class="hidden space-y-2">
-                        <div class="bg-gray-100 rounded-full px-4 py-2 flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span id="mobile-wallet-balance" class="text-sm font-medium">0 SOL</span>
-                            </div>
-                            <span id="mobile-wallet-address" class="text-sm font-mono">Not Connected</span>
-                        </div>
-                        <button id="mobile-disconnect-wallet-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 w-full flex items-center justify-center">
-                            <i data-feather="log-out" class="w-4 h-4 mr-2"></i>
-                            Disconnect
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+    <!-- Container untuk navbar -->
+    <div id="navbar-container"></div>
+    
+    <!-- Shopping Cart Container -->
+    <div id="cart-container"></div>
+    
+    <!-- Spacer untuk navbar fixed -->
+    <div class="h-20"></div>
+    
     <!-- Marketplace Hero -->
-    <section class="pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section class="pt-8 sm:pt-12 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="grid md:grid-cols-2 gap-8 sm:gap-12 items-center mb-8 sm:mb-12">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 leading-tight">Discover <span class="gradient-text">Digital Art</span></h1>
-                <p class="text-gray-600 max-w-2xl text-sm sm:text-base">Explore unique digital collectibles on the Solana blockchain. Buy, sell, and discover exclusive assets.</p>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 leading-tight">Jelajahi <span class="gradient-text">Produk Pilihan</span> Kami</h1>
+                <p class="text-gray-600 max-w-2xl text-sm sm:text-base">Temukan berbagai produk berkualitas untuk memenuhi kebutuhan Anda. Belanja mudah, aman, dan nyaman.</p>
             </div>
             <div class="relative order-first md:order-last">
                 <div class="absolute -top-2 sm:-top-4 -left-2 sm:-left-4 w-20 sm:w-32 h-20 sm:h-32 bg-primary rounded-2xl opacity-20 -z-10"></div>
@@ -290,13 +214,17 @@
             </div>
         </div>
         
-        <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
-            <button class="filter-btn active px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">All Items</button>
-            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Art</button>
-            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Photography</button>
-            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Collectibles</button>
-            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Music</button>
-            <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base hidden sm:block">Virtual Worlds</button>
+        <!-- Shopping Cart dan Purchase History Buttons -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <button class="filter-btn active px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Semua</button>
+                <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Elektronik</button>
+                <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Fashion</button>
+                <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Rumah Tangga</button>
+                <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base">Hobi</button>
+                <button class="filter-btn px-3 sm:px-6 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition text-sm sm:text-base hidden sm:block">Olahraga</button>
+            </div>
+
         </div>
         
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
@@ -318,40 +246,417 @@
         </div>
     </section>
 
-    <!-- NFT Grid -->
+    <!-- Product Grid -->
     <section class="pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            <!-- NFT Item 1 -->
-            <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" onclick="openModal('modal1')">
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+            <!-- Product Card 1 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
                 <div class="relative">
-                    <img src="catalis (1).jpg" 
-                         alt="NFT" class="nft-image w-full h-48 sm:h-56 object-cover">
-                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
-                        <i data-feather="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-secondary"></i>
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23facc15' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3EDigital Dreams #124%3C/text%3E%3C/svg%3E" alt="Digital Dreams #124" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Digital Dreams #124</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Digital</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Karya seni digital yang dihasilkan oleh AI, menjelajahi persimpangan antara teknologi dan kreativitas.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(88)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.250.000</p>
                     </div>
                 </div>
-                <div class="p-3 sm:p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-base sm:text-lg truncate pr-2">Digital Dreams #124</h3>
-                        <div class="bg-primary/10 text-primary text-xs sm:text-sm px-2 py-1 rounded whitespace-nowrap text-right">
-                            <div>2.5 SOL</div>
-                            <div class="text-xs text-gray-600 price-idr" data-sol="2.5"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3">
-                        <span class="truncate">By @Fauziyyah</span>
-                        <span class="whitespace-nowrap">3/10 minted</span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); openModal('modal1')">
-                            Lihat Detail
-                        </button>
-                        <button class="bg-secondary hover:bg-blue-600 text-white px-3 py-2 sm:py-2.5 rounded-lg transition text-sm sm:text-base" onclick="event.stopPropagation(); addToCart('1', 'Digital Dreams #124', '2.5', 'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80')">
-                            <i data-feather="shopping-cart" class="w-4 h-4"></i>
-                        </button>
-                    </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
                 </div>
             </div>
+            <!-- Product Card 2 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23d946ef' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3EAbstract Thoughts #42%3C/text%3E%3C/svg%3E" alt="Abstract Thoughts #42" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Abstract Thoughts #42</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Abstrak</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Lukisan abstrak yang mengeksplorasi emosi dan pikiran bawah sadar melalui warna dan bentuk.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(152)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 900.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Product Card 3 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23facc15' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3EColor Burst #78%3C/text%3E%3C/svg%3E" alt="Color Burst #78" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Color Burst #78</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Kontemporer</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Ledakan warna-warni yang merayakan kegembiraan dan energi kehidupan.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(45)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.600.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Product Card 4 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23d946ef' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3ENeon Dreams #56%3C/text%3E%3C/svg%3E" alt="Neon Dreams #56" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Neon Dreams #56</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Neon</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Pemandangan kota cyberpunk yang diterangi lampu neon, menangkap esensi malam yang tak pernah tidur.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(210)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 2.250.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 5 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23facc15' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3EOcean's Whisper #12%3C/text%3E%3C/svg%3E" alt="Ocean's Whisper #12" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Ocean's Whisper #12</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Fotografi</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Fotografi hitam putih yang menangkap ketenangan dan kekuatan ombak laut.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(95)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 850.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 6 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='224' viewBox='0 0 400 224' preserveAspectRatio='none'%3E%3Crect width='400' height='224' fill='%23d946ef' opacity='0.2'/%3E%3Ctext x='200' y='112' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='24' fill='%231e1b4b'%3EUrban Jungle #07%3C/text%3E%3C/svg%3E" alt="Urban Jungle #07" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Urban Jungle #07</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Jalanan</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Graffiti yang hidup di dinding bata, menggambarkan energi dan semangat kota.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(63)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 650.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 7 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1515405295579-ba7b45403062?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="Celestial Dance #33" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Celestial Dance #33</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Fantasi</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Ilustrasi digital yang menggambarkan tarian magis antara bulan dan bintang.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(312)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 3.100.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 8 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1579965342575-1642d7d66578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Portrait of a Lady #01" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Portrait of a Lady #01</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Klasik</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Lukisan cat minyak yang terinspirasi dari para master Renaisans, menangkap keanggunan dan misteri.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(180)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 5.500.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 9 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1519671482749-fd09be7ac915?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Surreal Dreamscape #19" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Surreal Dreamscape #19</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Surealis</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Dunia mimpi yang aneh dan menakjubkan, di mana logika tidak berlaku.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(72)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.950.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 10 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1501490992437-1fb1f485f810?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="Minimalist Lines #05" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Minimalist Lines #05</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Minimalis</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Keindahan dalam kesederhanaan, dieksplorasi melalui garis-garis yang bersih dan tajam.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(250)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 750.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 11 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1552359369-1dc39b286552?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Pop Art Princess #21" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Pop Art Princess #21</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Pop</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Potret ikonik yang diberi sentuhan pop art, penuh dengan warna-warna cerah dan berani.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(89)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.150.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 12 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1617201539903-a8b357851854?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="Geometric Harmony #14" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Geometric Harmony #14</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Geometris</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Komposisi bentuk dan pola geometris yang menciptakan rasa keseimbangan dan harmoni visual.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(112)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 980.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 13 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Floral Dreams #28" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Floral Dreams #28</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Botani</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Ilustrasi botani yang mendetail, merayakan keindahan dan keragaman flora.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(420)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.800.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+            <!-- Fictional Product Card 14 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1609704810816-03c3cf909b73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Cosmic Ink #03" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate group-hover:text-secondary">Cosmic Ink #03</h3>
+                    <p class="text-sm text-gray-500 mb-2">Seni Tinta</p>
+                    <p class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">Lukisan tinta yang terinspirasi dari kosmos, menggambarkan galaksi dan nebula yang jauh.</p>
+                    <div class="flex items-center mb-3">
+                        <div class="flex text-yellow-400">
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                            <i data-feather="star" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs text-gray-500 ml-2">(55)</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-lg font-bold text-dark">Rp 1.350.000</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-100">
+                    <button class="w-full bg-primary text-dark font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300">
+                        + Keranjang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
             
             <!-- NFT Item 2 -->
             <div class="nft-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300" data-aos="fade-up" data-aos-delay="100" onclick="openModal('modal2')">
@@ -596,7 +901,7 @@
                 </button>
             </div>
         </div>
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6">
+        <div id="cart-items" class="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] p-6">
             <div id="empty-cart" class="text-center py-12">
                 <i data-feather="shopping-cart" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
                 <p class="text-gray-500">Keranjang belanja kosong</p>
@@ -606,12 +911,12 @@
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="font-semibold">Total:</span>
-                    <span id="cart-total" class="text-2xl font-bold text-primary">Rp 0</span>
+                    <span id="cart-total" class="text-2xl font-bold text-primary">0 SOL</span>
                 </div>
             </div>
-            <button onclick="proceedToCheckout()" class="w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition duration-300">
+            <a href="checkout.html" class="block w-full bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition duration-300 text-center">
                 Lanjut ke Checkout
-            </button>
+            </a>
         </div>
     </div>
 
@@ -1469,8 +1774,16 @@
         });
         
         // Shopping Cart Functionality
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let purchaseHistory = JSON.parse(localStorage.getItem('purchaseHistory')) || [];
+        let cart = [];
+        let purchaseHistory = [];
+        
+        // Load cart and purchase history from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            cart = JSON.parse(localStorage.getItem('cart')) || [];
+            purchaseHistory = JSON.parse(localStorage.getItem('purchaseHistory')) || [];
+            updateCartCount();
+            updateCartDisplay();
+        });
         
         function updateCartCount() {
             const cartCount = document.getElementById('cart-count');
@@ -1483,6 +1796,14 @@
         }
         
         function addToCart(id, name, price, image) {
+            // Pastikan parameter diterima dengan benar
+            console.log("Adding to cart:", id, name, price, image);
+            
+            // Pastikan cart sudah diinisialisasi
+            if (!Array.isArray(cart)) {
+                cart = [];
+            }
+            
             const existingItem = cart.find(item => item.id === id);
             if (existingItem) {
                 existingItem.quantity += 1;
@@ -1495,6 +1816,8 @@
                     quantity: 1
                 });
             }
+            
+            // Simpan ke localStorage dan update tampilan
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             updateCartDisplay();
@@ -1531,6 +1854,7 @@
             if (cart.length === 0) {
                 emptyCart.style.display = 'block';
                 cartFooter.classList.add('hidden');
+                cartItems.innerHTML = '';
                 return;
             }
             
@@ -1544,23 +1868,31 @@
                 const priceIdr = convertSolToIdr(item.price);
                 
                 return `
-                    <div class="flex items-center space-x-4 p-4 border-b">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
-                        <div class="flex-1">
-                            <h4 class="font-semibold">${item.name}</h4>
-                            <div class="text-primary font-bold">
-                                <div>${item.price} SOL</div>
-                                ${priceIdr > 0 ? `<div class="text-xs text-gray-600">${formatIDR(priceIdr)}</div>` : ''}
+                    <div class="flex flex-col p-4 border-b">
+                        <div class="flex items-center space-x-4 mb-2">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <div class="text-primary font-bold">
+                                    <div>${item.price} SOL</div>
+                                    ${priceIdr > 0 ? `<div class="text-xs text-gray-600">${formatIDR(priceIdr)}</div>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700">
+                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="updateQuantity('${item.id}', -1)" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center">-</button>
+                                <span class="w-8 text-center">${item.quantity}</span>
+                                <button onclick="updateQuantity('${item.id}', 1)" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center">+</button>
+                            </div>
+                            <div class="font-medium text-right">
+                                <div>Total: ${(item.price * item.quantity).toFixed(1)} SOL</div>
+                                ${itemTotalIdr > 0 ? `<div class="text-xs text-gray-600">${formatIDR(itemTotalIdr)}</div>` : ''}
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="updateQuantity('${item.id}', -1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">-</button>
-                            <span class="w-8 text-center">${item.quantity}</span>
-                            <button onclick="updateQuantity('${item.id}', 1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                        <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700">
-                            <i data-feather="trash-2" class="w-4 h-4"></i>
-                        </button>
                     </div>
                 `;
             }).join('');
@@ -1578,14 +1910,19 @@
             const totalIdr = convertSolToIdr(total);
             const cartTotalElement = document.getElementById('cart-total');
             
-            if (totalIdr > 0) {
-                cartTotalElement.innerHTML = `
-                    <div>${total.toFixed(1)} SOL</div>
-                    <div class="text-lg text-gray-600">${formatIDR(totalIdr)}</div>
-                `;
-            } else {
-                cartTotalElement.textContent = `${total.toFixed(1)} SOL`;
+            if (cartTotalElement) {
+                if (totalIdr > 0) {
+                    cartTotalElement.innerHTML = `
+                        <div class="text-2xl font-bold text-primary">${total.toFixed(1)} SOL</div>
+                        <div class="text-lg text-gray-600">${formatIDR(totalIdr)}</div>
+                    `;
+                } else {
+                    cartTotalElement.innerHTML = `<div class="text-2xl font-bold text-primary">${total.toFixed(1)} SOL</div>`;
+                }
             }
+            
+            // Update cart count badge
+            updateCartCount();
         }
         
         function toggleCart() {
@@ -1598,6 +1935,23 @@
             // Toggle cart sidebar
             cartSidebar.classList.toggle('translate-x-full');
             updateCartDisplay();
+        }
+        
+        function updateCartCount() {
+            const cartCount = document.getElementById('cart-count');
+            if (!cartCount) return;
+            
+            let count = 0;
+            cart.forEach(item => {
+                count += item.quantity;
+            });
+            
+            if (count > 0) {
+                cartCount.textContent = count;
+                cartCount.classList.remove('hidden');
+            } else {
+                cartCount.classList.add('hidden');
+            }
         }
         
         function toggleHistory() {
