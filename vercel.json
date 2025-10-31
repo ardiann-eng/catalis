@@ -1,0 +1,37 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/generate-snap-token",
+      "destination": "/api/midtrans-callback.js"
+    },
+    {
+      "source": "/api/midtrans-callback",
+      "destination": "/api/midtrans-callback.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "SUPABASE_URL": "https://anzsbqqippijhemwxkqh.supabase.co",
+    "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuenNicXFpcHBpamhlbXd4a3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDM1MTQsImV4cCI6MjA3Njc3OTUxNH0.6l1Bt9_5_5ohFeH8IN6mP9jU0pFUToHMmV1NwQEeP-Q",
+    "MIDTRANS_SERVER_KEY": "Mid-server-XVdnQPgGcucvnoRJYNWzNw1j",
+    "MIDTRANS_CLIENT_KEY": "Mid-client-QZNRNJ4ROIoY8PAn",
+    "MIDTRANS_MERCHANT_ID": "G498472407",
+    "MIDTRANS_IS_PRODUCTION": "false"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Accept"
+        }
+      ]
+    }
+  ]
+}

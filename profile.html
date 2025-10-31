@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Pengguna - Catalist Creative</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      :root {
+        --primary: #fcd34d;
+        --primary-dark: #f59e0b;
+        --secondary: #d946ef;
+        --secondary-dark: #c026d3;
+        --dark: #1f2937;
+        --light: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --info: #3b82f6;
+      }
+
+      body {
+        font-family: "Inter", "Poppins", sans-serif;
+        color: var(--dark);
+        line-height: 1.6;
+        letter-spacing: -0.01em;
+      }
+
+      .font-display {
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: -0.03em;
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, var(--secondary), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-link::after {
+        content: "";
+        display: block;
+        width: 0;
+        height: 2px;
+        background: var(--secondary);
+        transition: width 0.3s ease, transform 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+        transform: translateY(1px);
+      }
+
+      /* Card styles */
+      .profile-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--gray-200);
+      }
+
+      .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      /* Button styles */
+      .btn {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: linear-gradient(
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .btn:hover::after {
+        opacity: 1;
+      }
+
+      /* Status indicator */
+      .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        font-size: 0.75rem;
+      }
+
+      .status-active {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+
+      /* Form styles */
+      .form-input {
+        transition: all 0.2s ease;
+        border: 1px solid var(--gray-300);
+      }
+
+      .form-input:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.2);
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      .timeline {
+        position: relative;
+        padding-left: 2.5rem;
+      }
+      .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+      }
+      .timeline-item:last-child {
+        padding-bottom: 0;
+      }
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+        bottom: -0.5rem;
+        width: 2px;
+        background-color: var(--gray-200);
+      }
+      .timeline-item:last-child::before {
+        height: 0.5rem; /* Hanya sampai dot */
+        bottom: auto;
+      }
+      .timeline-dot {
+        position: absolute;
+        left: -0.4rem; /* (8px - 2px) / 2 */
+        top: 0.375rem; /* 6px */
+        height: 0.8rem; /* 14px */
+        width: 0.8rem; /* 14px */
+        border-radius: 9999px;
+        background-color: var(--gray-300);
+        border: 2px solid var(--light);
+      }
+      .timeline-item-active .timeline-dot {
+        background-color: var(--secondary);
+      }
+      .timeline-item-active::before {
+        background-color: var(--secondary);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800" id="profile-page">
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <img
+              src="logo.png"
+              alt="Catalist Creative Logo"
+              class="h-10 w-auto mr-3"
+            />
+            <a
+              href="index.html"
+              class="text-2xl font-display font-bold gradient-text"
+              >Catalist Creative</a
+            >
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-center space-x-8">
+              <a
+                href="index.html"
+                class="nav-link text-dark font-medium hover:text-secondary px-3 py-2"
+                >Home</a
+              >
+              <a
+                href="marketplace.html"
+                class="nav-link text-dark font-medium hover:text-secondary px-3 py-2"
+                >Marketplace</a
+              >
+              <a
+                href="profiles.html"
+                class="nav-link text-dark font-medium hover:text-secondary px-3 py-2"
+                >Profiles</a
+              >
+              <a
+                href="about.html"
+                class="nav-link text-dark font-medium hover:text-secondary px-3 py-2"
+                >About Us</a
+              >
+              <div id="auth-buttons">
+                <a
+                  href="login.html"
+                  id="login-button"
+                  class="bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300"
+                >
+                  Login
+                </a>
+              </div>
+              <div id="user-profile" class="hidden">
+                <div class="flex items-center space-x-3">
+                  <span id="user-email" class="text-dark font-medium"></span>
+                  <button
+                    id="logout-button"
+                    class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-1 rounded-full transition duration-300 text-sm"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="md:hidden">
+            <button id="menu-toggle" class="text-dark focus:outline-none">
+              <i data-feather="menu"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white pb-4 px-4 shadow-lg"
+      >
+        <div class="flex flex-col space-y-3">
+          <a
+            href="index.html"
+            class="text-dark font-medium hover:text-secondary px-3 py-2"
+            >Home</a
+          >
+          <a
+            href="marketplace.html"
+            class="text-dark font-medium hover:text-secondary px-3 py-2"
+            >Marketplace</a
+          >
+          <a
+            href="profiles.html"
+            class="text-dark font-medium hover:text-secondary px-3 py-2"
+            >Profiles</a
+          >
+          <a
+            href="about.html"
+            class="text-dark font-medium hover:text-secondary px-3 py-2"
+            >About Us</a
+          >
+          <div id="mobile-auth-buttons">
+            <a
+              href="login.html"
+              id="mobile-login-button"
+              class="block bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300 text-center"
+            >
+              Login
+            </a>
+          </div>
+          <div id="mobile-user-profile" class="hidden">
+            <div class="flex flex-col space-y-2">
+              <span id="mobile-user-email" class="text-dark font-medium"></span>
+              <button
+                id="mobile-logout-button"
+                class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 text-sm"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+          <button
+            class="bg-primary hover:bg-yellow-500 text-dark font-bold px-6 py-2 rounded-full transition duration-300 w-full"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <section class="pt-32 pb-20">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div
+            class="bg-gradient-to-r from-purple-500 to-yellow-400 h-48 relative"
+          >
+            <div class="absolute -bottom-16 left-8">
+              <div
+                class="h-32 w-32 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center overflow-hidden"
+              >
+                <i data-feather="user" class="h-16 w-16 text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-20 px-8 pb-8">
+            <div class="flex justify-between items-start">
+              <div>
+                <h1 id="profile-name" class="text-2xl font-bold text-gray-800">
+                  Loading...
+                </h1>
+                <p id="profile-email" class="text-gray-600">Loading...</p>
+              </div>
+              <button
+                id="edit-profile-btn"
+                class="bg-secondary text-white font-bold px-6 py-3 rounded-lg transition duration-300 flex items-center shadow-lg hover:bg-purple-700 active:bg-purple-800 group"
+              >
+                <i
+                  data-feather="edit-2"
+                  class="h-5 w-5 mr-2 text-white group-hover:text-orange-400"
+                ></i>
+                <span class="text-lg text-white group-hover:text-orange-400"
+                  >Edit Profile</span
+                >
+              </button>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 p-6 rounded-xl">
+                <h2 class="text-lg font-semibold mb-4">Account Information</h2>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-sm text-gray-500">Member Since</p>
+                    <p id="member-since" class="font-medium">Loading...</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Last Login</p>
+                    <p id="last-login" class="font-medium">Loading...</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Account Status</p>
+                    <div class="flex items-center">
+                      <span
+                        class="h-2 w-2 rounded-full bg-green-500 mr-2"
+                      ></span>
+                      <p class="font-medium text-green-600">Active</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gray-50 p-6 rounded-xl">
+                <h2 class="text-lg font-semibold mb-4">Personal Information</h2>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-sm text-gray-500">Phone Number</p>
+                    <p id="profile-phone" class="font-medium">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Location</p>
+                    <p id="profile-location" class="font-medium">-</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gray-50 p-6 rounded-xl col-span-1 md:col-span-2">
+                <h2 class="text-lg font-semibold mb-4">About Me</h2>
+                <p id="profile-bio" class="text-gray-700">-</p>
+              </div>
+
+              <div class="mt-8 col-span-1 md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                <div class="bg-gray-50 rounded-xl p-6">
+                  <div id="activity-loading" class="text-center py-8">
+                    <div
+                      class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"
+                    ></div>
+                    <p class="mt-4 text-gray-600">Loading your activity...</p>
+                  </div>
+
+                  <div
+                    id="activity-empty"
+                    class="text-center py-8 text-gray-500 hidden"
+                  >
+                    <i
+                      data-feather="activity"
+                      class="h-12 w-12 mx-auto mb-4 text-gray-400"
+                    ></i>
+                    <p>No recent activity to display</p>
+                    <p class="text-sm mt-2">
+                      Your activity will appear here once you start interacting
+                      with the marketplace
+                    </p>
+                  </div>
+
+                  <div id="activity-content" class="hidden">
+                    <div
+                      class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0"
+                    >
+                      <h3 class="font-medium text-gray-700">
+                        Purchase History
+                      </h3>
+
+                      <div
+                        class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto"
+                      >
+                        <div class="flex space-x-2">
+                          <div class="relative">
+                            <select
+                              id="filter-status"
+                              class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                            >
+                              <option value="all">All Status</option>
+                              <option value="pending">Pending</option>
+                              <option value="processing">Processing</option>
+                              <option value="completed">Completed</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </div>
+
+                          <div class="relative">
+                            <select
+                              id="filter-date"
+                              class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                            >
+                              <option value="all">All Time</option>
+                              <option value="today">Today</option>
+                              <option value="week">This Week</option>
+                              <option value="month">This Month</option>
+                              <option value="year">This Year</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="flex space-x-2">
+                          <div class="relative">
+                            <select
+                              id="sort-by"
+                              class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                            >
+                              <option value="date-desc">Date (Newest)</option>
+                              <option value="date-asc">Date (Oldest)</option>
+                              <option value="amount-desc">
+                                Amount (Low to High)
+                              </option>
+                              <option value="amount-asc">
+                                Amount (High to Low)
+                              </option>
+                            </select>
+                          </div>
+
+                          <button
+                            id="view-all-orders"
+                            class="text-sm text-purple-600 hover:text-purple-800 flex items-center bg-white px-3 py-2 border border-gray-300 rounded-md"
+                          >
+                            <span>View All</span>
+                            <i
+                              data-feather="chevron-right"
+                              class="h-4 w-4 ml-1"
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mb-4">
+                      <div class="relative">
+                        <input
+                          type="text"
+                          id="search-orders"
+                          placeholder="Search by Order ID or Product Name"
+                          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                        />
+                        <div
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                        >
+                          <i
+                            data-feather="search"
+                            class="h-4 w-4 text-gray-400"
+                          ></i>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="overflow-hidden">
+                      <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                          <tr>
+                            <th
+                              scope="col"
+                              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              <div
+                                class="flex items-center cursor-pointer"
+                                data-sort="order"
+                              >
+                                Order ID
+                                <i
+                                  data-feather="chevron-down"
+                                  class="h-4 w-4 ml-1 sort-icon hidden"
+                                ></i>
+                              </div>
+                            </th>
+                            <th
+                              scope="col"
+                              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              <div
+                                class="flex items-center cursor-pointer"
+                                data-sort="date"
+                              >
+                                Date
+                                <i
+                                  data-feather="chevron-down"
+                                  class="h-4 w-4 ml-1 sort-icon"
+                                ></i>
+                              </div>
+                            </th>
+                            <th
+                              scope="col"
+                              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              <div
+                                class="flex items-center cursor-pointer"
+                                data-sort="amount"
+                              >
+                                Amount
+                                <i
+                                  data-feather="chevron-down"
+                                  class="h-4 w-4 ml-1 sort-icon hidden"
+                                ></i>
+                              </div>
+                            </th>
+                            <th
+                              scope="col"
+                              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              <div
+                                class="flex items-center cursor-pointer"
+                                data-sort="status"
+                              >
+                                Status
+                                <i
+                                  data-feather="chevron-down"
+                                  class="h-4 w-4 ml-1 sort-icon hidden"
+                                ></i>
+                              </div>
+                            </th>
+                            <th
+                              scope="col"
+                              class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody
+                          id="orders-table-body"
+                          class="bg-white divide-y divide-gray-200"
+                        ></tbody>
+                      </table>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between">
+                      <div class="text-sm text-gray-500">
+                        Showing <span id="showing-start">1</span> to
+                        <span id="showing-end">5</span> of
+                        <span id="total-orders">0</span> orders
+                      </div>
+                      <div class="flex space-x-2">
+                        <button
+                          id="prev-page"
+                          class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Previous
+                        </button>
+                        <button
+                          id="next-page"
+                          class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div
+      id="edit-profile-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden"
+    >
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold">Edit Profile</h2>
+          <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+
+        <form id="profile-form" class="space-y-4">
+          <div>
+            <label
+              for="display-name"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Display Name</label
+            >
+            <input
+              type="text"
+              id="display-name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+              required
+              minlength="3"
+              maxlength="50"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Nama akan ditampilkan di profil Anda
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="phone"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Nomor HP</label
+            >
+            <input
+              type="tel"
+              id="phone"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+              pattern="[0-9]{10,15}"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Format: 08xxxxxxxxxx (tanpa spasi atau tanda)
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="bio"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Bio</label
+            >
+            <textarea
+              id="bio"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+              maxlength="200"
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-1">Maksimal 200 karakter</p>
+          </div>
+
+          <div>
+            <label
+              for="location"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Lokasi</label
+            >
+            <input
+              type="text"
+              id="location"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+              maxlength="100"
+            />
+            <p class="text-xs text-gray-500 mt-1">Contoh: Jakarta, Indonesia</p>
+          </div>
+
+          <div class="pt-4">
+            <button
+              id="save-profile-btn"
+              type="submit"
+              class="w-full bg-secondary font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg hover:bg-purple-700 active:bg-purple-800 group"
+            >
+              <span class="text-lg text-white group-hover:text-gray-900"
+                >Save Changes</span
+              >
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div
+      id="order-detail-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="bg-white rounded-2xl p-6 md:p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold">
+            Detail Pesanan
+            <span
+              id="modal-order-number"
+              class="text-purple-600 ml-2 font-mono"
+            ></span>
+          </h2>
+          <button
+            id="close-detail-modal"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+
+        <div id="modal-order-content" class="space-y-6"></div>
+      </div>
+    </div>
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-xl font-bold mb-4">Catalist Creative</h3>
+            <p class="text-gray-400">
+              Marketplace NFT terbaik untuk seniman dan kolektor Indonesia.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Marketplace</h4>
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >All NFTs</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Art</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Photography</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Music</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Account</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="profile.html"
+                  class="text-gray-400 hover:text-white transition"
+                  >Profile</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Favorites</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Watchlist</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >My Collections</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Resources</h4>
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Platform Status</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Partners</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition"
+                  >Blog</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
+        >
+          <p class="text-gray-400">
+            © 2023 Catalist Creative. All rights reserved.
+          </p>
+          <div class="flex space-x-6 mt-4 md:mt-0">
+            <a href="#" class="text-gray-400 hover:text-white transition"
+              ><i data-feather="twitter" class="h-5 w-5"></i
+            ></a>
+            <a href="#" class="text-gray-400 hover:text-white transition"
+              ><i data-feather="instagram" class="h-5 w-5"></i
+            ></a>
+            <a href="#" class="text-gray-400 hover:text-white transition"
+              ><i data-feather="facebook" class="h-5 w-5"></i
+            ></a>
+            <a href="#" class="text-gray-400 hover:text-white transition"
+              ><i data-feather="youtube" class="h-5 w-5"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Inisialisasi Supabase client
+      const supabaseUrl = "https://anzsbqqippijhemwxkqh.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuenNicXFpcHBpamhlbXd4a3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDM1MTQsImV4cCI6MjA3Njc3OTUxNH0.6l1Bt9_5_5ohFeH8IN6mP9jU0pFUToHMmV1NwQEeP-Q";
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+      // Inisialisasi Feather Icons
+      document.addEventListener("DOMContentLoaded", function () {
+        feather.replace();
+        AOS.init();
+
+        // Toggle mobile menu
+        document
+          .getElementById("menu-toggle")
+          .addEventListener("click", function () {
+            document.getElementById("mobile-menu").classList.toggle("hidden");
+          });
+
+        // Edit profile modal
+        const editProfileBtn = document.getElementById("edit-profile-btn");
+        const editProfileModal = document.getElementById("edit-profile-modal");
+        const closeModalBtn = document.getElementById("close-modal");
+
+        if (editProfileBtn) {
+          editProfileBtn.addEventListener("click", function () {
+            editProfileModal.classList.remove("hidden");
+          });
+        }
+        if (closeModalBtn) {
+          closeModalBtn.addEventListener("click", function () {
+            editProfileModal.classList.add("hidden");
+          });
+        }
+        const detailModal = document.getElementById("order-detail-modal");
+        const closeDetailModalBtn =
+          document.getElementById("close-detail-modal");
+
+        if (closeDetailModalBtn) {
+          closeDetailModalBtn.addEventListener("click", function () {
+            detailModal.classList.add("hidden");
+          });
+        }
+        // Close modal when clicking outside
+        window.addEventListener("click", function (event) {
+          if (event.target === editProfileModal) {
+            editProfileModal.classList.add("hidden");
+          }
+          // TAMBAHKAN INI:
+          if (event.target === detailModal) {
+            detailModal.classList.add("hidden");
+          }
+        });
+
+        // Profile form submission
+        const profileForm = document.getElementById("profile-form");
+        if (profileForm) {
+          profileForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const displayName = document
+              .getElementById("display-name")
+              .value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const bio = document.getElementById("bio").value.trim();
+            const location = document.getElementById("location").value.trim();
+
+            if (!displayName) {
+              alert("Nama tidak boleh kosong");
+              return;
+            }
+
+            // Validasi nomor HP jika diisi
+            if (phone && !/^[0-9]{10,15}$/.test(phone)) {
+              alert("Format nomor HP tidak valid");
+              return;
+            }
+
+            // Tampilkan indikator loading
+            const submitBtn = document.getElementById("save-profile-btn");
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML =
+              '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...';
+            submitBtn.disabled = true;
+
+            try {
+              const {
+                data: { user },
+                error: userError,
+              } = await supabase.auth.getUser();
+
+              if (userError || !user) {
+                console.error("Error getting user:", userError);
+                alert("Sesi Anda berakhir, silakan login kembali.");
+                return;
+              }
+
+              // Update user metadata di auth
+              const { error: authError } = await supabase.auth.updateUser({
+                data: {
+                  display_name: displayName,
+                  phone: phone || null,
+                  bio: bio || null,
+                  location: location || null,
+                },
+              });
+
+              if (authError) {
+                console.error("Error updating auth profile:", authError);
+                alert("Gagal memperbarui data auth.");
+                return;
+              }
+
+              // Update atau insert data di tabel profiles
+              const { error: profileError } = await supabase
+                .from("profiles")
+                .upsert({
+                  id: user.id,
+                  display_name: displayName,
+                  phone: phone || null,
+                  bio: bio || null,
+                  location: location || null,
+                  updated_at: new Date().toISOString(),
+                });
+
+              if (profileError) {
+                console.error(
+                  "Error updating profile in database:",
+                  profileError
+                );
+                // Tetap lanjutkan karena auth sudah diupdate
+              }
+
+              // Update UI
+              document.getElementById("profile-name").textContent = displayName;
+              document.getElementById("profile-phone").textContent =
+                phone || "-";
+              document.getElementById("profile-location").textContent =
+                location || "-";
+              document.getElementById("profile-bio").textContent =
+                bio || "Belum ada informasi bio.";
+
+              // Tampilkan notifikasi sukses
+              const notification = document.createElement("div");
+              notification.className =
+                "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300";
+              notification.textContent = "Profil berhasil diperbarui";
+              document.body.appendChild(notification);
+
+              // Hilangkan notifikasi setelah 3 detik
+              setTimeout(() => {
+                notification.style.opacity = "0";
+                setTimeout(() => {
+                  document.body.removeChild(notification);
+                }, 300);
+              }, 3000);
+
+              // Close modal
+              editProfileModal.classList.add("hidden");
+            } catch (error) {
+              console.error("Error in profile update:", error);
+              alert("Terjadi kesalahan saat memperbarui profil");
+            } finally {
+              // Kembalikan tombol ke keadaan semula
+              submitBtn.innerHTML = originalBtnText;
+              submitBtn.disabled = false;
+            }
+          });
+        }
+
+        // Load user profile (dan riwayat aktivitas)
+        loadUserProfile();
+      });
+      /**
+       * Membuat HTML untuk timeline status pengiriman
+       */
+      function generateShippingTimeline(history) {
+        if (!history || history.length === 0) {
+          return '<p class="text-sm text-gray-500">Tidak ada riwayat status ditemukan.</p>';
+        }
+
+        // Balikkan array agar yang terbaru di atas
+        const sortedHistory = [...history].reverse();
+
+        return `<ul class="timeline">
+            ${sortedHistory
+              .map((item, index) => {
+                const itemDate = new Date(item.created_at);
+                const formattedDate = itemDate.toLocaleString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                // Beri style 'active' untuk item terbaru (index 0)
+                const isActive = index === 0;
+
+                return `
+                <li class="timeline-item ${
+                  isActive ? "timeline-item-active" : ""
+                }">
+                    <div class="timeline-dot"></div>
+                    <div class="pl-4">
+                        <p class="text-sm font-semibold text-gray-900">${getStatusBadge(
+                          item.status
+                        )}</p>
+                        <p class="text-xs text-gray-500 mb-1">${formattedDate}</p>
+                        ${
+                          item.shipping_details?.notes
+                            ? `<p class="text-sm text-gray-700">${item.shipping_details.notes}</p>`
+                            : ""
+                        }
+                        ${
+                          item.tracking_number
+                            ? `<p class="text-sm text-gray-700">No. Resi: <span class="font-medium text-purple-600">${item.tracking_number}</span></p>`
+                            : ""
+                        }
+                    </div>
+                </li>
+                `;
+              })
+              .join("")}
+        </ul>`;
+      }
+
+      /**
+       * Membuat HTML lengkap untuk konten modal detail pesanan
+       */
+      function generateModalContent(order) {
+        // 1. Generate Daftar Item
+        const itemsHtml =
+          order.items.length > 0
+            ? order.items
+                .map(
+                  (item) => `
+                <div class="flex items-center py-2 border-b border-gray-100 last:border-b-0">
+                    <div class="w-12 h-12 flex-shrink-0 mr-3 bg-gray-100 rounded-md overflow-hidden">
+                        <img src="${
+                          item.products?.image_url ||
+                          "https://via.placeholder.com/48"
+                        }" alt="${
+                    item.products?.name
+                  }" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">${
+                          item.products?.name || "Product"
+                        }</p>
+                        <p class="text-xs text-gray-500">${
+                          item.products?.category || "Category"
+                        }</p>
+                    </div>
+                    <div class="text-right ml-2">
+                        <p class="text-sm font-medium text-gray-900">Rp ${formatPrice(
+                          item.price
+                        )} x ${item.quantity}</p>
+                        <p class="text-xs font-bold text-purple-600">Rp ${formatPrice(
+                          item.subtotal
+                        )}</p>
+                    </div>
+                </div>
+            `
+                )
+                .join("")
+            : '<p class="text-sm text-gray-500 py-2">Tidak ada detail item.</p>';
+
+        // 2. Generate Timeline Pengiriman
+        const timelineHtml = generateShippingTimeline(order.shipping_history);
+
+        // 3. Generate Info Pengiriman (Alamat)
+        const shippingHtml = order.shipping
+          ? `
+                <p class="text-sm"><span class="font-medium">Nama:</span> ${
+                  order.shipping.fullname || "-"
+                }</p>
+                <p class="text-sm"><span class="font-medium">Alamat:</span> ${
+                  order.shipping.address || "-"
+                }</p>
+                <p class="text-sm"><span class="font-medium">Kota:</span> ${
+                  order.shipping.city || "-"
+                }, ${order.shipping.province || "-"}</p>
+                <p class="text-sm"><span class="font-medium">Kode Pos:</span> ${
+                  order.shipping.postalCode || "-"
+                }</p>
+                <p class="text-sm"><span class="font-medium">HP:</span> ${
+                  order.shipping.phone || "-"
+                }</p>
+              `
+          : '<p class="text-sm text-gray-500">Tidak ada detail pengiriman.</p>';
+
+        // 4. Generate Info Pembayaran
+        const paymentHtml = order.payment
+          ? `
+                <p class="text-sm"><span class="font-medium">Metode:</span> ${
+                  order.payment.payment_method || order.payment_method || "-"
+                }</p>
+                <p class="text-sm"><span class="font-medium">Status:</span> ${getStatusBadge(
+                  order.payment.status
+                )}</p>
+                <p class="text-sm"><span class="font-medium">ID Transaksi:</span> ${
+                  order.payment.transaction_id || "-"
+                }</p>
+              `
+          : '<p class="text-sm text-gray-500">Tidak ada detail pembayaran.</p>';
+        return `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">Riwayat Status</h4>
+                <div class="bg-white p-3 rounded-lg shadow-sm max-h-64 overflow-y-auto pr-2">
+                  ${timelineHtml}
+                  </div>
+                  </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Detail Item</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm max-h-64 overflow-y-auto">
+                        ${itemsHtml}
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Informasi Pengiriman</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm space-y-1">
+                        ${shippingHtml}
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Informasi Pembayaran</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm space-y-1">
+                        ${paymentHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+      }
+
+      // Fungsi untuk memeriksa status autentikasi dan mengambil data profil
+      async function loadUserProfile() {
+        try {
+          // Cek session pengguna
+          const {
+            data: { session },
+            error,
+          } = await supabase.auth.getSession();
+
+          if (error) {
+            console.error("Error checking auth status:", error);
+            window.location.href = "login.html";
+            return;
+          }
+
+          if (!session) {
+            // Redirect ke login jika tidak ada session
+            console.log("No session, redirecting to login.");
+            window.location.href = "login.html";
+            return;
+          }
+
+          const user = session.user;
+
+          // Ambil data profil dari database Supabase
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+
+          if (profileError && profileError.code !== "PGRST116") {
+            // PGRST116 = baris tidak ditemukan
+            console.error("Error fetching profile data:", profileError);
+            // Tetap lanjutkan dengan data dari auth
+          }
+
+          // Gunakan data dari tabel profiles jika ada, jika tidak gunakan dari auth
+          const displayName =
+            profileData?.display_name ||
+            user.user_metadata?.display_name ||
+            user.email;
+          const phone = profileData?.phone || user.user_metadata?.phone || "";
+          const bio = profileData?.bio || user.user_metadata?.bio || "";
+          const location =
+            profileData?.location || user.user_metadata?.location || "";
+
+          // Update UI dengan data pengguna
+          document.getElementById("profile-email").textContent = user.email;
+          document.getElementById("profile-name").textContent = displayName;
+
+          // Format tanggal
+          const createdAt = new Date(user.created_at);
+          const lastSignIn = new Date(user.last_sign_in_at || user.created_at);
+
+          document.getElementById("member-since").textContent =
+            createdAt.toLocaleDateString("id-ID", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+
+          document.getElementById("last-login").textContent =
+            lastSignIn.toLocaleString("id-ID", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+          // Update informasi personal
+          document.getElementById("profile-phone").textContent = phone || "-";
+          document.getElementById("profile-location").textContent =
+            location || "-";
+          document.getElementById("profile-bio").textContent =
+            bio || "Belum ada informasi bio.";
+
+          // Set nilai form
+          document.getElementById("display-name").value = displayName;
+          document.getElementById("phone").value = phone;
+          document.getElementById("bio").value = bio;
+          document.getElementById("location").value = location;
+
+          // Tampilkan profil pengguna di navbar
+          showUserProfile(user);
+
+          // Load purchase history
+          loadPurchaseHistory(user.id);
+        } catch (error) {
+          console.error("Error loading profile:", error);
+          // window.location.href = 'login.html'; // Matikan ini agar tidak redirect loop jika ada error
+        }
+      }
+
+      // Variabel global untuk menyimpan data order dan state pagination
+      let allOrders = [];
+      let filteredOrders = [];
+      let currentPage = 1;
+      let itemsPerPage = 5;
+      let currentUserId = null;
+      let currentSortField = "date";
+      let currentSortDirection = "desc";
+      let currentFilters = {
+        status: "all",
+        dateRange: "all",
+        search: "",
+      };
+
+      // Fungsi untuk mengambil dan menampilkan riwayat pembelian
+      async function loadPurchaseHistory(userId) {
+        try {
+          console.log("=== LOADING PURCHASE HISTORY ===");
+          console.log("User ID:", userId);
+
+          // Tampilkan loading
+          document
+            .getElementById("activity-loading")
+            .classList.remove("hidden");
+          document.getElementById("activity-empty").classList.add("hidden");
+          document.getElementById("activity-content").classList.add("hidden");
+
+          currentUserId = userId;
+
+          // Ambil data order dari user
+          console.log("Fetching orders for user:", userId);
+          const { data: orders, error: ordersError } = await supabase
+            .from("orders")
+            .select(
+              "id, order_number, status, total_amount, created_at, shipping_address, payment_method"
+            )
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false });
+
+          console.log("Orders query result:", { orders, ordersError });
+
+          if (ordersError) {
+            console.error("Error fetching orders:", ordersError);
+            document.getElementById("activity-loading").classList.add("hidden");
+            document
+              .getElementById("activity-empty")
+              .classList.remove("hidden");
+            return;
+          }
+
+          // ============================================================
+          // PERUBAHAN: Mematikan Data Dummy
+          // ============================================================
+          if (!orders || orders.length === 0) {
+            console.log("No orders found for user:", userId);
+            const showDummyData = false; // <<< DIPASTIKAN FALSE
+
+            if (showDummyData) {
+              // ... (kode data dummy tidak akan berjalan) ...
+            }
+
+            // Tidak ada order, tampilkan pesan kosong
+            document.getElementById("activity-loading").classList.add("hidden");
+            document
+              .getElementById("activity-empty")
+              .classList.remove("hidden");
+            return;
+          }
+
+          console.log("Found", orders.length, "orders for user:", userId);
+
+          // Ambil payment history untuk setiap order
+          const orderIds = orders.map((order) => order.id);
+          const { data: payments, error: paymentsError } = await supabase
+            .from("payment_history")
+            .select(
+              "order_id, payment_method, amount, status, created_at, transaction_id, payment_details"
+            )
+            .in("order_id", orderIds)
+            .order("created_at", { ascending: false });
+
+          if (paymentsError) {
+            console.error("Error fetching payment history:", paymentsError);
+          }
+
+          // Ambil item pesanan untuk setiap order
+          const { data: orderItems, error: itemsError } = await supabase
+            .from("order_items")
+            .select(
+              `
+                        id, 
+                        order_id, 
+                        quantity, 
+                        price, 
+                        subtotal,
+                        products (
+                            id,
+                            name,
+                            image_url,
+                            category
+                        )
+                    `
+            )
+            .in("order_id", orderIds);
+          const { data: shippingHistory, error: shippingError } = await supabase
+            .from("shipping_history")
+            .select(
+              "order_id, status, created_at, shipping_details, tracking_number"
+            )
+            .in("order_id", orderIds)
+            .order("created_at", { ascending: true }); // Dari terlama ke terbaru untuk timeline
+
+          if (shippingError) {
+            console.error("Error fetching shipping history:", shippingError);
+            // Kita tidak menghentikan proses, timeline akan kosong saja
+          }
+          if (itemsError) {
+            console.error("Error fetching order items:", itemsError);
+          }
+
+          // Gabungkan data order dengan payment history dan order items
+          const ordersWithDetails = orders.map((order) => {
+            const orderPayments =
+              payments?.filter((payment) => payment.order_id === order.id) ||
+              [];
+            const latestPayment =
+              orderPayments.length > 0 ? orderPayments[0] : null;
+            const items =
+              orderItems?.filter((item) => item.order_id === order.id) || [];
+
+            let shippingAddress = {};
+            try {
+              if (typeof order.shipping_address === "string") {
+                shippingAddress = JSON.parse(order.shipping_address);
+              } else {
+                shippingAddress = order.shipping_address;
+              }
+            } catch (e) {
+              console.error("Error parsing shipping address:", e);
+            }
+
+            return {
+              ...order,
+              payment: latestPayment,
+              items: items,
+              shipping: shippingAddress,
+              shipping_history:
+                shippingHistory?.filter((hist) => hist.order_id === order.id) ||
+                [],
+            };
+          });
+
+          // Simpan data order untuk digunakan oleh filter dan sorting
+          allOrders = ordersWithDetails;
+
+          // Terapkan filter dan sorting default
+          applyFiltersAndSort();
+
+          // Setup event listeners untuk filter dan sorting
+          setupFilterAndSortListeners();
+
+          // Tampilkan konten (akan diatur oleh renderCurrentPage)
+          // document.getElementById('activity-loading').classList.add('hidden');
+          // document.getElementById('activity-content').classList.remove('hidden');
+        } catch (error) {
+          console.error("Error loading purchase history:", error);
+          document.getElementById("activity-loading").classList.add("hidden");
+          document.getElementById("activity-empty").classList.remove("hidden");
+        }
+      }
+
+      // Fungsi untuk setup event listeners filter dan sorting
+      function setupFilterAndSortListeners() {
+        // (Hanya tambahkan listener jika belum ada)
+        const statusFilter = document.getElementById("filter-status");
+        if (statusFilter && !statusFilter.dataset.listener) {
+          statusFilter.dataset.listener = "true";
+          statusFilter.addEventListener("change", function () {
+            currentFilters.status = this.value;
+            currentPage = 1; // Reset ke halaman pertama
+            applyFiltersAndSort();
+          });
+        }
+
+        const dateFilter = document.getElementById("filter-date");
+        if (dateFilter && !dateFilter.dataset.listener) {
+          dateFilter.dataset.listener = "true";
+          dateFilter.addEventListener("change", function () {
+            currentFilters.dateRange = this.value;
+            currentPage = 1; // Reset ke halaman pertama
+            applyFiltersAndSort();
+          });
+        }
+
+        const sortFilter = document.getElementById("sort-by");
+        if (sortFilter && !sortFilter.dataset.listener) {
+          sortFilter.dataset.listener = "true";
+          sortFilter.addEventListener("change", function () {
+            const [field, direction] = this.value.split("-");
+            currentSortField = field;
+            currentSortDirection = direction;
+            applyFiltersAndSort();
+          });
+        }
+
+        const searchInput = document.getElementById("search-orders");
+        if (searchInput && !searchInput.dataset.listener) {
+          searchInput.dataset.listener = "true";
+          let searchTimeout;
+          searchInput.addEventListener("input", function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              currentFilters.search = this.value.trim().toLowerCase();
+              currentPage = 1; // Reset ke halaman pertama
+              applyFiltersAndSort();
+            }, 300); // Debounce 300ms
+          });
+        }
+
+        document.querySelectorAll("[data-sort]").forEach((header) => {
+          if (!header.dataset.listener) {
+            header.dataset.listener = "true";
+            header.addEventListener("click", function () {
+              const field = this.getAttribute("data-sort");
+
+              if (field === currentSortField) {
+                currentSortDirection =
+                  currentSortDirection === "asc" ? "desc" : "asc";
+              } else {
+                currentSortField = field;
+                currentSortDirection = "desc";
+              }
+
+              const sortBySelect = document.getElementById("sort-by");
+              const optionValue = `${currentSortField}-${currentSortDirection}`;
+              if (
+                sortBySelect.querySelector(`option[value="${optionValue}"]`)
+              ) {
+                sortBySelect.value = optionValue;
+              }
+
+              document.querySelectorAll(".sort-icon").forEach((icon) => {
+                icon.classList.add("hidden");
+              });
+
+              const currentIcon = this.querySelector(".sort-icon");
+              if (currentIcon) {
+                currentIcon.classList.remove("hidden");
+                currentIcon.style.transform =
+                  currentSortDirection === "asc"
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)";
+              }
+
+              applyFiltersAndSort();
+            });
+          }
+        });
+
+        const prevBtn = document.getElementById("prev-page");
+        if (prevBtn && !prevBtn.dataset.listener) {
+          prevBtn.dataset.listener = "true";
+          prevBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+              currentPage--;
+              renderCurrentPage();
+            }
+          });
+        }
+
+        const nextBtn = document.getElementById("next-page");
+        if (nextBtn && !nextBtn.dataset.listener) {
+          nextBtn.dataset.listener = "true";
+          nextBtn.addEventListener("click", function () {
+            const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+            if (currentPage < totalPages) {
+              currentPage++;
+              renderCurrentPage();
+            }
+          });
+        }
+        const viewAllBtn = document.getElementById("view-all-orders");
+        if (viewAllBtn && !viewAllBtn.dataset.listener) {
+          viewAllBtn.dataset.listener = "true";
+          viewAllBtn.addEventListener("click", function () {
+            const span = this.querySelector("span");
+            const paginationControls = document.querySelector(
+              ".mt-4.flex.items-center.justify-between"
+            );
+
+            if (span.textContent === "View All") {
+              // --- Logika Baru untuk VIEW ALL ---
+              itemsPerPage = 10000; // Set ke angka yang sangat besar
+              span.textContent = "Show Less";
+              if (paginationControls) {
+                paginationControls.style.display = "none";
+              }
+            } else {
+              // --- Logika Baru untuk SHOW LESS ---
+              itemsPerPage = 5; // Kembalikan ke 5
+              span.textContent = "View All";
+              if (paginationControls) {
+                paginationControls.style.display = "flex";
+              }
+            }
+
+            // Panggil ulang render/filter
+            currentPage = 1;
+            applyFiltersAndSort();
+          });
+        }
+      }
+
+      // Fungsi untuk menerapkan filter dan sorting
+      function applyFiltersAndSort() {
+        // Filter orders
+        filteredOrders = allOrders.filter((order) => {
+          // Filter by status
+          // PERBAIKAN: Cek status dari order.status
+          const orderStatus = order.status ? order.status.toLowerCase() : "";
+          if (
+            currentFilters.status !== "all" &&
+            orderStatus !== currentFilters.status
+          ) {
+            return false;
+          }
+
+          // Filter by date range
+          if (currentFilters.dateRange !== "all") {
+            const orderDate = new Date(order.created_at);
+            const now = new Date();
+            const todayStart = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate()
+            );
+
+            switch (currentFilters.dateRange) {
+              case "today":
+                if (orderDate < todayStart) return false;
+                break;
+              case "week":
+                const weekStart = new Date(now.setDate(now.getDate() - 7));
+                weekStart.setHours(0, 0, 0, 0);
+                if (orderDate < weekStart) return false;
+                break;
+              case "month":
+                const monthStart = new Date(
+                  now.getFullYear(),
+                  now.getMonth(),
+                  1
+                );
+                if (orderDate < monthStart) return false;
+                break;
+              case "year":
+                const yearStart = new Date(now.getFullYear(), 0, 1);
+                if (orderDate < yearStart) return false;
+                break;
+            }
+          }
+
+          // Filter by search
+          if (currentFilters.search) {
+            const searchTerm = currentFilters.search.toLowerCase();
+
+            // Search in order number
+            if (order.order_number.toLowerCase().includes(searchTerm)) {
+              return true;
+            }
+
+            // Search in product names
+            const hasMatchingProduct = order.items.some(
+              (item) =>
+                item.products &&
+                item.products.name.toLowerCase().includes(searchTerm)
+            );
+
+            if (hasMatchingProduct) {
+              return true;
+            }
+
+            // If no match found
+            return false;
+          }
+
+          return true;
+        });
+
+        // Sort orders
+        filteredOrders.sort((a, b) => {
+          let comparison = 0;
+
+          switch (currentSortField) {
+            case "order":
+              comparison = a.order_number.localeCompare(b.order_number);
+              break;
+            case "date":
+              comparison = new Date(b.created_at) - new Date(a.created_at); // Descending default
+              break;
+            case "amount":
+              comparison = a.total_amount - b.total_amount;
+              break;
+            case "status":
+              comparison = (a.status || "").localeCompare(b.status || "");
+              break;
+            default:
+              comparison = new Date(b.created_at) - new Date(a.created_at);
+          }
+
+          // Reverse for ascending order
+          return currentSortDirection === "asc" ? -comparison : comparison;
+        });
+
+        // Reset to first page and render
+        currentPage = 1;
+        renderCurrentPage();
+      }
+
+      // ============================================================
+      // PERUBAHAN 4: Logika renderCurrentPage yang DIPERBAIKI
+      // ============================================================
+      function renderCurrentPage() {
+        console.log("Rendering current page:", currentPage);
+
+        // Sembunyikan loading
+        document.getElementById("activity-loading").classList.add("hidden");
+
+        // Calculate pagination
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(
+          startIndex + itemsPerPage,
+          filteredOrders.length
+        );
+        const currentPageOrders = filteredOrders.slice(startIndex, endIndex);
+
+        console.log("Orders for this page:", currentPageOrders.length);
+
+        // Update pagination UI
+        document.getElementById("showing-start").textContent =
+          filteredOrders.length > 0 ? startIndex + 1 : 0;
+        document.getElementById("showing-end").textContent = endIndex;
+        document.getElementById("total-orders").textContent =
+          filteredOrders.length;
+
+        // Enable/disable pagination buttons
+        document.getElementById("prev-page").disabled = currentPage === 1;
+        document.getElementById("next-page").disabled =
+          endIndex >= filteredOrders.length;
+
+        // Render data ke tabel
+        renderPurchaseHistory(currentPageOrders); // Fungsi ini sekarang HANYA merender baris
+
+        // TENTUKAN CONTAINER MANA YANG TAMPIL
+        if (allOrders.length === 0) {
+          // KASUS 1: User belum pernah order sama sekali
+          console.log("No orders found at all. Showing empty state.");
+          document.getElementById("activity-empty").classList.remove("hidden");
+          document.getElementById("activity-content").classList.add("hidden");
+        } else {
+          // KASUS 2: User punya order (meskipun mungkin 0 setelah difilter)
+          // SELALU tampilkan 'activity-content' (filternya, tabelnya, dll)
+          console.log("User has orders. Showing content state.");
+          document.getElementById("activity-empty").classList.add("hidden");
+          document
+            .getElementById("activity-content")
+            .classList.remove("hidden");
+        }
+
+        // Pastikan Feather icons diinisialisasi ulang jika ada
+        if (window.feather) {
+          window.feather.replace();
+        }
+      }
+
+      // ============================================================
+      // PERUBAHAN 5: Menambahkan getStatusBadge dan formatPrice
+      // ============================================================
+
+      // Fungsi helper untuk format status
+      function getStatusBadge(status) {
+        let statusClass = "";
+        let statusText = status
+          ? status.charAt(0).toUpperCase() + status.slice(1)
+          : "Unknown";
+
+        switch (status ? status.toLowerCase() : "") {
+          case "pending":
+            statusClass = "bg-yellow-100 text-yellow-800";
+            statusText = "Pending";
+            break;
+          case "processing":
+          case "paid":
+          case "settlement": // Status dari Midtrans
+            statusClass = "bg-blue-100 text-blue-800";
+            statusText = "Diproses";
+            break;
+          case "shipped":
+            statusClass = "bg-indigo-100 text-indigo-800";
+            statusText = "Dikirim";
+            break;
+          case "success":
+          case "completed": // Status Anda
+          case "delivered":
+          case "capture": // Status dari Midtrans
+            statusClass = "bg-green-100 text-green-800";
+            statusText = "Selesai";
+            break;
+          case "failed":
+          case "cancelled": // Status Anda
+          case "expire": // Status dari Midtrans
+          case "deny": // Status dari Midtrans
+            statusClass = "bg-red-100 text-red-800";
+            statusText = "Gagal";
+            break;
+          case "challenge": // Status dari Midtrans
+            statusClass = "bg-orange-100 text-orange-800";
+            statusText = "Challenge";
+            break;
+          default:
+            statusClass = "bg-gray-100 text-gray-800";
+        }
+        return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>`;
+      }
+
+      // Fungsi helper untuk format harga
+      function formatPrice(price) {
+        if (typeof price !== "number" || price === null) {
+          price = 0;
+        }
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+
+      // Fungsi ini HANYA merender baris tabel, tidak mengatur container
+      function renderPurchaseHistory(orders) {
+        console.log("Rendering purchase history rows:", orders.length);
+
+        const tableBody = document.getElementById("orders-table-body");
+        if (!tableBody) {
+          console.error("Table body element not found!");
+          return;
+        }
+
+        // Bersihkan tabel
+        tableBody.innerHTML = "";
+
+        // Cek apakah array orders (dari halaman ini) kosong
+        if (orders.length === 0) {
+          // Cek apakah total hasil filter (dari semua halaman) juga kosong
+          if (filteredOrders.length === 0 && allOrders.length > 0) {
+            // Ini kasus filter tidak menemukan apa-apa
+            console.log("No orders match filter, showing message in table.");
+            tableBody.innerHTML = `<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada pesanan yang cocok dengan filter Anda.</td></tr>`;
+          }
+          // Jika allOrders.length === 0, renderCurrentPage akan menyembunyikan
+          // 'activity-content', jadi pesan ini tidak akan terlihat (itu OK).
+          return;
+        }
+
+        console.log("Rendering", orders.length, "order rows");
+
+        orders.forEach((order) => {
+          const orderDate = new Date(order.created_at);
+          const formattedDate = orderDate.toLocaleDateString("id-ID", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+
+          const statusBadgeHtml = getStatusBadge(order.status);
+
+          const formattedAmount = new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+          }).format(order.total_amount);
+
+          const mainRow = document.createElement("tr");
+          mainRow.className =
+            "order-row cursor-pointer hover:bg-gray-50 transition-colors";
+          mainRow.setAttribute("data-order-id", order.id);
+
+          mainRow.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <button class="expand-button mr-2 text-gray-400 hover:text-purple-600 focus:outline-none transition-transform duration-200" data-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                            <div class="text-sm font-medium text-gray-900">${order.order_number}</div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${formattedDate}</div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${formattedAmount}</div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        ${statusBadgeHtml}
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="#" class="view-details-btn text-purple-600 hover:text-purple-900">View Details</a>
+                    </td>
+                `;
+
+          tableBody.appendChild(mainRow);
+
+          const detailRow = document.createElement("tr");
+          detailRow.className = "order-detail-row hidden";
+          detailRow.setAttribute("data-parent-id", order.id);
+
+          let itemsHtml = "";
+          if (order.items && order.items.length > 0) {
+            itemsHtml = order.items
+              .map(
+                (item) => `
+                        <div class="flex items-center py-2 border-b border-gray-100">
+                            <div class="w-12 h-12 flex-shrink-0 mr-3 bg-gray-100 rounded-md overflow-hidden">
+                                <img src="${
+                                  item.products?.image_url ||
+                                  "https://via.placeholder.com/48"
+                                }" alt="${
+                  item.products?.name
+                }" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate">${
+                                  item.products?.name || "Product"
+                                }</p>
+                                <p class="text-xs text-gray-500">${
+                                  item.products?.category || "Category"
+                                }</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">Rp ${formatPrice(
+                                  item.price
+                                )} x ${item.quantity}</p>
+                                <p class="text-xs font-bold text-purple-600">Rp ${formatPrice(
+                                  item.subtotal
+                                )}</p>
+                            </div>
+                        </div>
+                    `
+              )
+              .join("");
+          } else {
+            itemsHtml =
+              '<p class="text-sm text-gray-500 py-2">Tidak ada detail item tersedia</p>';
+          }
+
+          let shippingHtml = "";
+          if (order.shipping) {
+            shippingHtml = `
+                        <p class="text-sm"><span class="font-medium">Nama:</span> ${
+                          order.shipping.fullname || "-"
+                        }</p>
+                        <p class="text-sm"><span class="font-medium">Alamat:</span> ${
+                          order.shipping.address || "-"
+                        }</p>
+                        <p class="text-sm"><span class="font-medium">Kota:</span> ${
+                          order.shipping.city || "-"
+                        }, ${order.shipping.province || "-"}</p>
+                        <p class="text-sm"><span class="font-medium">Kode Pos:</span> ${
+                          order.shipping.postalCode || "-"
+                        }</p>
+                    `;
+          } else {
+            shippingHtml =
+              '<p class="text-sm text-gray-500">Tidak ada detail pengiriman tersedia</p>';
+          }
+
+          let paymentHtml = "";
+          if (order.payment) {
+            const paymentDate = new Date(order.payment.created_at);
+            const formattedPaymentDate = paymentDate.toLocaleString("id-ID", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            let paymentStatusClass = "";
+            let paymentStatusText = order.payment.status
+              ? order.payment.status.charAt(0).toUpperCase() +
+                order.payment.status.slice(1)
+              : "Unknown";
+            switch (order.payment.status) {
+              case "success":
+              case "settlement":
+              case "capture":
+                paymentStatusClass = "text-green-600";
+                break;
+              case "pending":
+                paymentStatusClass = "text-yellow-600";
+                break;
+              case "failed":
+              case "expire":
+              case "deny":
+                paymentStatusClass = "text-red-600";
+                break;
+              default:
+                paymentStatusClass = "text-gray-600";
+            }
+
+            paymentHtml = `
+                        <p class="text-sm"><span class="font-medium">Metode:</span> ${
+                          order.payment.payment_method ||
+                          order.payment_method ||
+                          "-"
+                        }</p>
+                        <p class="text-sm"><span class="font-medium">Tanggal:</span> ${formattedPaymentDate}</p>
+                        <p class="text-sm"><span class="font-medium">Status:</span> <span class="${paymentStatusClass} font-medium">${paymentStatusText}</span></p>
+                        <p class="text-sm"><span class="font-medium">ID Transaksi:</span> ${
+                          order.payment.transaction_id || "-"
+                        }</p>
+                    `;
+          } else {
+            paymentHtml =
+              '<p class="text-sm text-gray-500">Tidak ada detail pembayaran tersedia</p>';
+          }
+
+          detailRow.innerHTML = `
+                    <td colspan="5" class="px-4 py-4 bg-gray-50">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-2">Detail Item</h4>
+                                <div class="bg-white p-3 rounded-lg shadow-sm">
+                                    ${itemsHtml}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-2">Informasi Pengiriman</h4>
+                                <div class="bg-white p-3 rounded-lg shadow-sm space-y-1">
+                                    ${shippingHtml}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-2">Informasi Pembayaran</h4>
+                                <div class="bg-white p-3 rounded-lg shadow-sm space-y-1">
+                                    ${paymentHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+          tableBody.appendChild(detailRow);
+        });
+
+        // Tambahkan event listener untuk expand/collapse detail
+        document.querySelectorAll(".order-row").forEach((row) => {
+          row.addEventListener("click", function (e) {
+            if (e.target.closest(".view-details-btn")) {
+              return;
+            }
+
+            const orderId = this.getAttribute("data-order-id");
+            const detailRow = document.querySelector(
+              `tr[data-parent-id="${orderId}"]`
+            );
+            const expandButton = this.querySelector(".expand-button");
+
+            if (detailRow.classList.contains("hidden")) {
+              detailRow.classList.remove("hidden");
+              expandButton.style.transform = "rotate(90deg)";
+              expandButton.setAttribute("data-expanded", "true");
+            } else {
+              detailRow.classList.add("hidden");
+              expandButton.style.transform = "rotate(0)";
+              expandButton.setAttribute("data-expanded", "false");
+            }
+          });
+        });
+
+        // Tambahkan event listener untuk tombol view details
+        document.querySelectorAll(".view-details-btn").forEach((btn) => {
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation(); // Mencegah baris ikut ter-klik
+
+            // 1. Dapatkan orderId dari baris
+            const orderId = this.closest("tr").getAttribute("data-order-id");
+            const orderNumberEl = this.closest("tr").querySelector(
+              ".text-sm.font-medium.text-gray-900"
+            );
+            const orderNumber = orderNumberEl
+              ? orderNumberEl.textContent.trim()
+              : "N/A";
+
+            // 2. Cari data order lengkap dari variabel global allOrders
+            const order = allOrders.find((o) => o.id === orderId);
+
+            if (order) {
+              // 3. Buat HTML baru menggunakan fungsi helper
+              const modalHtml = generateModalContent(order);
+
+              // 4. Masukkan HTML ke modal
+              document.getElementById("modal-order-number").textContent =
+                orderNumber;
+              document.getElementById("modal-order-content").innerHTML =
+                modalHtml;
+
+              // 5. Tampilkan modal
+              document
+                .getElementById("order-detail-modal")
+                .classList.remove("hidden");
+
+              // 6. Render ulang ikon (penting untuk timeline)
+              if (window.feather) {
+                window.feather.replace();
+              }
+            } else {
+              console.error(
+                "Tidak dapat menemukan data order lengkap untuk:",
+                orderId
+              );
+              alert("Gagal memuat detail pesanan.");
+            }
+          });
+        });
+      }
+
+      // Fungsi untuk menampilkan profil pengguna di navbar
+      function showUserProfile(user) {
+        // Desktop
+        document.getElementById("auth-buttons").classList.add("hidden");
+        document.getElementById("user-profile").classList.remove("hidden");
+        document.getElementById("user-email").textContent = user.email;
+
+        // Mobile
+        document.getElementById("mobile-auth-buttons").classList.add("hidden");
+        document
+          .getElementById("mobile-user-profile")
+          .classList.remove("hidden");
+        document.getElementById("mobile-user-email").textContent = user.email;
+
+        // Tambahkan event listener untuk tombol logout
+        document
+          .getElementById("logout-button")
+          .addEventListener("click", handleLogout);
+        document
+          .getElementById("mobile-logout-button")
+          .addEventListener("click", handleLogout);
+      }
+
+      // Fungsi untuk menangani logout
+      async function handleLogout() {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error("Error during logout:", error);
+            return;
+          }
+
+          // Redirect ke halaman login setelah logout
+          window.location.href = "login.html";
+        } catch (error) {
+          console.error("Error in logout:", error);
+        }
+      }
+    </script>
+  </body>
+</html>

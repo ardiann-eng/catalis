@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran Berhasil - Catalist Creative</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Auth dan Navbar JS -->
+    <script src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/main.js"></script>
+    
+    <style>
+        /* Base styles */
+        :root {
+            --primary: #fcd34d;
+            --primary-dark: #f59e0b;
+            --secondary: #d946ef;
+            --secondary-dark: #c026d3;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.03em;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width .3s ease, transform .3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+            transform: translateY(1px);
+        }
+        
+        /* Success animation */
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .success-checkmark .check-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            border: 4px solid var(--secondary);
+        }
+        
+        .success-checkmark .check-icon::before {
+            top: 3px;
+            left: -2px;
+            width: 30px;
+            transform-origin: 100% 50%;
+            border-radius: 100px 0 0 100px;
+        }
+        
+        .success-checkmark .check-icon::after {
+            top: 0;
+            left: 30px;
+            width: 60px;
+            transform-origin: 0 50%;
+            border-radius: 0 100px 100px 0;
+            animation: rotate-circle 4.25s ease-in;
+        }
+        
+        .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
+            content: '';
+            height: 100px;
+            position: absolute;
+            background: #FFFFFF;
+            transform: rotate(-45deg);
+        }
+        
+        .success-checkmark .check-icon .icon-line {
+            height: 5px;
+            background-color: var(--secondary);
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+        }
+        
+        .success-checkmark .check-icon .icon-line.line-tip {
+            top: 46px;
+            left: 14px;
+            width: 25px;
+            transform: rotate(45deg);
+            animation: icon-line-tip 0.75s;
+        }
+        
+        .success-checkmark .check-icon .icon-line.line-long {
+            top: 38px;
+            right: 8px;
+            width: 47px;
+            transform: rotate(-45deg);
+            animation: icon-line-long 0.75s;
+        }
+        
+        .success-checkmark .check-icon .icon-circle {
+            top: -4px;
+            left: -4px;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: absolute;
+            box-sizing: content-box;
+            border: 4px solid rgba(217, 70, 239, 0.5);
+        }
+        
+        .success-checkmark .check-icon .icon-fix {
+            top: 8px;
+            width: 5px;
+            left: 26px;
+            z-index: 1;
+            height: 85px;
+            position: absolute;
+            transform: rotate(-45deg);
+            background-color: #FFFFFF;
+        }
+        
+        @keyframes rotate-circle {
+            0% {
+                transform: rotate(-45deg);
+            }
+            5% {
+                transform: rotate(-45deg);
+            }
+            12% {
+                transform: rotate(-405deg);
+            }
+            100% {
+                transform: rotate(-405deg);
+            }
+        }
+        
+        @keyframes icon-line-tip {
+            0% {
+                width: 0;
+                left: 1px;
+                top: 19px;
+            }
+            54% {
+                width: 0;
+                left: 1px;
+                top: 19px;
+            }
+            70% {
+                width: 50px;
+                left: -8px;
+                top: 37px;
+            }
+            84% {
+                width: 17px;
+                left: 21px;
+                top: 48px;
+            }
+            100% {
+                width: 25px;
+                left: 14px;
+                top: 45px;
+            }
+        }
+        
+        @keyframes icon-line-long {
+            0% {
+                width: 0;
+                right: 46px;
+                top: 54px;
+            }
+            65% {
+                width: 0;
+                right: 46px;
+                top: 54px;
+            }
+            84% {
+                width: 55px;
+                right: 0px;
+                top: 35px;
+            }
+            100% {
+                width: 47px;
+                right: 8px;
+                top: 38px;
+            }
+        }
+        
+        /* Card styles */
+        .success-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <img src="logo.png" alt="Catalist Creative Logo" class="h-10 w-auto mr-3">
+                    <a href="index.html" class="text-2xl font-display font-bold gradient-text">Catalist Creative</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
+                        <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
+                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
+                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
+                        <!-- Auth buttons -->
+                        <div id="auth-buttons">
+                            <a href="login.html" id="login-button" class="bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300">
+                                Login
+                            </a>
+                        </div>
+                        <div id="user-profile" class="hidden">
+                            <div class="flex items-center space-x-3">
+                                <span id="user-email" class="text-dark font-medium"></span>
+                                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-1 rounded-full transition duration-300 text-sm">
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                        <button id="cart-button" class="relative p-2 text-gray-700 hover:text-purple-600">
+                            <i data-feather="shopping-cart"></i>
+                            <span id="cart-count" class="absolute top-0 right-0 bg-purple-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-dark focus:outline-none">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white pb-4 px-4 shadow-lg">
+            <div class="flex flex-col space-y-3">
+                <a href="index.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
+                <a href="marketplace.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
+                <a href="profiles.html" class="text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
+                <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
+                <!-- Mobile auth buttons -->
+                <div id="mobile-auth-buttons">
+                    <a href="login.html" id="mobile-login-button" class="block bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300 text-center">
+                        Login
+                    </a>
+                </div>
+                <div id="mobile-user-profile" class="hidden">
+                    <div class="flex flex-col space-y-2">
+                        <span id="mobile-user-email" class="text-dark font-medium"></span>
+                        <button id="mobile-logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 text-sm">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <!-- Cart content will be loaded here -->
+    </div>
+    
+    <!-- Main Content -->
+    <main class="pt-32 pb-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="success-card bg-white rounded-2xl overflow-hidden" data-aos="fade-up" data-aos-duration="800">
+                <div class="bg-gradient-to-r from-purple-500 to-yellow-400 h-24 relative"></div>
+                
+                <div class="px-8 py-10 -mt-12">
+                    <div class="text-center mb-8">
+                        <div class="success-checkmark">
+                            <div class="check-icon">
+                                <span class="icon-line line-tip"></span>
+                                <span class="icon-line line-long"></span>
+                                <div class="icon-circle"></div>
+                                <div class="icon-fix"></div>
+                            </div>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mt-4 font-display">Pembayaran Berhasil!</h1>
+                        <p class="text-gray-600 mt-2">Terima kasih telah berbelanja di Catalist Creative.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-xl mb-8 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 font-display">Detail Transaksi</h2>
+                        <div id="transaction-details" class="text-gray-600 space-y-3">
+                            <!-- Transaction details will be loaded here -->
+                            <div class="flex justify-between items-center border-b border-gray-200 pb-3">
+                                <span class="font-medium">ID Pesanan:</span>
+                                <span id="order-id" class="text-gray-800">Loading...</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-200 pb-3">
+                                <span class="font-medium">Status:</span>
+                                <span id="transaction-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium text-sm">Berhasil</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">Waktu:</span>
+                                <span id="transaction-time" class="text-gray-800">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-up" data-aos-delay="400">
+                        <a href="profile.html" class="btn-primary px-6 py-3 rounded-lg text-center">
+                            Lihat Profil Saya
+                        </a>
+                        <a href="marketplace.html" class="btn-secondary px-6 py-3 rounded-lg text-center">
+                            Lanjutkan Belanja
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Catalist Creative</h3>
+                    <p class="text-gray-400">Marketplace NFT terbaik untuk seniman dan kolektor Indonesia.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Marketplace</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">All NFTs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Art</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Photography</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Music</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Account</h4>
+                    <ul class="space-y-2">
+                        <li><a href="profile.html" class="text-gray-400 hover:text-white transition">Profile</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Favorites</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Watchlist</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">My Collections</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Platform Status</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Partners</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">© 2023 Catalist Creative. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="twitter" class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="instagram" class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="facebook" class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="youtube" class="h-5 w-5"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Inisialisasi Supabase client
+        const supabaseUrl = 'https://anzsbqqippijhemwxkqh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuenNicXFpcHBpamhlbXd4a3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDM1MTQsImV4cCI6MjA3Njc3OTUxNH0.6l1Bt9_5_5ohFeH8IN6mP9jU0pFUToHMmV1NwQEeP-Q';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Initialize Feather icons and AOS
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            AOS.init();
+            
+            // Toggle mobile menu
+            document.getElementById('menu-toggle')?.addEventListener('click', function() {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+            
+            // Check authentication status
+            checkAuthStatus();
+            
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id');
+            const status = urlParams.get('transaction_status');
+            
+            // Update transaction details
+            if (orderId) {
+                document.getElementById('order-id').textContent = orderId;
+                
+                // Fetch order details from database if possible
+                fetchOrderDetails(orderId);
+            }
+            
+            // Set current date and time
+            const now = new Date();
+            document.getElementById('transaction-time').textContent = now.toLocaleString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Update transaction status if available
+            if (status) {
+                updateTransactionStatus(status);
+            }
+        });
+        
+        // Fungsi untuk memeriksa status autentikasi
+        async function checkAuthStatus() {
+            try {
+                // Periksa parameter URL untuk auth_preserved
+                const urlParams = new URLSearchParams(window.location.search);
+                const authPreserved = urlParams.get('auth_preserved');
+                const userId = urlParams.get('user_id');
+                
+                // Jika ada parameter auth_preserved, coba pulihkan autentikasi
+                if (authPreserved === 'true' && userId) {
+                    console.log('Mencoba memulihkan autentikasi...');
+                    
+                    // Coba pulihkan dari localStorage
+                    const storedAuthData = localStorage.getItem('midtrans_auth_data');
+                    if (storedAuthData) {
+                        try {
+                            const authData = JSON.parse(storedAuthData);
+                            
+                            // Periksa apakah data autentikasi masih valid
+                            const now = new Date().getTime();
+                            const expiresAt = authData.expires_at * 1000; // Convert to milliseconds
+                            
+                            if (now < expiresAt && authData.user.id === userId) {
+                                console.log('Data autentikasi ditemukan dan masih valid');
+                                
+                                // Set session dengan token yang disimpan
+                                const { error: setSessionError } = await supabase.auth.setSession({
+                                    access_token: authData.access_token,
+                                    refresh_token: authData.refresh_token
+                                });
+                                
+                                if (setSessionError) {
+                                    console.error('Error setting session:', setSessionError);
+                                    // Lanjutkan dengan pemeriksaan normal
+                                } else {
+                                    console.log('Autentikasi berhasil dipulihkan');
+                                    
+                                    // Hapus data autentikasi dari localStorage
+                                    localStorage.removeItem('midtrans_auth_data');
+                                    
+                                    // Dapatkan session yang baru diset
+                                    const { data: { session: restoredSession } } = await supabase.auth.getSession();
+                                    if (restoredSession) {
+                                        showUserProfile(restoredSession.user);
+                                        return;
+                                    }
+                                }
+                            } else {
+                                console.log('Data autentikasi kedaluwarsa atau tidak cocok');
+                                localStorage.removeItem('midtrans_auth_data');
+                            }
+                        } catch (parseError) {
+                            console.error('Error parsing stored auth data:', parseError);
+                            localStorage.removeItem('midtrans_auth_data');
+                        }
+                    } else {
+                        console.log('Tidak ada data autentikasi tersimpan');
+                    }
+                }
+                
+                // Jika pemulihan gagal atau tidak ada parameter, periksa session normal
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Error checking auth status:', error);
+                    return;
+                }
+                
+                if (session) {
+                    // User is logged in
+                    showUserProfile(session.user);
+                } else {
+                    // User is not logged in
+                    showLoginButton();
+                }
+            } catch (error) {
+                console.error('Error in auth check:', error);
+                showLoginButton();
+            }
+        }
+        
+        // Fungsi untuk menampilkan profil pengguna di navbar
+        function showUserProfile(user) {
+            // Desktop
+            if (document.getElementById('auth-buttons')) {
+                document.getElementById('auth-buttons').classList.add('hidden');
+            }
+            if (document.getElementById('user-profile')) {
+                document.getElementById('user-profile').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+            }
+            
+            // Mobile
+            if (document.getElementById('mobile-auth-buttons')) {
+                document.getElementById('mobile-auth-buttons').classList.add('hidden');
+            }
+            if (document.getElementById('mobile-user-profile')) {
+                document.getElementById('mobile-user-profile').classList.remove('hidden');
+                document.getElementById('mobile-user-email').textContent = user.email;
+            }
+            
+            // Tambahkan event listener untuk tombol logout
+            document.getElementById('logout-button')?.addEventListener('click', handleLogout);
+            document.getElementById('mobile-logout-button')?.addEventListener('click', handleLogout);
+        }
+        
+        // Fungsi untuk menampilkan tombol login
+        function showLoginButton() {
+            // Desktop
+            if (document.getElementById('auth-buttons')) {
+                document.getElementById('auth-buttons').classList.remove('hidden');
+            }
+            if (document.getElementById('user-profile')) {
+                document.getElementById('user-profile').classList.add('hidden');
+            }
+            
+            // Mobile
+            if (document.getElementById('mobile-auth-buttons')) {
+                document.getElementById('mobile-auth-buttons').classList.remove('hidden');
+            }
+            if (document.getElementById('mobile-user-profile')) {
+                document.getElementById('mobile-user-profile').classList.add('hidden');
+            }
+        }
+        
+        // Fungsi untuk menangani logout
+        async function handleLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    console.error('Error during logout:', error);
+                    return;
+                }
+                
+                // Redirect ke halaman login setelah logout
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error in logout:', error);
+            }
+        }
+        
+        // Fungsi untuk mengambil detail pesanan dari database
+        async function fetchOrderDetails(orderNumber) {
+            try {
+                // Ambil data order dari database
+                const { data: orders, error: orderError } = await supabase
+                    .from('orders')
+                    .select('id, status, total_amount, created_at')
+                    .eq('order_number', orderNumber)
+                    .single();
+                
+                if (orderError) {
+                    console.error('Error fetching order details:', orderError);
+                    return;
+                }
+                
+                if (orders) {
+                    // Update status transaksi
+                    updateTransactionStatus(orders.status);
+                    
+                    // Update waktu transaksi
+                    const orderDate = new Date(orders.created_at);
+                    document.getElementById('transaction-time').textContent = orderDate.toLocaleString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching order details:', error);
+            }
+        }
+        
+        // Fungsi untuk memperbarui status transaksi
+        function updateTransactionStatus(status) {
+            const statusElement = document.getElementById('transaction-status');
+            let statusText = status;
+            let statusClass = 'px-3 py-1 rounded-full font-medium text-sm ';
+            
+            // Translate status to Indonesian
+            switch (status) {
+                case 'settlement':
+                case 'capture':
+                case 'success':
+                case 'completed':
+                    statusText = 'Berhasil';
+                    statusClass += 'bg-green-100 text-green-800';
+                    break;
+                case 'pending':
+                    statusText = 'Menunggu';
+                    statusClass += 'bg-yellow-100 text-yellow-800';
+                    break;
+                case 'deny':
+                case 'cancel':
+                case 'expire':
+                case 'failed':
+                case 'cancelled':
+                    statusText = 'Gagal';
+                    statusClass += 'bg-red-100 text-red-800';
+                    break;
+                case 'refund':
+                case 'refunded':
+                    statusText = 'Dikembalikan';
+                    statusClass += 'bg-blue-100 text-blue-800';
+                    break;
+                case 'processing':
+                    statusText = 'Diproses';
+                    statusClass += 'bg-indigo-100 text-indigo-800';
+                    break;
+                default:
+                    statusClass += 'bg-gray-100 text-gray-800';
+            }
+            
+            statusElement.textContent = statusText;
+            statusElement.className = statusClass;
+        }
+    </script>
+</body>
+</html>

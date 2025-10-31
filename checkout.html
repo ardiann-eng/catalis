@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Catalist Creative</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Midtrans Snap -->
+    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-QZNRNJ4ROIoY8PAn"></script>
+    <!-- Auth dan Navbar JS -->
+    <script src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <!-- Midtrans JS -->
+    <script type="module" src="js/midtrans-config.js"></script>
+    <script type="module" src="js/midtrans.js"></script>
+    <!-- Checkout JS -->
+    <script type="module" src="js/checkout.js"></script>
+    
+    <style>
+        /* Custom styles */
+        .gradient-bg {
+            background: linear-gradient(135deg, #fbbf24, #a855f7);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #fbbf24, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Progress bar styles */
+        .progress-bar {
+            position: relative;
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #fbbf24, #a855f7);
+            transition: width 0.5s ease;
+        }
+        
+        /* Step indicator styles */
+        .step-indicator {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-circle {
+            background: linear-gradient(135deg, #fbbf24, #a855f7);
+            border-color: #a855f7;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
+        }
+        
+        .step.completed .step-circle {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        
+        .step-title {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        
+        .step.active .step-title {
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .step-connector {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+            background-color: white;
+        }
+        
+        .form-input.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Payment method styles */
+        .payment-method {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method:hover {
+            border-color: #a855f7;
+            background-color: #f9fafb;
+        }
+        
+        .payment-method.selected {
+            border-color: #a855f7;
+            background-color: #f5f3ff;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+        
+        /* Responsive styles for mobile */
+        @media (max-width: 640px) {
+            .step-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+            
+            .step-title {
+                font-size: 0.75rem;
+            }
+            
+            .form-input {
+                padding: 0.625rem 0.875rem;
+            }
+            
+            .progress-bar {
+                height: 3px;
+            }
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- Container untuk navbar -->
+    <div id="navbar-container"></div>
+    
+    <!-- Container untuk cart sidebar -->
+    <div id="cart-sidebar-container"></div>
+    
+    <!-- Spacer untuk navbar fixed -->
+    <div class="h-20"></div>
+    
+    <!-- Checkout Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold font-display gradient-text mb-2">Checkout</h1>
+            <p class="text-gray-600">Selesaikan pembelian Anda dengan mengikuti langkah-langkah berikut.</p>
+        </div>
+        
+        <!-- Progress Indicator -->
+        <div class="mb-12">
+            <div class="step-indicator">
+                <div class="step-connector"></div>
+                
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-title">Data Pengiriman</div>
+                </div>
+                
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-title">Pembayaran</div>
+                </div>
+                
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-title">Konfirmasi</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 33.33%;"></div>
+            </div>
+        </div>
+        
+        <!-- Checkout Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content (Left) -->
+            <div class="lg:col-span-2">
+                <!-- Step 1: Data Pengiriman -->
+                <div id="step-1" class="checkout-step bg-white p-6 rounded-xl shadow-md slide-in">
+                    <h2 class="text-xl font-bold mb-6">Data Pengiriman</h2>
+                    
+                    <form id="shipping-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="fullname" class="form-label">Nama Lengkap</label>
+                                <input type="text" id="fullname" name="fullname" class="form-input" required>
+                                <div class="error-message" id="fullname-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                                <div class="error-message" id="email-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Nomor Telepon</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" required>
+                                <div class="error-message" id="phone-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="postal-code" class="form-label">Kode Pos</label>
+                                <input type="text" id="postal-code" name="postalCode" class="form-input" required>
+                                <div class="error-message" id="postal-code-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="form-label">Alamat Lengkap</label>
+                            <textarea id="address" name="address" rows="3" class="form-input" required></textarea>
+                            <div class="error-message" id="address-error"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="form-group">
+                                <label for="province" class="form-label">Provinsi</label>
+                                <select id="province" name="province" class="form-input" required>
+                                    <option value="">Pilih Provinsi</option>
+                                    <!-- Opsi provinsi akan diisi oleh JavaScript -->
+                                </select>
+                                <div class="error-message" id="province-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="city" class="form-label">Kota/Kabupaten</label>
+                                <select id="city" name="city" class="form-input" required disabled>
+                                    <option value="">Pilih Kota/Kabupaten</option>
+                                    <!-- Opsi kota akan diisi oleh JavaScript -->
+                                </select>
+                                <div class="error-message" id="city-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="district" class="form-label">Kecamatan</label>
+                                <select id="district" name="district" class="form-input" required disabled>
+                                    <option value="">Pilih Kecamatan</option>
+                                    <!-- Opsi kecamatan akan diisi oleh JavaScript -->
+                                </select>
+                                <div class="error-message" id="district-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes" class="form-label">Catatan (Opsional)</label>
+                            <textarea id="notes" name="notes" rows="2" class="form-input"></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="submit" class="gradient-bg text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all">
+                                Lanjut ke Pembayaran
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Step 2: Pembayaran -->
+                <div id="step-2" class="checkout-step bg-white p-6 rounded-xl shadow-md hidden">
+                    <h2 class="text-xl font-bold mb-6">Metode Pembayaran</h2>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="p-4 bg-purple-50 rounded-lg border border-purple-200 mb-4">
+                            <div class="flex items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-medium text-purple-800">Informasi Pembayaran</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Kami menggunakan Midtrans sebagai gateway pembayaran yang aman. Anda dapat memilih berbagai metode pembayaran seperti:
+                            </p>
+                            <ul class="mt-2 text-sm text-gray-600 space-y-1 ml-5 list-disc">
+                                <li>Transfer Bank (BCA, BNI, BRI, Mandiri, Permata)</li>
+                                <li>E-Wallet (GoPay, OVO, DANA, LinkAja, ShopeePay)</li>
+                                <li>Kartu Kredit (Visa, Mastercard, JCB)</li>
+                                <li>Minimarket (Indomaret, Alfamart)</li>
+                                <li>QRIS</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 flex flex-col sm:flex-row items-center justify-between">
+                            <div class="mb-3 sm:mb-0 text-center sm:text-left">
+                                <h3 class="font-medium">Pembayaran dengan Midtrans</h3>
+                                <p class="text-sm text-gray-500">Pilih metode pembayaran pada halaman berikutnya</p>
+                            </div>
+                            <img src="https://midtrans.com/assets/images/logo-midtrans-color.png" alt="Midtrans" class="h-8">
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
+                        <button id="back-to-shipping" class="bg-gray-200 text-gray-700 px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-all w-full sm:w-auto">
+                            Kembali
+                        </button>
+                        <button id="pay-with-midtrans" class="gradient-bg text-white px-4 sm:px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all w-full sm:w-auto">
+                            Bayar Sekarang
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Konfirmasi -->
+                <div id="step-3" class="checkout-step bg-white p-6 rounded-xl shadow-md hidden">
+                    <div class="text-center mb-8">
+                        <div id="payment-status-icon" class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-2" id="payment-status-title">Pesanan Berhasil!</h2>
+                        <p class="text-gray-600" id="payment-status-message">Terima kasih telah berbelanja di Catalist Creative.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Nomor Pesanan:</span>
+                            <span class="font-medium" id="order-number">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tanggal Pesanan:</span>
+                            <span class="font-medium" id="order-date">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-6">
+                        <h3 class="font-medium mb-3">Status Pembayaran</h3>
+                        <div id="payment-status-details" class="text-sm text-gray-600">
+                            <!-- Status pembayaran akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-6">
+                        <h3 class="font-medium mb-3">Detail Pengiriman</h3>
+                        <div id="shipping-details" class="text-sm text-gray-600">
+                            <!-- Detail pengiriman akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-6">
+                        <h3 class="font-medium mb-3">Instruksi Pembayaran</h3>
+                        <div id="payment-instructions" class="text-sm text-gray-600">
+                            <!-- Instruksi pembayaran akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <a href="index.html" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                            Kembali ke Beranda
+                        </a>
+                        <button id="check-payment-status" class="gradient-bg text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all">
+                            Cek Status Pembayaran
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary (Right) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-xl shadow-md sticky top-24">
+                    <h2 class="text-xl font-bold mb-4">Ringkasan Pesanan</h2>
+                    
+                    <div id="order-items" class="space-y-4 mb-6 max-h-80 overflow-y-auto">
+                        <!-- Order items akan diisi oleh JavaScript -->
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="font-medium" id="subtotal">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Ongkos Kirim</span>
+                            <span class="font-medium" id="shipping-cost">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Pajak</span>
+                            <span class="font-medium" id="tax">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
+                            <span class="text-lg font-bold">Total</span>
+                            <span class="text-lg font-bold gradient-text" id="total">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Catalist Creative</h3>
+                    <p class="text-gray-400 mb-4">Platform marketplace untuk produk kreatif lokal Indonesia.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-feather="facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-feather="instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-feather="twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Tautan</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Beranda</a></li>
+                        <li><a href="marketplace.html" class="text-gray-400 hover:text-white transition-colors">Marketplace</a></li>
+                        <li><a href="profiles.html" class="text-gray-400 hover:text-white transition-colors">Profil Kreator</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">Tentang Kami</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Kontak</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i data-feather="map-pin" class="mr-2 h-5 w-5"></i>
+                            <span>Jl. Contoh No. 123, Jakarta Selatan</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-feather="mail" class="mr-2 h-5 w-5"></i>
+                            <span>hello@catalistcreative.id</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-feather="phone" class="mr-2 h-5 w-5"></i>
+                            <span>+62 812 3456 7890</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Catalist Creative. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Initialize Feather Icons
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
+</body>
+</html>
