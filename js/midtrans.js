@@ -450,7 +450,7 @@ async function getTokenFromBackend(requestData) {
   // Daftar URL backend yang akan dicoba, dimulai dari yang utama
   const backendUrls = isProduction
     ? [
-        "https://newcatalist.vercel.app/api/generate-snap-token",
+        "https://catalis-lac.vercel.app/api/generate-snap-token",
         "https://catalist-backend.vercel.app/api/generate-snap-token", // URL fallback 1
         "https://catalist-payment-api.vercel.app/api/generate-snap-token" // URL fallback 2
       ]
