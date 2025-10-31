@@ -140,7 +140,7 @@ async function startMidtransPayment(orderData) {
       );
 
       const backendUrl = isProduction
-        ? "https://newcatalist.vercel.app/api/generate-snap-token" // URL produksi
+        ? "https://catalis-lac.vercel.app/api/generate-snap-token" // URL produksi
         : "http://localhost:3001/generate-snap-token"; // URL development
       console.log(
         `Environment detected as: ${
