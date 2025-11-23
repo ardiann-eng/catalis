@@ -333,8 +333,18 @@ async function addToCart(product) {
         // Update tampilan
         updateCartDisplay();
         
-        // Tampilkan notifikasi
         showCartNotification(`${product.name} ditambahkan ke keranjang!`);
+        const cartFab = document.getElementById('cart-fab');
+        if (cartFab) {
+            cartFab.classList.add('animate-bounce');
+            setTimeout(() => cartFab.classList.remove('animate-bounce'), 600);
+        }
+        const cartToggleBtn = document.getElementById('cart-toggle-btn');
+        if (cartToggleBtn) {
+            cartToggleBtn.classList.add('animate-bounce');
+            setTimeout(() => cartToggleBtn.classList.remove('animate-bounce'), 600);
+        }
+        openCart();
         
         // Sinkronkan ke Supabase jika user login
         await syncCartAfterChange();
@@ -633,6 +643,20 @@ function updateCartDisplay() {
         cartCountMobile.textContent = totalItems;
         cartCountMobile.style.display = totalItems > 0 ? 'flex' : 'none';
     }
+
+    // Update FAB cart count
+    const cartFabCount = document.getElementById('cart-fab-count');
+    if (cartFabCount) {
+        cartFabCount.textContent = totalItems;
+        cartFabCount.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+
+    // Update Toggle Bar count
+    const cartToggleCount = document.getElementById('cart-toggle-count');
+    if (cartToggleCount) {
+        cartToggleCount.textContent = totalItems;
+        cartToggleCount.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
 }
 
 // Fungsi untuk membuka sidebar cart
@@ -803,6 +827,8 @@ function setupCartEventListeners() {
     // Event listener untuk tombol cart di navbar
     const cartButtonDesktop = document.getElementById('cart-button-desktop');
     const cartButtonMobile = document.getElementById('cart-button-mobile');
+    const cartFab = document.getElementById('cart-fab');
+    const cartToggleBtn = document.getElementById('cart-toggle-btn');
 
     if (cartButtonDesktop) {
         cartButtonDesktop.addEventListener('click', openCart);
@@ -810,6 +836,18 @@ function setupCartEventListeners() {
 
     if (cartButtonMobile) {
         cartButtonMobile.addEventListener('click', openCart);
+    }
+
+    if (cartFab) {
+        cartFab.addEventListener('click', () => {
+            if (isCartOpen) closeCart(); else openCart();
+        });
+    }
+
+    if (cartToggleBtn) {
+        cartToggleBtn.addEventListener('click', () => {
+            if (isCartOpen) closeCart(); else openCart();
+        });
     }
 
     // Event listener untuk tombol close cart

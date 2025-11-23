@@ -11,7 +11,7 @@ function insertFooter() {
 
     const year = new Date().getFullYear();
     container.innerHTML = `
-      <footer class="bg-gray-900 text-white pt-12 pb-8 mt-16">
+      <footer class="bg-gray-900 text-white pt-12 pb-32 sm:pb-12 mt-16" style="padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
@@ -55,23 +55,23 @@ function insertFooter() {
                 <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="facebook"></i></a>
                 <a href="#" class="text-gray-400 hover:text-primary transition"><i data-feather="linkedin"></i></a>
               </div>
-              <form id="newsletter-form" class="flex gap-2">
-                <input type="email" id="newsletter-email" placeholder="Email Anda" class="flex-1 px-3 py-2 rounded-md bg-gray-800 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-secondary" required />
-                <button class="px-4 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark transition">Subscribe</button>
+              <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="newsletter-email" placeholder="Email Anda" class="min-w-0 flex-1 px-3 py-2 rounded-md bg-gray-800 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-secondary" required />
+                <button class="w-full sm:w-auto px-4 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark transition">Subscribe</button>
               </form>
               <div id="newsletter-msg" class="text-xs text-gray-400 mt-2"></div>
             </div>
           </div>
           <div class="border-t border-gray-800 mt-10 pt-6 flex flex-col md:flex-row gap-4 md:gap-0 md:items-center md:justify-between">
             <div class="text-gray-400">&copy; ${year} Catalist Creative. All rights reserved.</div>
-            <div class="flex items-center gap-6 text-sm">
+            <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm">
               <a href="privacy.html" class="text-gray-400 hover:text-primary transition">Kebijakan Privasi</a>
               <a href="terms.html" class="text-gray-400 hover:text-primary transition">Syarat & Ketentuan</a>
               <span class="inline-flex items-center gap-2 text-gray-400">
                 <i data-feather="shield" class="w-4 h-4"></i>
                 Secure Checkout
               </span>
-              <span class="text-gray-400">Operasional: Senin–Jumat 09:00–18:00</span>
+              <span class="text-gray-400 w-full sm:w-auto mt-2 sm:mt-0">Operasional: Senin–Jumat 09:00–18:00</span>
             </div>
           </div>
         </div>
@@ -127,4 +127,3 @@ function setupNewsletter() {
 }
 
 document.addEventListener('DOMContentLoaded', insertFooter);
-

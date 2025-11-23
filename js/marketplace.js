@@ -1,6 +1,5 @@
 // Import Supabase client
 import { supabase } from './supabase.js';
-import { isLoggedIn } from './auth-utils.js';
 
 // State untuk menyimpan data produk
 let products = [];
@@ -18,67 +17,12 @@ const sortSelect = document.getElementById('sort-select');
 const loadingIndicator = document.getElementById('loading-indicator');
 
 let loginAnimInstances = [];
-
-function ensureLoginOverlay() {
-    let overlay = document.getElementById('login-animation-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'login-animation-overlay';
-        overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden';
-        overlay.innerHTML = `
-            <div class="bg-gray-900/90 border border-gray-700 rounded-2xl p-6 w-[90%] max-w-md text-white shadow-2xl">
-                <div class="flex items-center gap-3 mb-4">
-                    <i data-feather="lock" class="w-6 h-6 text-secondary"></i>
-                    <span class="font-semibold">Masuk untuk pengalaman penuh</span>
-                </div>
-                <button id="login-cta" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-dark font-bold">Login</button>
-                <div id="login-anim-bar" class="mt-4 h-1 w-full bg-gradient-to-r from-secondary to-primary rounded-full opacity-60"></div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        if (typeof feather !== 'undefined') feather.replace();
-        const cta = document.getElementById('login-cta');
-        if (cta) cta.addEventListener('click', () => {
-            window.location.href = 'login.html?redirect=marketplace.html';
-        });
-    }
-    return overlay;
-}
-
-function showLoginAnimation() {
-    const overlay = ensureLoginOverlay();
-    overlay.classList.remove('hidden');
-    if (typeof anime !== 'undefined') {
-        const anim1 = anime({
-            targets: '#login-anim-bar',
-            translateX: ['-20%', '20%'],
-            direction: 'alternate',
-            easing: 'easeInOutSine',
-            duration: 1200,
-            loop: true
-        });
-        const anim2 = anime({
-            targets: '#login-cta',
-            scale: [1, 1.05],
-            direction: 'alternate',
-            easing: 'easeInOutQuad',
-            duration: 800,
-            loop: true
-        });
-        loginAnimInstances.push(anim1, anim2);
-    }
-}
-
-function hideLoginAnimation() {
-    const overlay = document.getElementById('login-animation-overlay');
-    if (overlay) overlay.classList.add('hidden');
-    loginAnimInstances.forEach(a => { try { a.pause(); } catch(e) {} });
-    loginAnimInstances = [];
-}
+let favorites = [];
 
 // Inisialisasi halaman
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        favorites = loadFavorites();
         // Tampilkan loading indicator
         showLoading(true);
         
@@ -99,6 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Sembunyikan loading indicator
         showLoading(false);
+
+        ensureCartReady();
     } catch (error) {
         console.error('Error initializing marketplace:', error);
         showError('Gagal memuat produk. Silakan coba lagi nanti.');
@@ -179,57 +125,37 @@ function renderProducts(productsToRender) {
     let productsHTML = '';
     
     productsToRender.forEach(product => {
+        const fav = isFavorite(product.id);
         productsHTML += `
-            <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden card-hover transition-all duration-300 border border-gray-100" 
+            <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300" 
                  data-product-id="${product.id}">
-                <div class="relative">
-                    <img src="${product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'}" 
+                <div class="relative aspect-square">
+                    <img src="${product.image_url || 'https://via.placeholder.com/600x600?text=No+Image'}" 
                          alt="${product.name}" 
-                         class="nft-image w-full h-56 md:h-64 object-cover">
+                         class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute top-2 left-2 category-badge px-2 py-1 rounded-full text-xs font-semibold">
                         ${product.category || 'Uncategorized'}
                     </div>
+                    <button class="favorite-btn absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow hover:scale-105 transition" data-product-id="${product.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart ${fav ? 'text-red-500' : 'text-gray-500'}"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+                    </button>
                 </div>
                 <div class="p-4">
-                    <h3 class="text-lg font-semibold mb-1 truncate text-gray-900">${product.name}</h3>
-                    <p class="text-gray-600 text-sm mb-3 line-clamp-2 h-11">${product.description || 'Tidak ada deskripsi'}</p>
-
-                    <!-- Price -->
-                    <div class="mb-4">
-                        <span class="text-gray-900 font-extrabold text-xl">Rp ${formatPrice(product.price || 0)}</span>
-                        ${product.stock ? `<p class="text-xs text-gray-500 mt-1">Stok: ${product.stock}</p>` : ''}
+                    <h3 class="text-base font-semibold mb-1 truncate text-gray-900">${product.name}</h3>
+                    ${product.description ? `<p class="text-xs text-gray-600 mb-2 line-clamp-2">${product.description}</p>` : ''}
+                    <div class="mb-3">
+                        <span class="text-gray-900 font-extrabold text-sm">Rp ${formatPrice(product.price || 0)}</span>
                     </div>
-
-                    <!-- Quantity Selector & Add to Cart -->
-                    <div class="flex items-center gap-2">
-                        <!-- Quantity Controls -->
-                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
-                            <button class="quantity-decrease-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 transition-colors"
-                                    data-product-id="${product.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 12h14"></path>
-                                </svg>
-                            </button>
-                            <input type="number"
-                                   value="1"
-                                   min="1"
-                                   max="${product.stock || 999}"
-                                   class="quantity-input w-12 text-center border-0 focus:outline-none py-1"
-                                   data-product-id="${product.id}">
-                            <button class="quantity-increase-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 transition-colors"
-                                    data-product-id="${product.id}"
-                                    ${product.stock ? `data-max-stock="${product.stock}"` : ''}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 5v14"></path>
-                                    <path d="M5 12h14"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Add to Cart Button -->
-                        <button class="add-to-cart-btn flex-1 bg-secondary hover:bg-pink-600 text-white px-3 py-2 rounded-xl text-sm font-semibold shadow-sm transition-all"
+                    <div class="grid grid-cols-1 gap-2">
+                        <button class="add-to-cart-btn h-12 w-11/12 sm:w-full mx-auto flex items-center justify-center gap-1 bg-secondary hover:bg-pink-600 text-white px-2 rounded-lg text-xs font-semibold shadow-sm active:scale-[0.98] transition-all"
                                 data-product-id="${product.id}">
-                            + Keranjang
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            Tambah ke Keranjang
+                        </button>
+                        <button class="buy-now-btn h-12 w-11/12 sm:w-full mx-auto flex items-center justify-center gap-1 bg-primary hover:bg-yellow-500 text-dark px-2 rounded-lg text-xs font-bold shadow-sm active:scale-[0.98] transition-all"
+                                data-product-id="${product.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Beli Sekarang
                         </button>
                     </div>
                 </div>
@@ -238,6 +164,8 @@ function renderProducts(productsToRender) {
     });
     
     productGrid.innerHTML = productsHTML;
+    if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+    ensureCartReady();
 }
 
 // Fungsi untuk setup event listeners
@@ -314,10 +242,25 @@ function setupEventListeners() {
 
                 // Jika yang diklik adalah tombol add to cart
                 if (e.target.classList.contains('add-to-cart-btn')) {
-                    const quantityInput = productCard.querySelector('.quantity-input');
-                    const quantity = parseInt(quantityInput.value) || 1;
-                    addProductToCart(productId, quantity);
+                    addProductToCart(productId, 1);
                     e.stopPropagation(); // Hindari membuka detail produk
+                } else if (e.target.classList.contains('buy-now-btn')) {
+                    addProductToCart(productId, 1);
+                    if (typeof window.openCart === 'function') {
+                        window.openCart();
+                    }
+                    if (typeof window.checkout === 'function') {
+                        setTimeout(() => window.checkout(), 600);
+                    }
+                    e.stopPropagation();
+                } else if (e.target.closest('.favorite-btn')) {
+                    toggleFavorite(productId);
+                    const icon = e.target.closest('.favorite-btn').querySelector('.feather-heart');
+                    if (icon) {
+                        icon.classList.toggle('text-red-500');
+                        icon.classList.toggle('text-gray-500');
+                    }
+                    e.stopPropagation();
                 } else if (!e.target.closest('.quantity-input') && !e.target.closest('button')) {
                     // Tampilkan detail produk (jika bukan klik input atau button)
                     showProductDetail(productId);
@@ -543,8 +486,9 @@ function addProductToCart(productId, quantity = 1) {
 function addCartButtonPulse() {
     const cartButtonDesktop = document.getElementById('cart-button-desktop');
     const cartButtonMobile = document.getElementById('cart-button-mobile');
+    const cartFab = document.getElementById('cart-fab');
     
-    [cartButtonDesktop, cartButtonMobile].forEach(button => {
+    [cartButtonDesktop, cartButtonMobile, cartFab].forEach(button => {
         if (button) {
             button.classList.add('cart-button-pulse');
             setTimeout(() => {
@@ -600,13 +544,6 @@ function showLoading(isLoading) {
     
     if (productGrid) {
         productGrid.style.opacity = isLoading ? '0.5' : '1';
-    }
-    if (isLoading) {
-        if (!isLoggedIn()) {
-            showLoginAnimation();
-        }
-    } else {
-        hideLoginAnimation();
     }
 }
 
@@ -675,6 +612,60 @@ function showNotification(message) {
             notification.remove();
         }, 300);
     }, 3000);
+}
+
+function ensureCartReady() {
+    try {
+        const sidebar = document.getElementById('cart-sidebar');
+        const container = document.getElementById('cart-sidebar-container');
+        if (!sidebar && container) {
+            fetch('cart-sidebar.html')
+                .then(r => r.text())
+                .then(html => {
+                    container.innerHTML = html;
+                    setTimeout(() => {
+                        if (typeof window.setupCartEventListeners === 'function') window.setupCartEventListeners();
+                        if (typeof window.loadCartFromStorage === 'function') window.loadCartFromStorage();
+                        if (typeof window.renderCartItems === 'function') window.renderCartItems();
+                        if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+                    }, 50);
+                })
+                .catch(e => console.error('Error injecting cart sidebar:', e));
+        }
+        const footer = document.querySelector('footer');
+        if (footer) {
+            footer.style.display = '';
+            footer.style.visibility = 'visible';
+        }
+    } catch(e) { console.warn('ensureCartReady failed', e); }
+}
+
+function loadFavorites() {
+    try {
+        const raw = localStorage.getItem('favorites');
+        return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function saveFavorites() {
+    try {
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    } catch (_) {}
+}
+
+function isFavorite(id) {
+    return favorites.some(f => String(f) === String(id));
+}
+
+function toggleFavorite(id) {
+    if (isFavorite(id)) {
+        favorites = favorites.filter(f => String(f) !== String(id));
+    } else {
+        favorites.push(id);
+    }
+    saveFavorites();
 }
 
 // Export fungsi yang dibutuhkan
