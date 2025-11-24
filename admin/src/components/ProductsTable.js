@@ -179,15 +179,15 @@ const ProductsTable = ({ products, loading, onDelete, onCategoryChange }) => {
       <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <h3 className="text-lg font-medium text-gray-900">Daftar Produk</h3>
         <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="text-gray-400" />
+          <div className="input-with-icon flex-1 sm:flex-none sm:w-64">
+            <div className="input-icon">
+              <FiSearch />
             </div>
             <input
               value={filterInput}
               onChange={handleFilterChange}
               placeholder="Cari produk..."
-              className="form-input pl-10 py-2 w-full"
+              className="form-input py-2 w-full"
             />
           </div>
           <select

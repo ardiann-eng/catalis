@@ -17,17 +17,24 @@ const sortSelect = document.getElementById('sort-select');
 const loadingIndicator = document.getElementById('loading-indicator');
 
 let loginAnimInstances = [];
-let favorites = [];
+let likes = new Set();
+let currentUserId = null;
+const likeSaving = new Set();
 
 // Inisialisasi halaman
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        favorites = loadFavorites();
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUserId = session?.user?.id || null;
         // Tampilkan loading indicator
         showLoading(true);
         
         // Ambil data produk dari Supabase
         await fetchProducts();
+        if (currentUserId) {
+            await fetchUserLikes();
+            setupRealtimeLikes();
+        }
         
         // Ambil kategori unik dari produk
         extractCategories();
@@ -640,32 +647,75 @@ function ensureCartReady() {
     } catch(e) { console.warn('ensureCartReady failed', e); }
 }
 
-function loadFavorites() {
-    try {
-        const raw = localStorage.getItem('favorites');
-        return raw ? JSON.parse(raw) : [];
-    } catch (_) {
-        return [];
-    }
-}
-
-function saveFavorites() {
-    try {
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    } catch (_) {}
-}
-
 function isFavorite(id) {
-    return favorites.some(f => String(f) === String(id));
+    return likes.has(String(id));
 }
 
-function toggleFavorite(id) {
-    if (isFavorite(id)) {
-        favorites = favorites.filter(f => String(f) !== String(id));
-    } else {
-        favorites.push(id);
+async function fetchUserLikes() {
+    const { data, error } = await supabase
+        .from('product_likes')
+        .select('product_id')
+        .eq('user_id', currentUserId);
+    if (error) { console.error('Error fetching likes', error); return; }
+    likes = new Set((data || []).map(d => String(d.product_id)));
+}
+
+function setupRealtimeLikes() {
+    const ch = supabase
+        .channel('likes-' + currentUserId)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'product_likes', filter: `user_id=eq.${currentUserId}` }, async () => {
+            await fetchUserLikes();
+            updateLikeIcons();
+        })
+        .subscribe();
+}
+
+function updateLikeIcons() {
+    if (!productGrid) return;
+    productGrid.querySelectorAll('.favorite-btn').forEach(btn => {
+        const pid = btn.getAttribute('data-product-id');
+        const icon = btn.querySelector('.feather-heart');
+        const fav = isFavorite(pid);
+        if (icon) {
+            icon.classList.toggle('text-red-500', !!fav);
+            icon.classList.toggle('text-gray-500', !fav);
+        }
+    });
+}
+
+async function toggleFavorite(id) {
+    if (!currentUserId) { showNotification('Silakan login untuk menyukai produk'); return; }
+    const pid = String(id);
+    if (likeSaving.has(pid)) return;
+    likeSaving.add(pid);
+    const btn = productGrid.querySelector(`.favorite-btn[data-product-id="${pid}"]`);
+    if (btn) { btn.classList.add('opacity-60'); btn.disabled = true; }
+    try {
+        if (isFavorite(pid)) {
+            const { error } = await supabase
+                .from('product_likes')
+                .delete()
+                .eq('user_id', currentUserId)
+                .eq('product_id', pid);
+            if (error) throw error;
+            likes.delete(pid);
+            showNotification('Produk dihapus dari Disukai');
+        } else {
+            const { error } = await supabase
+                .from('product_likes')
+                .upsert({ user_id: currentUserId, product_id: pid }, { onConflict: 'user_id,product_id' });
+            if (error) throw error;
+            likes.add(pid);
+            showNotification('Produk ditambahkan ke Disukai');
+        }
+        updateLikeIcons();
+    } catch (e) {
+        console.error('Error toggling like', e);
+        showNotification('Gagal menyimpan status Like');
+    } finally {
+        likeSaving.delete(pid);
+        if (btn) { btn.classList.remove('opacity-60'); btn.disabled = false; }
     }
-    saveFavorites();
 }
 
 // Export fungsi yang dibutuhkan

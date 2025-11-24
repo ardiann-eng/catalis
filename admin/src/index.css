@@ -59,7 +59,7 @@ code {
 }
 
 .form-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm;
 }
 
 .form-label {
@@ -69,6 +69,15 @@ code {
 .form-group {
   @apply mb-4;
 }
+
+/* Input with left icon helper */
+.input-with-icon { @apply relative; }
+.input-with-icon .input-icon { @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10; }
+.input-with-icon .input-icon svg { @apply h-5 w-5 text-gray-400; }
+.input-with-icon .form-input { @apply pl-11; }
+
+/* Inline error helper */
+.form-error { @apply mt-1 text-xs text-red-600; }
 
 .table-container {
   @apply overflow-x-auto rounded-xl shadow-md;

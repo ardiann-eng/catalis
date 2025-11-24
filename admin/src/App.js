@@ -16,6 +16,7 @@ import NotFound from './pages/NotFound';
 import ProductForm from './pages/ProductForm';
 import OrderDetail from './pages/OrderDetail';
 import Cancellations from './pages/Cancellations';
+import CommunityDashboard from './pages/CommunityDashboard';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -62,6 +63,7 @@ function App() {
         <Route path="products/new" element={<ProductForm />} />
         <Route path="products/edit/:id" element={<ProductForm />} />
         <Route path="users" element={<Users />} />
+        <Route path="community" element={<CommunityDashboard />} />
       </Route>
       
       {/* 404 Route */}

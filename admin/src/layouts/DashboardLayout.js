@@ -12,6 +12,7 @@ import {
   FiBell,
   FiUser
 } from 'react-icons/fi';
+import { FiMessageCircle } from 'react-icons/fi';
 
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
@@ -112,6 +113,18 @@ const DashboardLayout = () => {
               >
                 <FiUsers size={20} />
                 <span>Pengguna</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/community" 
+                className={({ isActive }) => 
+                  `sidebar-link ${isActive ? 'active' : ''}`
+                }
+                onClick={closeSidebar}
+              >
+                <FiMessageCircle size={20} />
+                <span>Komunitas</span>
               </NavLink>
             </li>
           </ul>

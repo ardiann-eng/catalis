@@ -15,7 +15,7 @@ function insertNavbar() {
                     <div class="ml-10 flex items-center space-x-8">
                         <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
                         <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Creators</a>
+                        <a href="community.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Community</a>
                         <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
                         <button id="navbar-search-btn" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-dark" title="Search">
                             <i data-feather="search"></i>
@@ -85,7 +85,7 @@ function insertNavbar() {
             <div class="flex flex-col space-y-3">
                 <a href="index.html" class="text-dark font-medium hover:text-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">Home</a>
                 <a href="marketplace.html" class="text-dark font-medium hover:text-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">Marketplace</a>
-                <a href="profiles.html" class="text-dark font-medium hover:text-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">Creators</a>
+                <a href="community.html" class="text-dark font-medium hover:text-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">Community</a>
                 <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">About Us</a>
                 
                 <!-- Mobile auth buttons -->

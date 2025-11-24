@@ -11,7 +11,7 @@ function insertFooter() {
 
     const year = new Date().getFullYear();
     container.innerHTML = `
-      <footer class="bg-gray-900 text-white pt-12 pb-32 sm:pb-12 mt-16" style="padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);">
+      <footer class="w-full bg-gray-900 text-white pt-12 pb-32 sm:pb-12 mt-16" style="padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
@@ -7,19 +7,34 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 10);
+    return () => clearTimeout(t);
+  }, []);
+
+  const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  const validatePassword = (val) => (val || '').length >= 6;
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate form
-    if (!email || !password) {
-      setError('Email dan password harus diisi');
-      return;
-    }
+    // Validate form (modern UX)
+    let hasError = false;
+    setEmailError('');
+    setPasswordError('');
+    setError('');
+    if (!email) { setEmailError('Email wajib diisi'); hasError = true; }
+    else if (!validateEmail(email)) { setEmailError('Format email tidak valid'); hasError = true; }
+    if (!password) { setPasswordError('Password wajib diisi'); hasError = true; }
+    else if (!validatePassword(password)) { setPasswordError('Minimal 6 karakter'); hasError = true; }
+    if (hasError) return;
     
     try {
       setError('');
@@ -39,12 +54,11 @@ const Login = () => {
   };
   
   return (
-    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+    <div className={`mt-8 sm:mx-auto sm:w-full sm:max-w-md transition-all duration-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'}`}>
+      <div className="bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-gray-100 py-8 px-6 sm:px-10">
         <form className="mb-0 space-y-6" onSubmit={handleSubmit}>
-          <h1 className="text-xl font-bold text-center text-gray-900 mb-6">
-            Login Admin
-          </h1>
+          <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Login Admin</h1>
+          <p className="text-center text-sm text-gray-500 mb-4">Masuk untuk mengelola Catalis Admin Panel</p>
           
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -56,13 +70,9 @@ const Login = () => {
           )}
           
           <div>
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiMail className="text-gray-400" />
-              </div>
+            <label htmlFor="email" className="form-label">Email</label>
+            <div className="input-with-icon mt-1">
+              <div className="input-icon"><FiMail /></div>
               <input
                 id="email"
                 name="email"
@@ -71,20 +81,18 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="form-input pl-10"
+                aria-invalid={!!emailError}
+                className="form-input"
                 placeholder="admin@example.com"
               />
             </div>
+            {emailError && <p className="form-error">{emailError}</p>}
           </div>
           
           <div>
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock className="text-gray-400" />
-              </div>
+            <label htmlFor="password" className="form-label">Password</label>
+            <div className="input-with-icon mt-1">
+              <div className="input-icon"><FiLock /></div>
               <input
                 id="password"
                 name="password"
@@ -93,17 +101,19 @@ const Login = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="form-input pl-10"
+                aria-invalid={!!passwordError}
+                className="form-input"
                 placeholder="••••••••"
               />
             </div>
+            {passwordError && <p className="form-error">{passwordError}</p>}
           </div>
           
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="w-full flex justify-center py-2.5 px-4 rounded-full shadow-sm text-sm font-semibold text-dark bg-primary hover:bg-primary-dark transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               {loading ? (
                 <>
