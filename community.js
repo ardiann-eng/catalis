@@ -54,6 +54,7 @@ function renderMessageCard(msg, replies = [], isLiked = false) {
   const viewCount = Number(msg.view_count || 0);
   const repliesHtml = replies.map(renderReplyItem).join('');
   const isOwner = !!currentUserId && (msg.user_id === currentUserId);
+  const formatted = formatMessageHtml(msg.message || '');
   return `
     <article class="feed-card" data-message-id="${msg.id}" data-user-id="${msg.user_id || ''}">
       <div class="flex items-start gap-3">
@@ -64,15 +65,16 @@ function renderMessageCard(msg, replies = [], isLiked = false) {
               <span class="font-semibold text-gray-900">${username}</span>
               <span class="text-xs text-gray-500">${time}</span>
             </div>
-            <div class="flex items-center gap-3">
-              <button class="copy-btn inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 text-xs" data-text="${encodeURIComponent(msg.message || '')}" title="Copy">
-                <i data-feather="copy" class="w-4 h-4"></i>
-                <span>Copy</span>
-              </button>
-              ${isOwner ? `<button class="delete-btn text-gray-500 hover:text-red-600" title="Delete" aria-label="Delete" data-id="${msg.id}"><i data-feather="trash" class="w-4 h-4"></i></button>` : ''}
+            <div class="relative">
+              <button class="menu-btn text-gray-600 hover:text-gray-800" title="Menu" aria-haspopup="true"><i data-feather="more-horizontal" class="w-5 h-5"></i></button>
+              <div class="menu-dropdown hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <button class="menu-copy w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Salin Teks</button>
+                <button class="menu-report w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Laporkan</button>
+                ${isOwner ? `<button class="menu-delete w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Hapus</button>` : ''}
+              </div>
             </div>
           </div>
-          <div class="mt-2 text-gray-800 text-sm whitespace-pre-wrap break-words">${(msg.message || '')}</div>
+          <div class="mt-2 text-gray-800 text-sm break-words">${formatted}</div>
           <div class="mt-3 flex items-center gap-4 text-sm">
             <button class="like-btn inline-flex items-center gap-2" data-liked="${isLiked ? 'true' : 'false'}">
               <svg class="heart w-5 h-5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
@@ -325,10 +327,41 @@ function showPlusOne(btn) {
 }
 
 feedEl.addEventListener('click', async (e) => {
-  const copy = e.target.closest('.copy-btn');
-  if (copy) {
-    const text = decodeURIComponent(copy.getAttribute('data-text') || '');
-    try { await navigator.clipboard.writeText(text); showToast('Disalin'); } catch(_) { showToast('Gagal menyalin'); }
+  const menuBtn = e.target.closest('.menu-btn');
+  if (menuBtn) {
+    const wrapper = menuBtn.parentElement;
+    const dd = wrapper?.querySelector('.menu-dropdown');
+    if (dd) dd.classList.toggle('hidden');
+    return;
+  }
+  const menuCopy = e.target.closest('.menu-copy');
+  if (menuCopy) {
+    const card = menuCopy.closest('[data-message-id]');
+    const txt = card?.querySelector('.mt-2').textContent || '';
+    try { await navigator.clipboard.writeText(txt); showToast('Disalin'); } catch(_) { showToast('Gagal menyalin'); }
+    menuCopy.closest('.menu-dropdown')?.classList.add('hidden');
+    return;
+  }
+  const menuReport = e.target.closest('.menu-report');
+  if (menuReport) {
+    const card = menuReport.closest('[data-message-id]');
+    const id = card?.getAttribute('data-message-id');
+    const text = card?.querySelector('.mt-2')?.textContent || '';
+    try {
+      const user = await getUser();
+      await supabase.from('community_reports').insert({ message_id: id, reporter_id: user?.id || null, message_text: text });
+      showToast('Dilaporkan');
+      window.location.href = 'admin/';
+    } catch(_) { showToast('Gagal melaporkan'); }
+    menuReport.closest('.menu-dropdown')?.classList.add('hidden');
+    return;
+  }
+  const menuDelete = e.target.closest('.menu-delete');
+  if (menuDelete) {
+    const card = menuDelete.closest('[data-message-id]');
+    const id = card?.getAttribute('data-message-id');
+    openDeleteModal(id);
+    menuDelete.closest('.menu-dropdown')?.classList.add('hidden');
     return;
   }
   const like = e.target.closest('.like-btn');
@@ -357,14 +390,6 @@ feedEl.addEventListener('click', async (e) => {
     card.querySelector('.reply-input')?.classList.add('hidden');
     return;
   }
-  const delBtn = e.target.closest('.delete-btn');
-  if (delBtn) {
-    const card = delBtn.closest('[data-message-id]');
-    if (!card) return;
-    const id = card.getAttribute('data-message-id');
-    openDeleteModal(id);
-    return;
-  }
 });
 
 sendBtn.addEventListener('click', sendMessage);
@@ -374,6 +399,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof AOS !== 'undefined') { try { AOS.init(); } catch(_) {} }
   await loadMessages();
   subscribeRealtime();
+  const input = document.getElementById('message-input');
+  const emojiBtn = document.getElementById('emoji-btn');
+  const boldBtn = document.getElementById('bold-btn');
+  const italicBtn = document.getElementById('italic-btn');
+  function insertAtCursor(el, str){
+    const start = el.selectionStart || 0; const end = el.selectionEnd || 0;
+    const val = el.value; el.value = val.slice(0,start) + str + val.slice(end);
+    el.focus(); el.selectionStart = el.selectionEnd = start + str.length;
+  }
+  emojiBtn && emojiBtn.addEventListener('click', () => insertAtCursor(input, ' 😊 '));
+  boldBtn && boldBtn.addEventListener('click', () => {
+    const start = input.selectionStart || 0; const end = input.selectionEnd || 0;
+    const sel = input.value.slice(start,end) || 'teks';
+    const wrapped = `**${sel}**`;
+    insertAtCursor(input, wrapped);
+  });
+  italicBtn && italicBtn.addEventListener('click', () => {
+    const start = input.selectionStart || 0; const end = input.selectionEnd || 0;
+    const sel = input.value.slice(start,end) || 'teks';
+    const wrapped = `*${sel}*`;
+    insertAtCursor(input, wrapped);
+  });
+  document.addEventListener('click', (evt) => {
+    const dd = evt.target.closest('.menu-dropdown');
+    const btn = evt.target.closest('.menu-btn');
+    if (!dd && !btn) {
+      document.querySelectorAll('.menu-dropdown').forEach(x => x.classList.add('hidden'));
+    }
+  });
 });
 
 // Delete modal
@@ -420,3 +474,13 @@ async function performDelete() {
 
 deleteConfirmBtn && deleteConfirmBtn.addEventListener('click', performDelete);
 deleteCancelBtn && deleteCancelBtn.addEventListener('click', closeDeleteModal);
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
+function formatMessageHtml(text){
+  let s = escapeHtml(text);
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(?<!\*)\*(.+?)\*(?!\*)/g, '<em>$1</em>');
+  s = s.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
+  s = s.replace(/_([^_]+?)_/g, '<em>$1</em>');
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}

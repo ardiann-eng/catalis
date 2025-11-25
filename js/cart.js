@@ -835,17 +835,21 @@ function setupCartEventListeners() {
     }
 
     if (cartButtonMobile) {
-        cartButtonMobile.addEventListener('click', openCart);
+        cartButtonMobile.addEventListener('click', () => {
+            if (isMobileViewport()) openCart();
+        });
     }
 
     if (cartFab) {
         cartFab.addEventListener('click', () => {
+            if (!isMobileViewport()) return;
             if (isCartOpen) closeCart(); else openCart();
         });
     }
 
     if (cartToggleBtn) {
         cartToggleBtn.addEventListener('click', () => {
+            if (!isMobileViewport()) return;
             if (isCartOpen) closeCart(); else openCart();
         });
     }
@@ -858,6 +862,10 @@ function setupCartEventListeners() {
 
     // Setup quantity button event delegation
     setupQuantityButtonListeners();
+}
+
+function isMobileViewport() {
+    return window.matchMedia('(max-width: 768px)').matches;
 }
 
 // Setup event delegation for quantity control buttons

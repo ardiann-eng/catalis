@@ -134,7 +134,7 @@ function renderProducts(productsToRender) {
     productsToRender.forEach(product => {
         const fav = isFavorite(product.id);
         productsHTML += `
-            <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300" 
+            <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 flex flex-col h-full" 
                  data-product-id="${product.id}">
                 <div class="relative aspect-square">
                     <img src="${product.image_url || 'https://via.placeholder.com/600x600?text=No+Image'}" 
@@ -147,23 +147,24 @@ function renderProducts(productsToRender) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart ${fav ? 'text-red-500' : 'text-gray-500'}"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
                     </button>
                 </div>
-                <div class="p-4">
-                    <h3 class="text-base font-semibold mb-1 truncate text-gray-900">${product.name}</h3>
-                    ${product.description ? `<p class="text-xs text-gray-600 mb-2 line-clamp-2">${product.description}</p>` : ''}
-                    <div class="mb-3">
-                        <span class="text-gray-900 font-extrabold text-sm">Rp ${formatPrice(product.price || 0)}</span>
+                <div class="p-4 sm:p-5 flex-1 flex flex-col">
+                    <h3 class="product-title text-sm font-semibold text-gray-900 line-clamp-2">${product.name}</h3>
+                    <div class="mt-2 mb-2 sm:mb-3 min-h-[28px] sm:min-h-[32px] flex items-baseline justify-between">
+                        <span class="text-xl sm:text-2xl font-extrabold text-primary">Rp ${formatPrice(product.price || 0)}</span>
+                        <span class="text-[11px] sm:text-xs text-gray-500 whitespace-nowrap">Stok ${product.stock ?? '-'}</span>
                     </div>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button class="add-to-cart-btn h-12 w-11/12 sm:w-full mx-auto flex items-center justify-center gap-1 bg-secondary hover:bg-pink-600 text-white px-2 rounded-lg text-xs font-semibold shadow-sm active:scale-[0.98] transition-all"
-                                data-product-id="${product.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                            Tambah ke Keranjang
-                        </button>
-                        <button class="buy-now-btn h-12 w-11/12 sm:w-full mx-auto flex items-center justify-center gap-1 bg-primary hover:bg-yellow-500 text-dark px-2 rounded-lg text-xs font-bold shadow-sm active:scale-[0.98] transition-all"
-                                data-product-id="${product.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            Beli Sekarang
-                        </button>
+                    <div class="mt-auto pt-2 sm:pt-3">
+                        <div class="sm:flex sm:items-center sm:gap-3">
+                            <button class="add-to-cart-btn w-full h-11 rounded-xl bg-secondary hover:bg-pink-600 text-white font-semibold active:scale-[0.98] transition"
+                                    data-product-id="${product.id}">
+                                <span class="sm:hidden">+ Keranjang</span>
+                                <span class="hidden sm:inline">Tambah ke Keranjang</span>
+                            </button>
+                            <button class="buy-now-btn hidden sm:flex h-11 w-11 rounded-full border-2 border-primary text-primary bg-white items-center justify-center active:scale-[0.98] transition"
+                                    data-product-id="${product.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,17 +249,14 @@ function setupEventListeners() {
                 }
 
                 // Jika yang diklik adalah tombol add to cart
-                if (e.target.classList.contains('add-to-cart-btn')) {
+                if (e.target.closest('.add-to-cart-btn')) {
                     addProductToCart(productId, 1);
-                    e.stopPropagation(); // Hindari membuka detail produk
-                } else if (e.target.classList.contains('buy-now-btn')) {
+                    const card = e.target.closest('.nft-card');
+                    if (card) animateAddToCart(card);
+                    e.stopPropagation();
+                } else if (e.target.closest('.buy-now-btn')) {
                     addProductToCart(productId, 1);
-                    if (typeof window.openCart === 'function') {
-                        window.openCart();
-                    }
-                    if (typeof window.checkout === 'function') {
-                        setTimeout(() => window.checkout(), 600);
-                    }
+                    window.location.href = 'checkout.html';
                     e.stopPropagation();
                 } else if (e.target.closest('.favorite-btn')) {
                     toggleFavorite(productId);
@@ -516,6 +514,35 @@ function addCartButtonPulse() {
             }, 400);
         }
     });
+}
+
+function animateAddToCart(card) {
+    try {
+        const img = card.querySelector('img');
+        const cartBtn = document.getElementById('cart-button-desktop') || document.getElementById('cart-fab');
+        if (!img || !cartBtn) return;
+        const imgRect = img.getBoundingClientRect();
+        const cartRect = cartBtn.getBoundingClientRect();
+        const clone = img.cloneNode(true);
+        clone.style.position = 'fixed';
+        clone.style.left = imgRect.left + 'px';
+        clone.style.top = imgRect.top + 'px';
+        clone.style.width = imgRect.width + 'px';
+        clone.style.height = imgRect.height + 'px';
+        clone.style.zIndex = 1000;
+        clone.style.borderRadius = '12px';
+        clone.style.transition = 'transform .6s ease, opacity .6s ease, width .6s ease, height .6s ease';
+        document.body.appendChild(clone);
+        const dx = cartRect.left - imgRect.left;
+        const dy = cartRect.top - imgRect.top;
+        requestAnimationFrame(() => {
+            clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.2)`;
+            clone.style.opacity = '0.3';
+            clone.style.width = '40px';
+            clone.style.height = '40px';
+        });
+        setTimeout(() => { clone.remove(); addCartButtonPulse(); }, 650);
+    } catch(_) {}
 }
 
 // Fungsi untuk memperbarui cart button desktop

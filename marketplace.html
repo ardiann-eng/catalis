@@ -197,6 +197,13 @@
             object-fit: cover;
             width: 100%;
         }
+        @media (max-width: 640px) {
+            .product-card .text-sm { font-size: 14px; }
+            .product-card-content { padding: 1rem; }
+        }
+        .product-title { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+        @media (max-width: 640px) { .product-title { -webkit-line-clamp: 2; } }
+        @media (min-width: 641px) { .product-title { -webkit-line-clamp: 1; } }
         
         .filter-btn {
             transition: all 0.2s ease;
@@ -429,7 +436,7 @@
     </section>
 
     <!-- Product Grid -->
-    <section class="pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
+    <section class="pb-24 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             <!-- Skeleton Loading -->
             <div id="skeleton-grid" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">

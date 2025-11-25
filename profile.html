@@ -48,8 +48,8 @@
         .btn-outline:hover { border-color: #d946ef; color: #d946ef; }
         .tab-btn { padding: .5rem 1rem; border-radius: .75rem; font-weight: 600; color: #374151; background-color: #f3f4f6; }
         .tab-btn-active { color: #fff; background-color: #1e1b4b; }
-        .cover-aspect { aspect-ratio: 16/9; max-height: 360px; }
-        @media (max-width: 640px) { .cover-aspect { aspect-ratio: auto; height: 120px; } }
+        .cover-aspect { aspect-ratio: 16/9; max-height: 280px; }
+        @media (max-width: 640px) { .cover-aspect { aspect-ratio: auto; height: clamp(160px, 30vh, 200px); } }
         .overlay-soft { background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.5) 100%); }
         .avatar-fallback { background-color: #f3f4f6; color: #1e1b4b; font-weight: 800; display: flex; align-items: center; justify-content: center; }
         .icon-wrap { width: 36px; height: 36px; border-radius: .75rem; display: flex; align-items: center; justify-content: center; }
@@ -57,95 +57,100 @@
         .toast-show { transform: translateX(0); opacity: 1; }
         .saved-highlight { animation: savedPulse .9s ease; }
         @keyframes savedPulse { 0% { box-shadow: 0 0 0 0 rgba(217,70,239,.4); transform: scale(1); } 50% { box-shadow: 0 0 0 12px rgba(217,70,239,.15); transform: scale(1.01); } 100% { box-shadow: 0 0 0 0 rgba(217,70,239,0); transform: scale(1); } }
+        .touch-target { min-width: 48px; min-height: 48px; }
+        .wrap-anywhere { word-break: break-word; overflow-wrap: anywhere; hyphens: auto; }
+        .tabs-bar { position: sticky; top: 5.5rem; z-index: 40; background: #fff; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab-link { white-space: nowrap; padding: .75rem 1rem; font-weight: 600; color: #4b5563; border-bottom: 2px solid transparent; }
+        .tab-link-active { color: #111827; border-bottom-color: #facc15; }
+        .stat-number { overflow-wrap: anywhere; word-break: break-word; }
     </style>
 </head>
 <body class="bg-white font-sans text-gray-800">
     <div id="navbar-container"></div>
     <div id="cart-sidebar-container"></div>
 
-    <section class="pt-32 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-6 sm:mb-8">
         <div class="card overflow-hidden">
-            <div id="profile-cover" class="relative cover-aspect w-full">
+            <div id="profile-cover" class="relative cover-aspect w-full p-3 sm:p-6">
                 <div class="absolute inset-0 gradient-bg"></div>
                 <div class="absolute inset-0 overlay-soft"></div>
-                <div class="absolute left-4 right-4 sm:left-6 sm:right-6 bottom-3 sm:bottom-6 flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-6">
+                <div class="absolute left-4 right-4 sm:left-6 sm:right-6 bottom-3 sm:bottom-6 flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
                     <div class="flex items-center gap-4">
-                        <div id="profile-avatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl ring-3 sm:ring-4 ring-white overflow-hidden avatar-fallback text-2xl sm:text-3xl">SJ</div>
+                        <div id="profile-avatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl ring-3 sm:ring-4 ring-white overflow-hidden avatar-fallback text-2xl sm:text-3xl relative z-10">SJ</div>
                         <div class="text-white drop-shadow">
-                            <div class="flex items-center gap-2">
-                                <h1 id="profile-username" class="text-2xl sm:text-3xl font-display font-bold">Sarah Johnson</h1>
+                            <div class="flex items-center gap-3">
+                                <h1 id="profile-username" class="text-2xl sm:text-3xl font-display font-bold text-white">Sarah Johnson</h1>
                                 <span id="profile-status" class="text-xs px-2.5 py-1 rounded-full bg-white/90 text-green-700 font-semibold">Member</span>
                             </div>
-                            <p id="profile-email" class="text-white/90">sarahj@example.com</p>
-                            <div class="flex flex-wrap gap-2 sm:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-white/90">
+                            <p id="profile-email" class="text-white mt-1">sarahj@example.com</p>
+                            <div class="flex flex-wrap gap-3 sm:gap-5 mt-3 sm:mt-4 text-xs sm:text-sm leading-relaxed text-white">
                                 <div class="flex items-center gap-1"><i data-feather="calendar" class="w-4 h-4"></i><span id="profile-joined">Bergabung: 12 Jan 2024</span></div>
                                 <div class="flex items-center gap-1"><i data-feather="clock" class="w-4 h-4"></i><span id="profile-last-login">Login terakhir: 24 Nov 2025</span></div>
                             </div>
                         </div>
                     </div>
                     <div class="sm:ml-auto flex items-center gap-2 sm:gap-3">
-                        <a href="#" class="btn btn-outline px-4 sm:px-6 py-2 bg-white/90">Lihat Pesanan</a>
-                        <button id="edit-profile-btn" class="btn btn-primary px-4 sm:px-6 py-2">Edit Profil</button>
+                        <a href="recent-activity.html" class="btn btn-outline px-4 sm:px-6 h-12 touch-target bg-white/90">Lihat Pesanan</a>
+                        <button id="edit-profile-btn" class="btn btn-primary px-4 sm:px-6 h-12 touch-target">Edit Profil</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <div class="card p-5">
+    <section class="pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div class="card p-4 sm:p-5">
                 <div class="flex items-center gap-3">
                     <div class="icon-wrap bg-yellow-100 text-yellow-600"><i data-feather="shopping-bag" class="w-5 h-5"></i></div>
                     <div>
-                        <div class="text-xs text-gray-500">Total Orders</div>
-                        <div id="stat-total-orders" class="mt-1 text-2xl font-bold">128</div>
+                        <div class="text-sm text-gray-600">Total Orders</div>
+                        <div id="stat-total-orders" class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">128</div>
                     </div>
                 </div>
             </div>
-            <div class="card p-5">
+            <div class="card p-4 sm:p-5">
                 <div class="flex items-center gap-3">
                     <div class="icon-wrap bg-green-100 text-green-600"><i data-feather="check-circle" class="w-5 h-5"></i></div>
                     <div>
-                        <div class="text-xs text-gray-500">Completed Orders</div>
-                        <div id="stat-completed-orders" class="mt-1 text-2xl font-bold">119</div>
+                        <div class="text-sm text-gray-600">Completed Orders</div>
+                        <div id="stat-completed-orders" class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">119</div>
                     </div>
                 </div>
             </div>
-            <div class="card p-5">
+            <div class="card p-4 sm:p-5">
                 <div class="flex items-center gap-3">
                     <div class="icon-wrap bg-purple-100 text-purple-600"><i data-feather="credit-card" class="w-5 h-5"></i></div>
                     <div>
-                        <div class="text-xs text-gray-500">Total Spending</div>
-                        <div id="stat-total-spending" class="mt-1 text-2xl font-bold">Rp 42.500.000</div>
+                        <div class="text-sm text-gray-600">Total Spending</div>
+                        <div id="stat-total-spending" class="stat-number mt-1 text-lg sm:text-2xl font-bold leading-snug tracking-tight px-1 min-w-0 truncate whitespace-nowrap" style="font-size: clamp(1rem, 2.8vw, 1.5rem);">Rp 42.500.000</div>
                     </div>
                 </div>
             </div>
-            <div class="card p-5">
+            <div class="card p-4 sm:p-5">
                 <div class="flex items-center gap-3">
                     <div class="icon-wrap bg-blue-100 text-blue-600"><i data-feather="package" class="w-5 h-5"></i></div>
                     <div>
-                        <div class="text-xs text-gray-500">Products Purchased</div>
-                        <div id="stat-products-purchased" class="mt-1 text-2xl font-bold">356</div>
+                        <div class="text-sm text-gray-600">Products Purchased</div>
+                        <div id="stat-products-purchased" class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">356</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-display font-bold">Navigasi Profil</h2>
-            <div class="flex gap-2">
-                <button class="tab-btn tab-btn-active" data-tab="favorit">Koleksi Favorit</button>
-                <button class="tab-btn" data-tab="alamat">Alamat Pengiriman</button>
-                <button class="tab-btn" data-tab="pengaturan">Pengaturan Akun</button>
+    <section class="pt-1 pb-8 px-0 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="tabs-bar md:rounded-none border-b">
+            <div class="flex gap-4 px-4">
+                <button class="tab-link tab-link-active" data-tab="favorit">Koleksi Favorit</button>
+                <button class="tab-link" data-tab="alamat">Alamat Pengiriman</button>
+                <button class="tab-link" data-tab="pengaturan">Pengaturan Akun</button>
             </div>
         </div>
 
         <div id="tab-content" class="card p-6">
             <div data-panel="favorit" class="space-y-4">
-                <div id="favorites-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                <div id="favorites-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
                 <div id="favorites-empty" class="col-span-full flex items-center justify-center py-16 text-center hidden">
                     <div>
                         <div class="mx-auto w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-secondary"><i data-feather="heart" class="w-6 h-6"></i></div>
@@ -155,11 +160,11 @@
             </div>
 
             <div data-panel="alamat" class="hidden">
-                <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center justify-between mb-2">
                     <div class="text-sm text-gray-600">Kelola alamat pengiriman Anda</div>
-                    <button id="add-address-btn" class="btn btn-primary px-4 py-2">Tambah Alamat</button>
+                    <button id="add-address-btn" class="btn btn-primary px-4 h-12 touch-target">Tambah Alamat</button>
                 </div>
-                <div id="addresses-list" class="grid sm:grid-cols-2 gap-4"></div>
+                <div id="addresses-list" class="grid sm:grid-cols-2 gap-3"></div>
                 <div id="addresses-empty" class="col-span-full flex items-center justify-center py-10 text-center hidden">
                     <div>
                         <div class="mx-auto w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-secondary"><i data-feather="map-pin" class="w-6 h-6"></i></div>
@@ -244,25 +249,25 @@
                         </div>
                         <div>
                             <label class="text-sm text-gray-600">No. Telepon</label>
-                            <input id="address-phone" type="text" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none" placeholder="08xxxxxxxxxx">
+                            <input id="address-phone" type="tel" inputmode="tel" autocomplete="tel" pattern="^\+?\d{9,15}$" maxlength="15" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none" placeholder="08xxxxxxxxxx">
                         </div>
                     </div>
                     <div>
                         <label class="text-sm text-gray-600">Alamat</label>
-                        <textarea id="address-line" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none" rows="3"></textarea>
+                        <textarea id="address-line" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none" rows="3" autocomplete="street-address"></textarea>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
                         <div>
                             <label class="text-sm text-gray-600">Kota</label>
-                            <input id="address-city" type="text" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                            <input id="address-city" type="text" autocomplete="address-level2" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
                         </div>
                         <div>
                             <label class="text-sm text-gray-600">Provinsi</label>
-                            <input id="address-province" type="text" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                            <input id="address-province" type="text" autocomplete="address-level1" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
                         </div>
                         <div>
                             <label class="text-sm text-gray-600">Kode Pos</label>
-                            <input id="address-postal" type="text" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                            <input id="address-postal" type="text" inputmode="numeric" pattern="\d{5}" maxlength="5" autocomplete="postal-code" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
                         </div>
                     </div>
                     <label class="flex items-center gap-2">
@@ -286,12 +291,12 @@
         import { refreshSession } from './js/auth-utils.js';
 
         const currencyID = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
-        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+        const tabs = Array.from(document.querySelectorAll('.tab-link'));
         const panels = Array.from(document.querySelectorAll('[data-panel]'));
         tabs.forEach(btn => {
             btn.addEventListener('click', () => {
-                tabs.forEach(b => b.classList.remove('tab-btn-active'));
-                btn.classList.add('tab-btn-active');
+                tabs.forEach(b => b.classList.remove('tab-link-active'));
+                btn.classList.add('tab-link-active');
                 const target = btn.getAttribute('data-tab');
                 panels.forEach(p => { p.classList.toggle('hidden', p.getAttribute('data-panel') !== target); });
             });
@@ -320,6 +325,8 @@
                 img.src = url;
                 img.alt = 'Avatar';
                 img.className = 'w-full h-full object-cover';
+                img.loading = 'lazy';
+                img.decoding = 'async';
                 container.classList.remove('avatar-fallback');
                 container.appendChild(img);
             } else {
@@ -367,7 +374,7 @@
                 .eq('user_id', user.id)
                 .eq('status', 'completed');
             const totalSpending = (spendingData || []).reduce((s, r) => s + (r.total_amount || 0), 0);
-            document.getElementById('stat-total-spending').textContent = currencyID.format(totalSpending);
+            document.getElementById('stat-total-spending').textContent = currencyID.format(Math.round(totalSpending));
 
             const { data: orderIds } = await supabase.from('orders').select('id').eq('user_id', user.id);
             const ids = (orderIds || []).map(o => o.id);
@@ -423,20 +430,43 @@
             empty.classList.add('hidden');
             items.forEach(({ id, product }) => {
                 const card = document.createElement('div');
-                card.className = 'card p-3';
+                card.className = 'card p-3 shadow-sm hover:shadow-md transition';
                 card.innerHTML = `
-                    <div class="space-y-3">
-                        <div class="w-full h-32 rounded-xl overflow-hidden bg-gray-100">
-                            <img src="${product.image_url || ''}" alt="${product.name}" class="w-full h-full object-cover">
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="w-full aspect-[3/4] sm:h-32 rounded-xl overflow-hidden bg-gray-100">
+                            <img src="${product.image_url || ''}" alt="${product.name}" class="w-full h-full object-cover object-center" loading="lazy" decoding="async" fetchpriority="low">
                         </div>
-                        <div class="font-semibold">${product.name}</div>
-                        <div class="text-primary font-bold">${currencyID.format(product.price || 0)}</div>
-                        <div class="flex gap-2">
-                            <a href="marketplace.html" class="btn btn-outline px-3 py-1">Lihat</a>
-                            <button data-like-id="${id}" data-product-id="${product.id}" class="btn btn-primary px-3 py-1">Unlike</button>
+                        <div class="font-semibold text-sm sm:text-base line-clamp-2">${product.name}</div>
+                        <div class="text-primary font-bold text-sm sm:text-base">${currencyID.format(product.price || 0)}</div>
+                        <div class="flex items-center justify-between">
+                            <button class="fav-buy-btn px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-dark text-xs flex items-center gap-2" 
+                                    data-product-id="${product.id}" 
+                                    data-product-name="${product.name}" 
+                                    data-product-price="${product.price || 0}" 
+                                    data-product-image="${product.image_url || ''}">
+                                <i data-feather="shopping-cart" class="w-4 h-4"></i>
+                                <span class="hidden sm:inline">Keranjang</span>
+                            </button>
+                            <button aria-label="Unlike" title="Unlike" data-like-id="${id}" data-product-id="${product.id}" class="h-10 w-10 touch-target rounded-full bg-white border flex items-center justify-center shadow-sm">
+                                <i data-feather="heart" class="w-5 h-5 text-red-500"></i>
+                            </button>
                         </div>
                     </div>`;
                 grid.appendChild(card);
+            });
+            grid.querySelectorAll('.fav-buy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const product = {
+                        id: btn.getAttribute('data-product-id'),
+                        name: btn.getAttribute('data-product-name'),
+                        price: Number(btn.getAttribute('data-product-price')) || 0,
+                        image_url: btn.getAttribute('data-product-image') || ''
+                    };
+                    if (typeof window.addToCart === 'function') {
+                        window.addToCart(product);
+                        if (typeof window.openCart === 'function') window.openCart();
+                    }
+                });
             });
             grid.querySelectorAll('button[data-like-id]').forEach(btn => {
                 btn.addEventListener('click', async () => {
@@ -488,7 +518,7 @@
                 const badge = addr.is_default ? '<span class="ml-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Alamat Utama</span>' : '';
                 card.innerHTML = `
                     <div class="flex items-start justify-between">
-                        <div>
+                        <div class="wrap-anywhere">
                             <div class="text-sm font-semibold">${addr.receiver_name || 'Penerima'} ${badge}</div>
                             <div class="mt-1 text-gray-600">${addr.phone_number || ''}</div>
                             <div class="mt-2 text-gray-600">${addr.address_line || ''}</div>
@@ -527,19 +557,31 @@
             setTimeout(() => { t.classList.remove('toast-show'); }, 2500);
         }
 
+        function sanitizePhone(input) {
+            let v = input.replace(/[^\d+]/g, '');
+            if (v.startsWith('+')) v = '+' + v.slice(1).replace(/\D/g, '');
+            else v = v.replace(/\D/g, '');
+            return v;
+        }
+
         async function saveAddress() {
             if (isSavingAddress) return;
             isSavingAddress = true;
             const saveBtn = document.getElementById('address-save');
             if (saveBtn) { saveBtn.disabled = true; saveBtn.classList.add('opacity-60'); }
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) backBtn.addEventListener('click', () => { try { history.back(); } catch(_) { window.location.href = 'index.html'; } });
             const receiver = document.getElementById('address-receiver').value.trim();
-            const phone = document.getElementById('address-phone').value.trim();
+            let phone = document.getElementById('address-phone').value.trim();
+            phone = sanitizePhone(phone);
             const line = document.getElementById('address-line').value.trim();
             const city = document.getElementById('address-city').value.trim();
             const province = document.getElementById('address-province').value.trim();
             const postal = document.getElementById('address-postal').value.trim();
             const isDefault = document.getElementById('address-default').checked;
-            if (!receiver || !phone || !line || !city || !province || !postal) { document.getElementById('address-save-status').textContent = 'Lengkapi data alamat'; return; }
+            if (!receiver || !phone || !line || !city || !province || !postal) { document.getElementById('address-save-status').textContent = 'Lengkapi data alamat'; isSavingAddress=false; if (saveBtn){saveBtn.disabled=false; saveBtn.classList.remove('opacity-60');} return; }
+            if (!/^\+?\d{9,15}$/.test(phone)) { document.getElementById('address-save-status').textContent = 'Nomor telepon tidak valid'; isSavingAddress=false; if (saveBtn){saveBtn.disabled=false; saveBtn.classList.remove('opacity-60');} return; }
+            if (!/^\d{5}$/.test(postal)) { document.getElementById('address-save-status').textContent = 'Kode pos harus 5 digit'; isSavingAddress=false; if (saveBtn){saveBtn.disabled=false; saveBtn.classList.remove('opacity-60');} return; }
             document.getElementById('address-save-status').textContent = 'Menyimpan...';
             if (isDefault) { await supabase.from('saved_addresses').update({ is_default: false }).eq('user_id', currentUserId); }
             if (editingAddressId) {
@@ -570,6 +612,8 @@
         document.getElementById('edit-profile-btn').addEventListener('click', openEditModal);
         document.getElementById('close-edit').addEventListener('click', closeEditModal);
         document.getElementById('editProfileModal').addEventListener('click', (e) => { if (e.target.id === 'editProfileModal') closeEditModal(); });
+        const mb = document.getElementById('mobile-back');
+        if (mb) mb.addEventListener('click', () => { try { history.back(); } catch(_) { window.location.href = 'index.html'; } });
 
         document.getElementById('edit-name').addEventListener('input', (e) => {
             const val = e.target.value.trim();

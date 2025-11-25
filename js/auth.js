@@ -220,11 +220,16 @@ function showUserProfile(user) {
     if (dropdownName) dropdownName.textContent = displayName;
     if (dropdownEmail) dropdownEmail.textContent = user.email;
     
-    // Mobile
     document.getElementById('mobile-auth-buttons').classList.add('hidden');
     document.getElementById('mobile-user-profile').classList.remove('hidden');
     const mobileEmail = document.getElementById('mobile-user-email');
+    const mobileName = document.getElementById('mobile-user-name');
+    const mobileAvatar = document.getElementById('mobile-user-avatar');
+    const avatarUrlMobile = user.user_metadata?.avatar_url || user.avatar_url || '';
+    const displayNameMobile = user.user_metadata?.display_name || user.user_metadata?.full_name || user.email;
     if (mobileEmail) mobileEmail.textContent = user.email;
+    if (mobileName) mobileName.textContent = displayNameMobile;
+    if (mobileAvatar) mobileAvatar.src = avatarUrlMobile || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayNameMobile)}`;
     
     // Tambahkan event listener untuk tombol logout
     const logoutBtn = document.getElementById('logout-button');

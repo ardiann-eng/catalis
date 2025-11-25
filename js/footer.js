@@ -57,7 +57,7 @@ function insertFooter() {
               </div>
               <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2">
                 <input type="email" id="newsletter-email" placeholder="Email Anda" class="min-w-0 flex-1 px-3 py-2 rounded-md bg-gray-800 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-secondary" required />
-                <button class="w-full sm:w-auto px-4 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark transition">Subscribe</button>
+                <button class="w-full sm:w-auto px-4 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark transition">Berlangganan</button>
               </form>
               <div id="newsletter-msg" class="text-xs text-gray-400 mt-2"></div>
             </div>
