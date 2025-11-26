@@ -1,11 +1,11 @@
 // Import Supabase client dari modul supabase.js
 import { supabase } from './supabase.js';
 // Import fungsi utility untuk manajemen session
-import { 
-    saveSession, 
-    getSession, 
-    clearSession, 
-    isLoggedIn, 
+import {
+    saveSession,
+    getSession,
+    clearSession,
+    isLoggedIn,
     refreshSession,
     handleRedirectAfterLogin,
     checkPageAuth
@@ -28,7 +28,7 @@ function showFormError(elementId, message) {
     if (errorElement) {
         errorElement.textContent = message;
         errorElement.style.display = 'block';
-        
+
         // Sembunyikan pesan error setelah 5 detik
         setTimeout(() => {
             errorElement.style.display = 'none';
@@ -39,41 +39,41 @@ function showFormError(elementId, message) {
 // Fungsi untuk login
 async function handleLoginForm(e) {
     if (e) e.preventDefault();
-    
+
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    
+
     // Validasi input
     if (!isValidEmail(email)) {
         showFormError('error-message', 'Format email tidak valid');
         return;
     }
-    
+
     if (!isValidPassword(password)) {
         showFormError('error-message', 'Password minimal 6 karakter');
         return;
     }
-    
+
     try {
         // Login dengan Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
-        
+
         if (error) throw error;
-        
+
         // Simpan session ke localStorage
         if (data && data.session) {
             saveSession(data.session, data.user);
         }
-        
+
         // Tampilkan notifikasi sukses
         showNotification('Login berhasil', 'success');
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('login-success', { detail: { user: data.user } }));
         }
-        
+
         // Redirect ke halaman yang sesuai setelah login berhasil
         setTimeout(() => {
             handleRedirectAfterLogin();
@@ -86,33 +86,33 @@ async function handleLoginForm(e) {
 // Fungsi untuk registrasi
 async function handleRegisterForm(e) {
     if (e) e.preventDefault();
-    
+
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
-    
+
     // Validasi input
     if (!name) {
         showFormError('error-message', 'Nama tidak boleh kosong');
         return;
     }
-    
+
     if (!isValidEmail(email)) {
         showFormError('error-message', 'Format email tidak valid');
         return;
     }
-    
+
     if (!isValidPassword(password)) {
         showFormError('error-message', 'Password minimal 6 karakter');
         return;
     }
-    
+
     if (password !== confirmPassword) {
         showFormError('error-message', 'Konfirmasi password tidak cocok');
         return;
     }
-    
+
     try {
         // Registrasi dengan Supabase
         const { data, error } = await supabase.auth.signUp({
@@ -124,27 +124,27 @@ async function handleRegisterForm(e) {
                 }
             }
         });
-        
+
         if (error) throw error;
-        
+
         // Tambahkan data user ke tabel profiles jika diperlukan
         if (data.user) {
             const { error: profileError } = await supabase
                 .from('profiles')
                 .insert([
-                    { 
-                        id: data.user.id, 
+                    {
+                        id: data.user.id,
                         full_name: name,
                         email: email
                     }
                 ]);
-                
+
             if (profileError) console.error('Error menyimpan profil:', profileError);
         }
-        
+
         // Tampilkan notifikasi sukses
         showNotification('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.', 'success');
-        
+
         // Redirect ke halaman login setelah registrasi berhasil
         setTimeout(() => {
             window.location.href = 'login.html';
@@ -161,13 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', handleLoginForm);
     }
-    
+
     // Cek apakah halaman saat ini adalah halaman registrasi
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegisterForm);
     }
-    
+
     // Cek status autentikasi
     checkAuthStatus().then(user => {
         if (user && (window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html'))) {
@@ -181,12 +181,12 @@ async function checkAuthStatus() {
     try {
         // Cek session pengguna
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
             console.error('Error checking auth status:', error);
             return;
         }
-        
+
         if (session) {
             // Pengguna sudah login
             const user = session.user;
@@ -219,7 +219,7 @@ function showUserProfile(user) {
     if (dropdownAvatar) dropdownAvatar.src = avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}`;
     if (dropdownName) dropdownName.textContent = displayName;
     if (dropdownEmail) dropdownEmail.textContent = user.email;
-    
+
     document.getElementById('mobile-auth-buttons').classList.add('hidden');
     document.getElementById('mobile-user-profile').classList.remove('hidden');
     const mobileEmail = document.getElementById('mobile-user-email');
@@ -230,7 +230,7 @@ function showUserProfile(user) {
     if (mobileEmail) mobileEmail.textContent = user.email;
     if (mobileName) mobileName.textContent = displayNameMobile;
     if (mobileAvatar) mobileAvatar.src = avatarUrlMobile || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayNameMobile)}`;
-    
+
     // Tambahkan event listener untuk tombol logout
     const logoutBtn = document.getElementById('logout-button');
     const logoutMenuItem = document.getElementById('logout-menu-item');
@@ -245,7 +245,7 @@ function showLoginButton() {
     // Desktop
     document.getElementById('auth-buttons').classList.remove('hidden');
     document.getElementById('user-profile').classList.add('hidden');
-    
+
     // Mobile
     document.getElementById('mobile-auth-buttons').classList.remove('hidden');
     document.getElementById('mobile-user-profile').classList.add('hidden');
@@ -259,10 +259,10 @@ async function handleLogout() {
             console.error('Error during logout:', error);
             return;
         }
-        
+
         // Tampilkan notifikasi logout berhasil
         showNotification('Logout berhasil', 'success');
-        
+
         // Redirect ke halaman utama setelah logout
         setTimeout(() => {
             window.location.href = 'index.html';
@@ -277,7 +277,7 @@ async function handleLogout() {
 function showNotification(message, type = 'info') {
     // Cek apakah elemen notifikasi sudah ada
     let notification = document.getElementById('auth-notification');
-    
+
     // Jika belum ada, buat elemen notifikasi
     if (!notification) {
         notification = document.createElement('div');
@@ -285,7 +285,7 @@ function showNotification(message, type = 'info') {
         notification.className = 'fixed top-24 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
         document.body.appendChild(notification);
     }
-    
+
     // Set warna berdasarkan tipe notifikasi
     if (type === 'success') {
         notification.className = notification.className.replace(/bg-\w+-\d+/g, '');
@@ -297,15 +297,15 @@ function showNotification(message, type = 'info') {
         notification.className = notification.className.replace(/bg-\w+-\d+/g, '');
         notification.classList.add('bg-blue-500', 'text-white');
     }
-    
+
     // Set pesan
     notification.textContent = message;
-    
+
     // Tampilkan notifikasi
     setTimeout(() => {
         notification.classList.remove('translate-x-full');
     }, 100);
-    
+
     // Sembunyikan notifikasi setelah 3 detik
     setTimeout(() => {
         notification.classList.add('translate-x-full');
@@ -313,9 +313,9 @@ function showNotification(message, type = 'info') {
 }
 
 // Inisialisasi auth saat dokumen dimuat
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     checkAuthStatus();
-    
+
     // Inisialisasi ikon Feather
     if (typeof feather !== 'undefined') {
         feather.replace();

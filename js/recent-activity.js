@@ -72,11 +72,12 @@ function setupUI() {
 
 function mapCategory(status) {
   const s = (status || '').toLowerCase();
-  if (['pending','unpaid','to_pay'].includes(s)) return 'to_pay';
-  if (['paid','success'].includes(s)) return 'paid';
-  if (['processing','packaging','shipped','progress'].includes(s)) return 'progress';
-  if (['delivered','completed','success_receive','receive'].includes(s)) return 'success';
-  if (['review','awaiting_review','review_pending'].includes(s)) return 'review';
+  if (['pending', 'unpaid', 'to_pay'].includes(s)) return 'to_pay';
+  if (['paid', 'success'].includes(s)) return 'paid';
+  if (['processing', 'packaging', 'shipped', 'progress'].includes(s)) return 'progress';
+  if (['delivered', 'completed', 'success_receive', 'receive'].includes(s)) return 'success';
+  if (['review', 'awaiting_review', 'review_pending'].includes(s)) return 'review';
+  if (['cancelled', 'void', 'failed'].includes(s)) return 'cancelled';
   return 'other';
 }
 
@@ -111,10 +112,10 @@ function applyFilters() {
 }
 
 function sortFiltered() {
-  if (sort === 'date_desc') filtered.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-  if (sort === 'date_asc') filtered.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-  if (sort === 'amount_desc') filtered.sort((a,b) => (b.total_amount||0) - (a.total_amount||0));
-  if (sort === 'amount_asc') filtered.sort((a,b) => (a.total_amount||0) - (b.total_amount||0));
+  if (sort === 'date_desc') filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  if (sort === 'date_asc') filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  if (sort === 'amount_desc') filtered.sort((a, b) => (b.total_amount || 0) - (a.total_amount || 0));
+  if (sort === 'amount_asc') filtered.sort((a, b) => (a.total_amount || 0) - (b.total_amount || 0));
 }
 
 function statusBadge(status) {
@@ -124,33 +125,36 @@ function statusBadge(status) {
     paid: 'Paid',
     progress: 'Progress',
     success: 'Selesai',
-    review: 'Review'
+    review: 'Review',
+    cancelled: 'Cancelled'
   })[cat] || status;
-  return `<span class="badge ${cat}">${label}</span>`;
+  // Ensure capitalization
+  const capLabel = label.charAt(0).toUpperCase() + label.slice(1);
+  return `<span class="badge ${cat}">${capLabel}</span>`;
 }
 
 function isCancelable(status) {
   const s = (status || '').toLowerCase();
-  return ['pending','unpaid','to_pay','paid'].includes(s);
+  return ['pending', 'unpaid', 'to_pay', 'paid'].includes(s);
 }
 
 function render() {
-  const start = (page-1)*pageSize;
-  const rows = filtered.slice(start, start+pageSize).map(o => `
+  const start = (page - 1) * pageSize;
+  const rows = filtered.slice(start, start + pageSize).map(o => `
     <tr>
-      <td class="px-4 py-3"><button class="text-dark font-semibold hover:text-secondary" data-view="${o.order_number}">${formatId(o.order_number)}</button></td>
-      <td class="px-4 py-3">${formatDate(o.created_at)}</td>
-      <td class="px-4 py-3">Rp ${formatPrice(o.total_amount)}</td>
+      <td class="px-4 py-3"><button class="text-order-id hover:text-secondary transition-colors" data-view="${o.order_number}">#${formatId(o.order_number)}</button></td>
+      <td class="px-4 py-3 text-gray-600">${formatDate(o.created_at)}</td>
+      <td class="px-4 py-3 text-amount">Rp ${formatPrice(o.total_amount)}</td>
       <td class="px-4 py-3">${statusBadge(o.status)}</td>
       <td class="px-4 py-3">
-        <button class="text-secondary mr-3" data-details="${o.order_number}">View Details</button>
-        ${isCancelable(o.status) ? `<button class="text-red-600" data-cancel="${o.order_number}">Cancel</button>` : ''}
+        <button class="text-sm font-medium text-secondary hover:text-purple-700 mr-3 transition-colors" data-details="${o.order_number}">Details</button>
+        ${isCancelable(o.status) ? `<button class="text-sm font-medium text-red-500 hover:text-red-700 transition-colors" data-cancel="${o.order_number}">Cancel</button>` : ''}
       </td>
     </tr>
   `).join('');
   bodyEl.innerHTML = rows || `<tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">Tidak ada pesanan</td></tr>`;
   const max = Math.ceil(filtered.length / pageSize) || 1;
-  paginationInfoEl.textContent = `Showing ${filtered.length ? start+1 : 0} to ${Math.min(start+pageSize, filtered.length)} of ${filtered.length} orders`;
+  paginationInfoEl.textContent = `Showing ${filtered.length ? start + 1 : 0} to ${Math.min(start + pageSize, filtered.length)} of ${filtered.length} orders`;
   bodyEl.querySelectorAll('[data-details]').forEach(btn => btn.addEventListener('click', () => openDetail(btn.dataset.details)));
   bodyEl.querySelectorAll('[data-cancel]').forEach(btn => btn.addEventListener('click', () => {
     const o = orders.find(x => x.order_number === btn.dataset.cancel);
@@ -174,11 +178,11 @@ async function openDetail(orderNumber) {
       .eq('order_id', order.id);
     items = itemsData || [];
   }
-  const itemsHtml = (items||[]).map(it => `
+  const itemsHtml = (items || []).map(it => `
     <div class="flex items-center">
-      <img src="${it.products?.image_url||''}" class="w-14 h-14 rounded mr-3"/>
+      <img src="${it.products?.image_url || ''}" class="w-14 h-14 rounded mr-3"/>
       <div class="flex-1">
-        <div class="font-semibold">${it.products?.name||'-'}</div>
+        <div class="font-semibold">${it.products?.name || '-'}</div>
         <div class="text-sm text-gray-600">Rp ${formatPrice(it.price)} x ${it.quantity}</div>
       </div>
     </div>
@@ -186,19 +190,19 @@ async function openDetail(orderNumber) {
   document.getElementById('item-details').innerHTML = itemsHtml || '<div class="text-gray-500 text-sm">Tidak ada item</div>';
   const s = order.shipping || {};
   const shipHtml = `
-    <div>Nama: ${s.fullname||'-'}</div>
-    <div>Alamat: ${s.address||'-'}</div>
-    <div>Kecamatan/Kota/Provinsi: ${[s.district,s.city,s.province].filter(Boolean).join(', ')||'-'}</div>
-    <div>Kode Pos: ${s.postalCode||'-'}</div>
-    <div>HP: ${s.phone||'-'}</div>
-    <div>Email: ${s.email||'-'}</div>
+    <div>Nama: ${s.fullname || '-'}</div>
+    <div>Alamat: ${s.address || '-'}</div>
+    <div>Kecamatan/Kota/Provinsi: ${[s.district, s.city, s.province].filter(Boolean).join(', ') || '-'}</div>
+    <div>Kode Pos: ${s.postalCode || '-'}</div>
+    <div>HP: ${s.phone || '-'}</div>
+    <div>Email: ${s.email || '-'}</div>
   `;
   document.getElementById('shipping-info').innerHTML = shipHtml;
   const payHtml = `
-    <div>Metode: ${order.payment_method||'-'}</div>
-    <div>Status: ${order.status||'-'}</div>
+    <div>Metode: ${order.payment_method || '-'}</div>
+    <div>Status: ${order.status || '-'}</div>
     <div>ID Transaksi: ${order.order_number}</div>
-    <div>Total: Rp ${formatPrice(order.total_amount||0)}</div>
+    <div>Total: Rp ${formatPrice(order.total_amount || 0)}</div>
   `;
   document.getElementById('payment-info').innerHTML = payHtml;
   const allowedCancel = isCancelable(order.status);
@@ -234,7 +238,7 @@ async function cancelOrder(order) {
 
     if (!apiOk) {
       const s = (order.status || '').toLowerCase();
-      if (!['pending','unpaid','to_pay','paid'].includes(s)) {
+      if (!['pending', 'unpaid', 'to_pay', 'paid'].includes(s)) {
         return false;
       }
 

@@ -28,26 +28,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUserId = session?.user?.id || null;
         // Tampilkan loading indicator
         showLoading(true);
-        
+
         // Ambil data produk dari Supabase
         await fetchProducts();
         if (currentUserId) {
             await fetchUserLikes();
             setupRealtimeLikes();
         }
-        
+
         // Ambil kategori unik dari produk
         extractCategories();
-        
+
         // Render filter kategori
         renderCategoryFilters();
-        
+
         // Render produk
         renderProducts(products);
-        
+
         // Setup event listeners
         setupEventListeners();
-        
+
         // Sembunyikan loading indicator
         showLoading(false);
 
@@ -66,9 +66,9 @@ async function fetchProducts() {
             .from('products')
             .select('*')
             .order('created_at', { ascending: false });
-            
+
         if (error) throw error;
-        
+
         if (data) {
             products = data;
             filteredProducts = [...products];
@@ -94,7 +94,7 @@ function extractCategories() {
 // Fungsi untuk merender filter kategori
 function renderCategoryFilters() {
     if (!categoryFilters) return;
-    
+
     // Tambahkan filter "Semua"
     let filtersHTML = `
         <button class="filter-btn active px-4 sm:px-5 py-2.5 rounded-full border border-gray-300 bg-white shadow-sm text-sm sm:text-base font-medium transition-all" 
@@ -102,7 +102,7 @@ function renderCategoryFilters() {
             Semua
         </button>
     `;
-    
+
     // Tambahkan filter untuk setiap kategori
     categories.forEach(category => {
         filtersHTML += `
@@ -112,14 +112,14 @@ function renderCategoryFilters() {
             </button>
         `;
     });
-    
+
     categoryFilters.innerHTML = filtersHTML;
 }
 
 // Fungsi untuk merender produk
 function renderProducts(productsToRender) {
     if (!productGrid) return;
-    
+
     if (productsToRender.length === 0) {
         productGrid.innerHTML = `
             <div class="col-span-full text-center py-10">
@@ -128,51 +128,62 @@ function renderProducts(productsToRender) {
         `;
         return;
     }
-    
+
     let productsHTML = '';
-    
+
     productsToRender.forEach(product => {
         const fav = isFavorite(product.id);
         productsHTML += `
-            <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 flex flex-col h-full" 
+            <div class="nft-card bg-white overflow-hidden transition-all duration-300 flex flex-col h-full" 
                  data-product-id="${product.id}">
+                <!-- Portrait Image Container -->
                 <div class="relative aspect-square">
-                    <img src="${product.image_url || 'https://via.placeholder.com/600x600?text=No+Image'}" 
+                    <img src="${product.image_url || 'https://via.placeholder.com/600x800?text=No+Image'}" 
                          alt="${product.name}" 
-                         class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute top-2 left-2 category-badge px-2 py-1 rounded-full text-xs font-semibold">
-                        ${product.category || 'Uncategorized'}
+                         class="absolute inset-0 w-full h-full">
+                    
+                    <!-- Category Badge - Inside Image (Top Left) -->
+                    <div class="absolute top-2 left-2 z-10">
+                        <span class="category-badge inline-block px-2.5 py-1 rounded-full text-xs">
+                            ${product.category || 'Uncategorized'}
+                        </span>
                     </div>
-                    <button class="favorite-btn absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow hover:scale-105 transition" data-product-id="${product.id}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart ${fav ? 'text-red-500' : 'text-gray-500'}"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+                    
+                    <!-- Favorite Button (Top Right) -->
+                    <button class="favorite-btn absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm hover:scale-105 transition z-10" data-product-id="${product.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart ${fav ? 'text-red-500' : 'text-gray-400'}"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
                     </button>
                 </div>
-                <div class="p-4 sm:p-5 flex-1 flex flex-col">
-                    <h3 class="product-title text-sm font-semibold text-gray-900 line-clamp-2">${product.name}</h3>
-                    <div class="mt-2 mb-2 sm:mb-3 min-h-[28px] sm:min-h-[32px] flex items-baseline justify-between">
-                        <span class="text-xl sm:text-2xl font-extrabold text-primary">Rp ${formatPrice(product.price || 0)}</span>
-                        <span class="text-[11px] sm:text-xs text-gray-500 whitespace-nowrap">Stok ${product.stock ?? '-'}</span>
+                <!-- Product Info - Left Aligned -->
+                <div class="p-3 sm:p-4 flex-1 flex flex-col">
+                    <!-- Title - Left Aligned -->
+                    <h3 class="product-title mb-2">${product.name}</h3>
+                    
+                    <!-- Price - Left Aligned, Dark Color -->
+                    <div class="mb-3">
+                        <span class="text-lg sm:text-xl font-bold text-primary">Rp ${formatPrice(product.price || 0)}</span>
+                        <div class="text-xs text-gray-500 mt-0.5">Stok: ${product.stock ?? '-'}</div>
                     </div>
-                    <div class="mt-auto pt-2 sm:pt-3">
-                        <div class="sm:flex sm:items-center sm:gap-3">
-                            <button class="add-to-cart-btn w-full h-11 rounded-xl bg-secondary hover:bg-pink-600 text-white font-semibold active:scale-[0.98] transition"
-                                    data-product-id="${product.id}">
-                                <span class="sm:hidden">+ Keranjang</span>
-                                <span class="hidden sm:inline">Tambah ke Keranjang</span>
-                            </button>
-                            <button class="buy-now-btn hidden sm:flex h-11 w-11 rounded-full border-2 border-primary text-primary bg-white items-center justify-center active:scale-[0.98] transition"
-                                    data-product-id="${product.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            </button>
-                        </div>
+                    
+                    <!-- Action Button - Catalis Gradient Theme -->
+                    <div class="mt-auto">
+                        <button class="add-to-cart-btn w-full rounded-lg text-white font-semibold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                                data-product-id="${product.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            <span class="text-xs sm:text-sm">Tambah ke Keranjang</span>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     });
-    
+
     productGrid.innerHTML = productsHTML;
-    if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+    if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
     ensureCartReady();
 }
 
@@ -187,7 +198,7 @@ function setupEventListeners() {
                     btn.classList.remove('active');
                 });
                 e.target.classList.add('active');
-                
+
                 // Filter produk berdasarkan kategori
                 currentCategory = e.target.dataset.category;
                 console.log('🏷️ Category changed to:', currentCategory);
@@ -195,7 +206,7 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     // Event listener untuk pencarian
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -212,7 +223,7 @@ function setupEventListeners() {
             filterAndSortProducts();
         });
     }
-    
+
     // Event listener untuk klik produk (detail produk)
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
@@ -339,12 +350,12 @@ async function showProductDetail(productId) {
     try {
         // Cari produk dari data yang sudah ada
         const product = products.find(p => p.id.toString() === productId.toString());
-        
+
         if (!product) {
             console.error('Product not found:', productId);
             return;
         }
-        
+
         // Buat modal untuk detail produk
         const modalHTML = `
             <div id="product-modal" class="modal">
@@ -402,33 +413,33 @@ async function showProductDetail(productId) {
                 </div>
             </div>
         `;
-        
+
         // Tambahkan modal ke body
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
+
         // Tampilkan modal
         const modal = document.getElementById('product-modal');
         modal.style.display = 'block';
-        
+
         // Event listener untuk menutup modal
         const closeBtn = modal.querySelector('.close');
         closeBtn.addEventListener('click', () => {
             modal.remove();
         });
-        
+
         // Event listener untuk klik di luar modal
         window.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.remove();
             }
         });
-        
+
         // Event listener untuk tombol add to cart di modal
         const addToCartBtn = modal.querySelector('.add-to-cart-btn');
         addToCartBtn.addEventListener('click', () => {
             addProductToCart(productId);
         });
-        
+
     } catch (error) {
         console.error('Error showing product detail:', error);
     }
@@ -492,7 +503,7 @@ function addCartButtonPulse() {
     const cartButtonDesktop = document.getElementById('cart-button-desktop');
     const cartButtonMobile = document.getElementById('cart-button-mobile');
     const cartFab = document.getElementById('cart-fab');
-    
+
     [cartButtonDesktop, cartButtonMobile, cartFab].forEach(button => {
         if (button) {
             button.classList.add('cart-button-pulse');
@@ -501,11 +512,11 @@ function addCartButtonPulse() {
             }, 600);
         }
     });
-    
+
     // Tambahkan animasi pada cart count
     const cartCountDesktop = document.getElementById('cart-count-desktop');
     const cartCountMobile = document.getElementById('cart-count-mobile');
-    
+
     [cartCountDesktop, cartCountMobile].forEach(count => {
         if (count && count.style.display !== 'none') {
             count.classList.add('cart-count-update');
@@ -542,7 +553,7 @@ function animateAddToCart(card) {
             clone.style.height = '40px';
         });
         setTimeout(() => { clone.remove(); addCartButtonPulse(); }, 650);
-    } catch(_) {}
+    } catch (_) { }
 }
 
 // Fungsi untuk memperbarui cart button desktop
@@ -550,14 +561,14 @@ function updateCartButtonDesktop() {
     // Ambil data keranjang dari localStorage dengan nama kunci yang benar
     const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-    
+
     // Update jumlah item di cart button desktop
     const cartCountDesktop = document.getElementById('cart-count-desktop');
     if (cartCountDesktop) {
         cartCountDesktop.textContent = itemCount;
         cartCountDesktop.style.display = itemCount > 0 ? 'flex' : 'none';
     }
-    
+
     // Update jumlah item di cart button mobile
     const cartCountMobile = document.getElementById('cart-count-mobile');
     if (cartCountMobile) {
@@ -575,7 +586,7 @@ function showLoading(isLoading) {
     if (loadingIndicator) {
         loadingIndicator.style.display = isLoading ? 'flex' : 'none';
     }
-    
+
     if (productGrid) {
         productGrid.style.opacity = isLoading ? '0.5' : '1';
     }
@@ -591,7 +602,7 @@ function showError(message) {
                 </button>
             </div>
         `;
-        
+
         const retryBtn = document.getElementById('retry-btn');
         if (retryBtn) {
             retryBtn.addEventListener('click', async () => {
@@ -613,11 +624,11 @@ function showError(message) {
 function showNotification(message) {
     // Cek apakah sudah ada notifikasi
     let notification = document.getElementById('notification');
-    
+
     if (notification) {
         // Update pesan notifikasi yang sudah ada
         notification.textContent = message;
-        
+
         // Reset timer
         clearTimeout(notification.timer);
     } else {
@@ -626,21 +637,21 @@ function showNotification(message) {
         notification.id = 'notification';
         notification.className = 'fixed bottom-4 right-4 bg-dark text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-0';
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
     }
-    
+
     // Animasi masuk
     setTimeout(() => {
         notification.style.transform = 'translateY(0)';
         notification.style.opacity = '1';
     }, 10);
-    
+
     // Set timer untuk menghilangkan notifikasi
     notification.timer = setTimeout(() => {
         notification.style.transform = 'translateY(20px)';
         notification.style.opacity = '0';
-        
+
         // Hapus elemen setelah animasi selesai
         setTimeout(() => {
             notification.remove();
@@ -661,7 +672,7 @@ function ensureCartReady() {
                         if (typeof window.setupCartEventListeners === 'function') window.setupCartEventListeners();
                         if (typeof window.loadCartFromStorage === 'function') window.loadCartFromStorage();
                         if (typeof window.renderCartItems === 'function') window.renderCartItems();
-                        if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+                        if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
                     }, 50);
                 })
                 .catch(e => console.error('Error injecting cart sidebar:', e));
@@ -671,7 +682,7 @@ function ensureCartReady() {
             footer.style.display = '';
             footer.style.visibility = 'visible';
         }
-    } catch(e) { console.warn('ensureCartReady failed', e); }
+    } catch (e) { console.warn('ensureCartReady failed', e); }
 }
 
 function isFavorite(id) {

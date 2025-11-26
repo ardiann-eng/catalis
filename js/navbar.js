@@ -125,27 +125,27 @@ function insertNavbar() {
         </div>
     </nav>
     `;
-    
+
     navbarContainer.innerHTML = navbar;
-    
+
     // Inisialisasi toggle menu mobile
     const menuToggle = document.getElementById('menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
-    
+
     if (menuToggle && mobileMenu) {
         const toggleMobileMenu = (open) => {
             if (open) {
-                mobileMenu.classList.remove('max-h-0','opacity-0','scale-y-95','translate-y-2','pointer-events-none');
-                mobileMenu.classList.add('max-h-screen','opacity-100','scale-y-100','translate-y-0');
-                menuToggle.setAttribute('aria-expanded','true');
+                mobileMenu.classList.remove('max-h-0', 'opacity-0', 'scale-y-95', 'translate-y-2', 'pointer-events-none');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'scale-y-100', 'translate-y-0');
+                menuToggle.setAttribute('aria-expanded', 'true');
             } else {
-                mobileMenu.classList.add('max-h-0','opacity-0','scale-y-95','translate-y-2','pointer-events-none');
-                mobileMenu.classList.remove('max-h-screen','opacity-100','scale-y-100','translate-y-0');
-                menuToggle.setAttribute('aria-expanded','false');
+                mobileMenu.classList.add('max-h-0', 'opacity-0', 'scale-y-95', 'translate-y-2', 'pointer-events-none');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'scale-y-100', 'translate-y-0');
+                menuToggle.setAttribute('aria-expanded', 'false');
             }
         };
         let isOpen = false;
-        menuToggle.addEventListener('click', function() {
+        menuToggle.addEventListener('click', function () {
             isOpen = !isOpen;
             toggleMobileMenu(isOpen);
         });
@@ -195,7 +195,7 @@ function insertNavbar() {
         });
     }
 
-    
+
 
     // Avatar dropdown toggle
     const avatarButton = document.getElementById('avatar-button');
@@ -220,17 +220,17 @@ function insertNavbar() {
 
     // Render feather icons within navbar
     if (typeof feather !== 'undefined') {
-        try { feather.replace(); } catch(_) {}
+        try { feather.replace(); } catch (_) { }
     }
 }
 
 // Fungsi untuk menandai menu aktif berdasarkan halaman saat ini
 function setActiveNavLink() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    
+
     // Pilih semua link navigasi
     const navLinks = document.querySelectorAll('.nav-link');
-    
+
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (href === currentPage) {
@@ -241,7 +241,7 @@ function setActiveNavLink() {
 }
 
 // Inisialisasi navbar saat dokumen dimuat
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     insertNavbar();
     setActiveNavLink();
 });
