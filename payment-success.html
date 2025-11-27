@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +15,10 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Auth dan Navbar JS -->
     <script src="js/supabase.js"></script>
@@ -24,7 +27,7 @@
     <script src="js/navbar.js"></script>
     <script type="module" src="js/cart.js"></script>
     <script type="module" src="js/main.js"></script>
-    
+
     <style>
         /* Base styles */
         :root {
@@ -44,30 +47,30 @@
             --error: #ef4444;
             --info: #3b82f6;
         }
-        
+
         body {
             font-family: 'Inter', 'Poppins', sans-serif;
             color: var(--dark);
             line-height: 1.6;
             letter-spacing: -0.01em;
         }
-        
+
         .font-display {
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: -0.03em;
         }
-        
+
         .gradient-bg {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
-        
+
         .gradient-text {
             background: linear-gradient(90deg, var(--secondary), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .nav-link::after {
             content: '';
             display: block;
@@ -76,12 +79,12 @@
             background: var(--secondary);
             transition: width .3s ease, transform .3s ease;
         }
-        
+
         .nav-link:hover::after {
             width: 100%;
             transform: translateY(1px);
         }
-        
+
         /* Success animation */
         .success-checkmark {
             width: 80px;
@@ -89,50 +92,37 @@
             margin: 0 auto;
             position: relative;
         }
-        
+
         .success-checkmark .check-icon {
             width: 80px;
             height: 80px;
             position: relative;
             border-radius: 50%;
             box-sizing: content-box;
-            border: 4px solid var(--secondary);
+            background: #10b981;
+            /* Solid Green */
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
         }
-        
-        .success-checkmark .check-icon::before {
-            top: 3px;
-            left: -2px;
-            width: 30px;
-            transform-origin: 100% 50%;
-            border-radius: 100px 0 0 100px;
-        }
-        
+
+        .success-checkmark .check-icon::before,
         .success-checkmark .check-icon::after {
-            top: 0;
-            left: 30px;
-            width: 60px;
-            transform-origin: 0 50%;
-            border-radius: 0 100px 100px 0;
-            animation: rotate-circle 4.25s ease-in;
-        }
-        
-        .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
             content: '';
             height: 100px;
             position: absolute;
-            background: #FFFFFF;
+            background: transparent;
             transform: rotate(-45deg);
         }
-        
+
         .success-checkmark .check-icon .icon-line {
             height: 5px;
-            background-color: var(--secondary);
+            background-color: #FFFFFF;
+            /* White checkmark */
             display: block;
             border-radius: 2px;
             position: absolute;
             z-index: 10;
         }
-        
+
         .success-checkmark .check-icon .icon-line.line-tip {
             top: 46px;
             left: 14px;
@@ -140,7 +130,7 @@
             transform: rotate(45deg);
             animation: icon-line-tip 0.75s;
         }
-        
+
         .success-checkmark .check-icon .icon-line.line-long {
             top: 38px;
             right: 8px;
@@ -148,7 +138,7 @@
             transform: rotate(-45deg);
             animation: icon-line-long 0.75s;
         }
-        
+
         .success-checkmark .check-icon .icon-circle {
             top: -4px;
             left: -4px;
@@ -158,123 +148,133 @@
             border-radius: 50%;
             position: absolute;
             box-sizing: content-box;
-            border: 4px solid rgba(217, 70, 239, 0.5);
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            /* White ring */
         }
-        
+
         .success-checkmark .check-icon .icon-fix {
-            top: 8px;
-            width: 5px;
-            left: 26px;
-            z-index: 1;
-            height: 85px;
-            position: absolute;
-            transform: rotate(-45deg);
-            background-color: #FFFFFF;
+            display: none;
         }
-        
+
         @keyframes rotate-circle {
             0% {
                 transform: rotate(-45deg);
             }
+
             5% {
                 transform: rotate(-45deg);
             }
+
             12% {
                 transform: rotate(-405deg);
             }
+
             100% {
                 transform: rotate(-405deg);
             }
         }
-        
+
         @keyframes icon-line-tip {
             0% {
                 width: 0;
                 left: 1px;
                 top: 19px;
             }
+
             54% {
                 width: 0;
                 left: 1px;
                 top: 19px;
             }
+
             70% {
                 width: 50px;
                 left: -8px;
                 top: 37px;
             }
+
             84% {
                 width: 17px;
                 left: 21px;
                 top: 48px;
             }
+
             100% {
                 width: 25px;
                 left: 14px;
                 top: 45px;
             }
         }
-        
+
         @keyframes icon-line-long {
             0% {
                 width: 0;
                 right: 46px;
                 top: 54px;
             }
+
             65% {
                 width: 0;
                 right: 46px;
                 top: 54px;
             }
+
             84% {
                 width: 55px;
                 right: 0px;
                 top: 35px;
             }
+
             100% {
                 width: 47px;
                 right: 8px;
                 top: 38px;
             }
         }
-        
+
         /* Card styles */
         .success-card {
             transition: all 0.3s ease;
             border: 1px solid var(--gray-200);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        
+
         /* Button styles */
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--dark);
-            font-weight: bold;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            background: var(--secondary);
             color: white;
             font-weight: bold;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 2px solid var(--secondary);
         }
-        
-        .btn-secondary:hover {
+
+        .btn-primary:hover {
+            background: var(--secondary-dark);
+            border-color: var(--secondary-dark);
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--secondary);
+            background: #fdf4ff;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800">
     <!-- Navigation -->
     <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
@@ -286,27 +286,34 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-8">
-                        <a href="index.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
-                        <a href="marketplace.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
-                        <a href="profiles.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
-                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
+                        <a href="index.html"
+                            class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Home</a>
+                        <a href="marketplace.html"
+                            class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Marketplace</a>
+                        <a href="profiles.html"
+                            class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">Profiles</a>
+                        <a href="about.html" class="nav-link text-dark font-medium hover:text-secondary px-3 py-2">About
+                            Us</a>
                         <!-- Auth buttons -->
                         <div id="auth-buttons">
-                            <a href="login.html" id="login-button" class="bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300">
+                            <a href="login.html" id="login-button"
+                                class="bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300">
                                 Login
                             </a>
                         </div>
                         <div id="user-profile" class="hidden">
                             <div class="flex items-center space-x-3">
                                 <span id="user-email" class="text-dark font-medium"></span>
-                                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-1 rounded-full transition duration-300 text-sm">
+                                <button id="logout-button"
+                                    class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-1 rounded-full transition duration-300 text-sm">
                                     Logout
                                 </button>
                             </div>
                         </div>
                         <button id="cart-button" class="relative p-2 text-gray-700 hover:text-purple-600">
                             <i data-feather="shopping-cart"></i>
-                            <span id="cart-count" class="absolute top-0 right-0 bg-purple-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">0</span>
+                            <span id="cart-count"
+                                class="absolute top-0 right-0 bg-purple-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">0</span>
                         </button>
                     </div>
                 </div>
@@ -326,14 +333,16 @@
                 <a href="about.html" class="text-dark font-medium hover:text-secondary px-3 py-2">About Us</a>
                 <!-- Mobile auth buttons -->
                 <div id="mobile-auth-buttons">
-                    <a href="login.html" id="mobile-login-button" class="block bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300 text-center">
+                    <a href="login.html" id="mobile-login-button"
+                        class="block bg-secondary hover:bg-purple-600 text-white font-bold px-6 py-2 rounded-full transition duration-300 text-center">
                         Login
                     </a>
                 </div>
                 <div id="mobile-user-profile" class="hidden">
                     <div class="flex flex-col space-y-2">
                         <span id="mobile-user-email" class="text-dark font-medium"></span>
-                        <button id="mobile-logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 text-sm">
+                        <button id="mobile-logout-button"
+                            class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-full transition duration-300 text-sm">
                             Logout
                         </button>
                     </div>
@@ -341,18 +350,19 @@
             </div>
         </div>
     </nav>
-    
+
     <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+    <div id="cart-sidebar"
+        class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
         <!-- Cart content will be loaded here -->
     </div>
-    
+
     <!-- Main Content -->
     <main class="pt-32 pb-20">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="success-card bg-white rounded-2xl overflow-hidden" data-aos="fade-up" data-aos-duration="800">
                 <div class="bg-gradient-to-r from-purple-500 to-yellow-400 h-24 relative"></div>
-                
+
                 <div class="px-8 py-10 -mt-12">
                     <div class="text-center mb-8">
                         <div class="success-checkmark">
@@ -365,19 +375,23 @@
                         </div>
                         <h1 class="text-3xl font-bold text-gray-800 mt-4 font-display">Pembayaran Berhasil!</h1>
                         <p class="text-gray-600 mt-2">Terima kasih telah berbelanja di Catalist Creative.</p>
+                        <p class="text-sm font-semibold text-purple-600 mt-3 uppercase tracking-wide">Cek productnya DI
+                            GMAIL KAMU</p>
                     </div>
-                    
-                    <div class="bg-gray-50 p-6 rounded-xl mb-8 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+
+                    <div class="bg-gray-50 p-8 rounded-xl mb-8 shadow-sm border border-gray-100" data-aos="fade-up"
+                        data-aos-delay="200">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 font-display">Detail Transaksi</h2>
-                        <div id="transaction-details" class="text-gray-600 space-y-3">
+                        <div id="transaction-details" class="text-gray-600 space-y-4">
                             <!-- Transaction details will be loaded here -->
                             <div class="flex justify-between items-center border-b border-gray-200 pb-3">
                                 <span class="font-medium">ID Pesanan:</span>
-                                <span id="order-id" class="text-gray-800">Loading...</span>
+                                <span id="order-id" class="text-gray-800 font-mono">Loading...</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-gray-200 pb-3">
                                 <span class="font-medium">Status:</span>
-                                <span id="transaction-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium text-sm">Berhasil</span>
+                                <span id="transaction-status"
+                                    class="px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium text-sm">Berhasil</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="font-medium">Waktu:</span>
@@ -385,20 +399,23 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-up" data-aos-delay="400">
-                        <a href="profile.html" class="btn-primary px-6 py-3 rounded-lg text-center">
-                            Lihat Profil Saya
-                        </a>
-                        <a href="marketplace.html" class="btn-secondary px-6 py-3 rounded-lg text-center">
+
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
+                        data-aos="fade-up" data-aos-delay="400">
+                        <a href="marketplace.html"
+                            class="btn-primary px-6 py-3 rounded-lg text-center flex-1 sm:flex-none">
                             Lanjutkan Belanja
+                        </a>
+                        <a href="profile.html"
+                            class="btn-secondary px-6 py-3 rounded-lg text-center flex-1 sm:flex-none">
+                            Lihat Profil Saya
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -438,63 +455,74 @@
             <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-400">© 2023 Catalist Creative. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="twitter" class="h-5 w-5"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="instagram" class="h-5 w-5"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="facebook" class="h-5 w-5"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="youtube" class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="twitter"
+                            class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="instagram"
+                            class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="facebook"
+                            class="h-5 w-5"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="youtube"
+                            class="h-5 w-5"></i></a>
                 </div>
             </div>
         </div>
     </footer>
-    
+
     <script>
         // Inisialisasi Supabase client
         const supabaseUrl = 'https://anzsbqqippijhemwxkqh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuenNicXFpcHBpamhlbXd4a3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDM1MTQsImV4cCI6MjA3Njc3OTUxNH0.6l1Bt9_5_5ohFeH8IN6mP9jU0pFUToHMmV1NwQEeP-Q';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        
+
         // Initialize Feather icons and AOS
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             feather.replace();
             AOS.init();
-            
+
             // Toggle mobile menu
-            document.getElementById('menu-toggle')?.addEventListener('click', function() {
+            document.getElementById('menu-toggle')?.addEventListener('click', function () {
                 document.getElementById('mobile-menu').classList.toggle('hidden');
             });
-            
+
             // Check authentication status
-            checkAuthStatus();
-            
+            const user = await checkAuthStatus();
+
             // Parse URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('order_id');
             const status = urlParams.get('transaction_status');
-            
+
             // Update transaction details
             if (orderId) {
                 document.getElementById('order-id').textContent = orderId;
-                
                 // Fetch order details from database if possible
                 fetchOrderDetails(orderId);
+            } else if (user) {
+                // Fallback: Fetch latest order for user
+                fetchLatestOrder(user.id);
+            } else {
+                document.getElementById('order-id').textContent = '-';
+                document.getElementById('transaction-time').textContent = '-';
             }
-            
-            // Set current date and time
+
+            // Set current date and time (initial placeholder, will be updated by fetch)
             const now = new Date();
-            document.getElementById('transaction-time').textContent = now.toLocaleString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
+            if (!document.getElementById('transaction-time').textContent || document.getElementById('transaction-time').textContent === 'Loading...') {
+                document.getElementById('transaction-time').textContent = now.toLocaleString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
             // Update transaction status if available
             if (status) {
                 updateTransactionStatus(status);
             }
         });
-        
+
         // Fungsi untuk memeriksa status autentikasi
         async function checkAuthStatus() {
             try {
@@ -502,44 +530,44 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const authPreserved = urlParams.get('auth_preserved');
                 const userId = urlParams.get('user_id');
-                
+
                 // Jika ada parameter auth_preserved, coba pulihkan autentikasi
                 if (authPreserved === 'true' && userId) {
                     console.log('Mencoba memulihkan autentikasi...');
-                    
+
                     // Coba pulihkan dari localStorage
                     const storedAuthData = localStorage.getItem('midtrans_auth_data');
                     if (storedAuthData) {
                         try {
                             const authData = JSON.parse(storedAuthData);
-                            
+
                             // Periksa apakah data autentikasi masih valid
                             const now = new Date().getTime();
                             const expiresAt = authData.expires_at * 1000; // Convert to milliseconds
-                            
+
                             if (now < expiresAt && authData.user.id === userId) {
                                 console.log('Data autentikasi ditemukan dan masih valid');
-                                
+
                                 // Set session dengan token yang disimpan
                                 const { error: setSessionError } = await supabase.auth.setSession({
                                     access_token: authData.access_token,
                                     refresh_token: authData.refresh_token
                                 });
-                                
+
                                 if (setSessionError) {
                                     console.error('Error setting session:', setSessionError);
                                     // Lanjutkan dengan pemeriksaan normal
                                 } else {
                                     console.log('Autentikasi berhasil dipulihkan');
-                                    
+
                                     // Hapus data autentikasi dari localStorage
                                     localStorage.removeItem('midtrans_auth_data');
-                                    
+
                                     // Dapatkan session yang baru diset
                                     const { data: { session: restoredSession } } = await supabase.auth.getSession();
                                     if (restoredSession) {
                                         showUserProfile(restoredSession.user);
-                                        return;
+                                        return restoredSession.user;
                                     }
                                 }
                             } else {
@@ -554,28 +582,31 @@
                         console.log('Tidak ada data autentikasi tersimpan');
                     }
                 }
-                
+
                 // Jika pemulihan gagal atau tidak ada parameter, periksa session normal
                 const { data: { session }, error } = await supabase.auth.getSession();
-                
+
                 if (error) {
                     console.error('Error checking auth status:', error);
-                    return;
+                    return null;
                 }
-                
+
                 if (session) {
                     // User is logged in
                     showUserProfile(session.user);
+                    return session.user;
                 } else {
                     // User is not logged in
                     showLoginButton();
+                    return null;
                 }
             } catch (error) {
                 console.error('Error in auth check:', error);
                 showLoginButton();
+                return null;
             }
         }
-        
+
         // Fungsi untuk menampilkan profil pengguna di navbar
         function showUserProfile(user) {
             // Desktop
@@ -586,7 +617,7 @@
                 document.getElementById('user-profile').classList.remove('hidden');
                 document.getElementById('user-email').textContent = user.email;
             }
-            
+
             // Mobile
             if (document.getElementById('mobile-auth-buttons')) {
                 document.getElementById('mobile-auth-buttons').classList.add('hidden');
@@ -595,12 +626,12 @@
                 document.getElementById('mobile-user-profile').classList.remove('hidden');
                 document.getElementById('mobile-user-email').textContent = user.email;
             }
-            
+
             // Tambahkan event listener untuk tombol logout
             document.getElementById('logout-button')?.addEventListener('click', handleLogout);
             document.getElementById('mobile-logout-button')?.addEventListener('click', handleLogout);
         }
-        
+
         // Fungsi untuk menampilkan tombol login
         function showLoginButton() {
             // Desktop
@@ -610,7 +641,7 @@
             if (document.getElementById('user-profile')) {
                 document.getElementById('user-profile').classList.add('hidden');
             }
-            
+
             // Mobile
             if (document.getElementById('mobile-auth-buttons')) {
                 document.getElementById('mobile-auth-buttons').classList.remove('hidden');
@@ -619,7 +650,7 @@
                 document.getElementById('mobile-user-profile').classList.add('hidden');
             }
         }
-        
+
         // Fungsi untuk menangani logout
         async function handleLogout() {
             try {
@@ -628,54 +659,89 @@
                     console.error('Error during logout:', error);
                     return;
                 }
-                
+
                 // Redirect ke halaman login setelah logout
                 window.location.href = 'login.html';
             } catch (error) {
                 console.error('Error in logout:', error);
             }
         }
-        
+
         // Fungsi untuk mengambil detail pesanan dari database
         async function fetchOrderDetails(orderNumber) {
             try {
                 // Ambil data order dari database
                 const { data: orders, error: orderError } = await supabase
                     .from('orders')
-                    .select('id, status, total_amount, created_at')
+                    .select('id, order_number, status, total_amount, created_at')
                     .eq('order_number', orderNumber)
                     .single();
-                
+
                 if (orderError) {
                     console.error('Error fetching order details:', orderError);
                     return;
                 }
-                
+
                 if (orders) {
-                    // Update status transaksi
-                    updateTransactionStatus(orders.status);
-                    
-                    // Update waktu transaksi
-                    const orderDate = new Date(orders.created_at);
-                    document.getElementById('transaction-time').textContent = orderDate.toLocaleString('id-ID', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
+                    displayOrderData(orders);
                 }
             } catch (error) {
                 console.error('Error fetching order details:', error);
             }
         }
-        
+
+        // Fungsi untuk mengambil pesanan TERBARU user
+        async function fetchLatestOrder(userId) {
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('id, order_number, status, total_amount, created_at')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching latest order:', error);
+                    document.getElementById('order-id').textContent = 'Belum ada pesanan';
+                    document.getElementById('transaction-time').textContent = '-';
+                    return;
+                }
+
+                if (orders) {
+                    displayOrderData(orders);
+                }
+            } catch (err) {
+                console.error('Unexpected error:', err);
+            }
+        }
+
+        // Helper untuk menampilkan data order ke UI
+        function displayOrderData(order) {
+            // Update Order ID
+            document.getElementById('order-id').textContent = order.order_number || order.id;
+
+            // Update Status
+            updateTransactionStatus(order.status);
+
+            // Update Time
+            const orderDate = new Date(order.created_at);
+            document.getElementById('transaction-time').textContent = orderDate.toLocaleString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZoneName: 'short'
+            });
+        }
+
         // Fungsi untuk memperbarui status transaksi
         function updateTransactionStatus(status) {
             const statusElement = document.getElementById('transaction-status');
             let statusText = status;
             let statusClass = 'px-3 py-1 rounded-full font-medium text-sm ';
-            
+
             // Translate status to Indonesian
             switch (status) {
                 case 'settlement':
@@ -709,10 +775,11 @@
                 default:
                     statusClass += 'bg-gray-100 text-gray-800';
             }
-            
+
             statusElement.textContent = statusText;
             statusElement.className = statusClass;
         }
     </script>
 </body>
+
 </html>

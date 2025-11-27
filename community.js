@@ -34,7 +34,7 @@ function renderReplyItem(rep) {
   return `
     <div class="reply-card">
       <div class="flex items-start gap-2">
-        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700">${(u || 'U').substring(0,1).toUpperCase()}</div>
+        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700">${(u || 'U').substring(0, 1).toUpperCase()}</div>
         <div class="flex-1">
           <div class="flex items-center gap-2">
             <span class="font-semibold text-gray-900 text-sm">${u}</span>
@@ -58,7 +58,7 @@ function renderMessageCard(msg, replies = [], isLiked = false) {
   return `
     <article class="feed-card" data-message-id="${msg.id}" data-user-id="${msg.user_id || ''}">
       <div class="flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">${(username || 'U').substring(0,1).toUpperCase()}</div>
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">${(username || 'U').substring(0, 1).toUpperCase()}</div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -130,7 +130,7 @@ async function loadMessages() {
     return renderMessageCard(enriched, repliesByMsg[m.id] || [], likedSet.has(m.id));
   }).join('');
   feedEl.innerHTML = html;
-  if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+  if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
   setupObservers(messages || []);
 }
 
@@ -154,7 +154,7 @@ async function sendMessage() {
     if (el) {
       el.classList.add('card-pop');
       el.classList.add('highlight-flash');
-      try { showSuccessBadge(el); } catch(_) {}
+      try { showSuccessBadge(el); } catch (_) { }
       setTimeout(() => el.classList.remove('card-pop'), 600);
       setTimeout(() => el.classList.remove('highlight-flash'), 1200);
       feedEl.scrollTop = feedEl.scrollHeight;
@@ -207,7 +207,7 @@ async function sendReply(messageId, text) {
     const last = thread.lastElementChild;
     if (last) {
       last.classList.add('reply-success');
-      setTimeout(()=> last.classList.remove('reply-success'), 800);
+      setTimeout(() => last.classList.remove('reply-success'), 800);
     }
   } else {
     const container = card.querySelector('.flex-1');
@@ -216,7 +216,7 @@ async function sendReply(messageId, text) {
       const last = container.querySelector('.reply-thread .reply-card:last-child');
       if (last) {
         last.classList.add('reply-success');
-        setTimeout(()=> last.classList.remove('reply-success'), 800);
+        setTimeout(() => last.classList.remove('reply-success'), 800);
       }
     }
   }
@@ -232,11 +232,11 @@ function subscribeRealtime() {
     if (el) {
       el.classList.add('card-pop');
       el.classList.add('highlight-flash');
-      try { showSuccessBadge(el); } catch(_) {}
+      try { showSuccessBadge(el); } catch (_) { }
       setTimeout(() => el.classList.remove('card-pop'), 600);
       setTimeout(() => el.classList.remove('highlight-flash'), 1200);
     }
-    if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
+    if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
     feedEl.scrollTop = feedEl.scrollHeight;
   });
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_replies' }, payload => {
@@ -314,7 +314,7 @@ function showSuccessBadge(card) {
   badge.className = 'success-badge';
   badge.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 16.2l-3.5-3.5 1.4-1.4L9 13.4l8.1-8.1 1.4 1.4z"/></svg>';
   card.appendChild(badge);
-  setTimeout(()=> { try { badge.remove(); } catch(_) {} }, 900);
+  setTimeout(() => { try { badge.remove(); } catch (_) { } }, 900);
 }
 
 function showPlusOne(btn) {
@@ -323,7 +323,7 @@ function showPlusOne(btn) {
   bubble.textContent = '+1';
   btn.style.position = 'relative';
   btn.appendChild(bubble);
-  setTimeout(()=> { try { bubble.remove(); } catch(_) {} }, 900);
+  setTimeout(() => { try { bubble.remove(); } catch (_) { } }, 900);
 }
 
 feedEl.addEventListener('click', async (e) => {
@@ -338,7 +338,7 @@ feedEl.addEventListener('click', async (e) => {
   if (menuCopy) {
     const card = menuCopy.closest('[data-message-id]');
     const txt = card?.querySelector('.mt-2').textContent || '';
-    try { await navigator.clipboard.writeText(txt); showToast('Disalin'); } catch(_) { showToast('Gagal menyalin'); }
+    try { await navigator.clipboard.writeText(txt); showToast('Disalin'); } catch (_) { showToast('Gagal menyalin'); }
     menuCopy.closest('.menu-dropdown')?.classList.add('hidden');
     return;
   }
@@ -352,7 +352,7 @@ feedEl.addEventListener('click', async (e) => {
       await supabase.from('community_reports').insert({ message_id: id, reporter_id: user?.id || null, message_text: text });
       showToast('Dilaporkan');
       window.location.href = 'admin/';
-    } catch(_) { showToast('Gagal melaporkan'); }
+    } catch (_) { showToast('Gagal melaporkan'); }
     menuReport.closest('.menu-dropdown')?.classList.add('hidden');
     return;
   }
@@ -395,29 +395,29 @@ feedEl.addEventListener('click', async (e) => {
 sendBtn.addEventListener('click', sendMessage);
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (typeof feather !== 'undefined') { try { feather.replace(); } catch(_) {} }
-  if (typeof AOS !== 'undefined') { try { AOS.init(); } catch(_) {} }
+  if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
+  if (typeof AOS !== 'undefined') { try { AOS.init(); } catch (_) { } }
   await loadMessages();
   subscribeRealtime();
   const input = document.getElementById('message-input');
   const emojiBtn = document.getElementById('emoji-btn');
   const boldBtn = document.getElementById('bold-btn');
   const italicBtn = document.getElementById('italic-btn');
-  function insertAtCursor(el, str){
+  function insertAtCursor(el, str) {
     const start = el.selectionStart || 0; const end = el.selectionEnd || 0;
-    const val = el.value; el.value = val.slice(0,start) + str + val.slice(end);
+    const val = el.value; el.value = val.slice(0, start) + str + val.slice(end);
     el.focus(); el.selectionStart = el.selectionEnd = start + str.length;
   }
   emojiBtn && emojiBtn.addEventListener('click', () => insertAtCursor(input, ' 😊 '));
   boldBtn && boldBtn.addEventListener('click', () => {
     const start = input.selectionStart || 0; const end = input.selectionEnd || 0;
-    const sel = input.value.slice(start,end) || 'teks';
+    const sel = input.value.slice(start, end) || 'teks';
     const wrapped = `**${sel}**`;
     insertAtCursor(input, wrapped);
   });
   italicBtn && italicBtn.addEventListener('click', () => {
     const start = input.selectionStart || 0; const end = input.selectionEnd || 0;
-    const sel = input.value.slice(start,end) || 'teks';
+    const sel = input.value.slice(start, end) || 'teks';
     const wrapped = `*${sel}*`;
     insertAtCursor(input, wrapped);
   });
@@ -474,8 +474,8 @@ async function performDelete() {
 
 deleteConfirmBtn && deleteConfirmBtn.addEventListener('click', performDelete);
 deleteCancelBtn && deleteCancelBtn.addEventListener('click', closeDeleteModal);
-function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
-function formatMessageHtml(text){
+function escapeHtml(str) { return String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[s])); }
+function formatMessageHtml(text) {
   let s = escapeHtml(text);
   s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/(?<!\*)\*(.+?)\*(?!\*)/g, '<em>$1</em>');

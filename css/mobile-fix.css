@@ -1,0 +1,48 @@
+/* Global Mobile Fix CSS - Prevent Horizontal Scroll */
+
+/* Prevent horizontal scroll on all pages */
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* Responsive Images - Prevent Overflow */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ensure Box Sizing for all elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Prevent containers from overflowing */
+.container, .wrapper, .row {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+    /* Prevent any element from forcing horizontal scroll */
+    * {
+        max-width: 100vw;
+    }
+    
+    /* Fix for grid layouts */
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    }
+    
+    /* Ensure padding/margin doesn't cause overflow */
+    section, div {
+        box-sizing: border-box;
+    }
+}

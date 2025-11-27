@@ -157,24 +157,27 @@ function renderProducts(productsToRender) {
                 <!-- Product Info - Left Aligned -->
                 <div class="p-3 sm:p-4 flex-1 flex flex-col">
                     <!-- Title - Left Aligned -->
-                    <h3 class="product-title mb-2">${product.name}</h3>
+                    <h3 class="product-title mb-3">${product.name}</h3>
                     
                     <!-- Price - Left Aligned, Dark Color -->
                     <div class="mb-3">
-                        <span class="text-lg sm:text-xl font-bold text-primary">Rp ${formatPrice(product.price || 0)}</span>
+                        <span class="text-base md:text-lg lg:text-xl font-bold text-primary whitespace-nowrap">Rp ${formatPrice(product.price || 0)}</span>
                         <div class="text-xs text-gray-500 mt-0.5">Stok: ${product.stock ?? '-'}</div>
                     </div>
                     
                     <!-- Action Button - Catalis Gradient Theme -->
                     <div class="mt-auto">
-                        <button class="add-to-cart-btn w-full rounded-lg text-white font-semibold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                        <button class="add-to-cart-btn w-full py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-white font-semibold active:scale-[0.98] transition flex items-center justify-center gap-1.5 sm:gap-2"
                                 data-product-id="${product.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
                                 <circle cx="9" cy="21" r="1"></circle>
                                 <circle cx="20" cy="21" r="1"></circle>
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                             </svg>
-                            <span class="text-xs sm:text-sm">Tambah ke Keranjang</span>
+                            <span class="text-xs sm:text-sm">
+                                <span class="hidden sm:inline">Tambah ke Keranjang</span>
+                                <span class="sm:hidden">+ Keranjang</span>
+                            </span>
                         </button>
                     </div>
                 </div>
