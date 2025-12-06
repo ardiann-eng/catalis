@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalis Creative | Profil</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+        .gradient-text {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #facc15 0%, #d946ef 100%);
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid rgba(17, 24, 39, 0.06);
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px -10px rgba(17, 24, 39, 0.2);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px -15px rgba(17, 24, 39, 0.25);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: 9999px;
+            transition: all .2s;
+        }
+
+        .btn-primary {
+            background-color: #d946ef;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #b832d6;
+        }
+
+        .btn-outline {
+            border: 2px solid #1e1b4b;
+            color: #1e1b4b;
+        }
+
+        .btn-outline:hover {
+            border-color: #d946ef;
+            color: #d946ef;
+        }
+
+        .tab-btn {
+            padding: .5rem 1rem;
+            border-radius: .75rem;
+            font-weight: 600;
+            color: #374151;
+            background-color: #f3f4f6;
+        }
+
+        .tab-btn-active {
+            color: #fff;
+            background-color: #1e1b4b;
+        }
+
+        .cover-aspect {
+            aspect-ratio: 16/9;
+            max-height: 280px;
+        }
+
+        @media (max-width: 640px) {
+            .cover-aspect {
+                aspect-ratio: auto;
+                height: clamp(160px, 30vh, 200px);
+            }
+        }
+
+        .overlay-soft {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        .avatar-fallback {
+            background-color: #f3f4f6;
+            color: #1e1b4b;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: .75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast {
+            position: fixed;
+            top: 90px;
+            right: 16px;
+            z-index: 60;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px -10px rgba(17, 24, 39, .3);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        .toast-show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .saved-highlight {
+            animation: savedPulse .9s ease;
+        }
+
+        @keyframes savedPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(217, 70, 239, .4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 0 12px rgba(217, 70, 239, .15);
+                transform: scale(1.01);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(217, 70, 239, 0);
+                transform: scale(1);
+            }
+        }
+
+        .touch-target {
+            min-width: 48px;
+            min-height: 48px;
+        }
+
+        .wrap-anywhere {
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            hyphens: auto;
+        }
+
+        .tabs-bar {
+            position: sticky;
+            top: 5.5rem;
+            z-index: 40;
+            background: #fff;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-link {
+            white-space: nowrap;
+            padding: .75rem 1rem;
+            font-weight: 600;
+            color: #4b5563;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-link-active {
+            color: #111827;
+            border-bottom-color: #facc15;
+        }
+
+        .stat-number {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body class="bg-white font-sans text-gray-800">
+    <div id="navbar-container"></div>
+    <div id="cart-sidebar-container"></div>
+
+    <section class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-6 sm:mb-8">
+        <div class="card overflow-hidden">
+            <div id="profile-cover" class="relative cover-aspect w-full p-3 sm:p-6">
+                <div class="absolute inset-0 gradient-bg"></div>
+                <div class="absolute inset-0 overlay-soft"></div>
+                <div
+                    class="absolute left-4 right-4 sm:left-6 sm:right-6 bottom-3 sm:bottom-6 flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
+                    <div class="flex items-center gap-4">
+                        <div id="profile-avatar"
+                            class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl ring-3 sm:ring-4 ring-white overflow-hidden avatar-fallback text-2xl sm:text-3xl relative z-10">
+                            SJ</div>
+                        <div class="text-white drop-shadow">
+                            <div class="flex items-center gap-3">
+                                <h1 id="profile-username"
+                                    class="text-2xl sm:text-3xl font-display font-bold text-white">Sarah Johnson</h1>
+                                <span id="profile-status"
+                                    class="text-xs px-2.5 py-1 rounded-full bg-white/90 text-green-700 font-semibold">Member</span>
+                            </div>
+                            <p id="profile-email" class="text-white mt-1">sarahj@example.com</p>
+                            <div
+                                class="flex flex-wrap gap-3 sm:gap-5 mt-3 sm:mt-4 text-xs sm:text-sm leading-relaxed text-white">
+                                <div class="flex items-center gap-1"><i data-feather="calendar"
+                                        class="w-4 h-4"></i><span id="profile-joined">Bergabung: 12 Jan 2024</span>
+                                </div>
+                                <div class="flex items-center gap-1"><i data-feather="clock" class="w-4 h-4"></i><span
+                                        id="profile-last-login">Login terakhir: 24 Nov 2025</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sm:ml-auto flex items-center gap-2 sm:gap-3">
+                        <button id="edit-profile-btn"
+                            class="btn px-4 sm:px-6 h-12 touch-target border-2 border-white text-white hover:bg-white/10 transition">Edit
+                            Profil</button>
+                        <a href="recent-activity.html"
+                            class="btn px-4 sm:px-6 h-12 touch-target bg-white text-dark hover:bg-gray-100 transition shadow-lg font-bold">Lihat
+                            Pesanan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div class="card p-4 sm:p-5">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-yellow-100 text-yellow-600"><i data-feather="shopping-bag"
+                            class="w-5 h-5"></i></div>
+                    <div>
+                        <div class="text-sm text-gray-600">Total Orders</div>
+                        <div id="stat-total-orders"
+                            class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">
+                            128</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4 sm:p-5">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-green-100 text-green-600"><i data-feather="check-circle"
+                            class="w-5 h-5"></i></div>
+                    <div>
+                        <div class="text-sm text-gray-600">Completed Orders</div>
+                        <div id="stat-completed-orders"
+                            class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">
+                            119</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4 sm:p-5">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-purple-100 text-purple-600"><i data-feather="credit-card"
+                            class="w-5 h-5"></i></div>
+                    <div>
+                        <div class="text-sm text-gray-600">Total Spending</div>
+                        <div id="stat-total-spending"
+                            class="stat-number mt-1 text-lg sm:text-2xl font-bold leading-snug tracking-tight px-1 min-w-0"
+                            style="font-size: clamp(1rem, 2.8vw, 1.5rem);">Rp 42.500.000</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4 sm:p-5">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-blue-100 text-blue-600"><i data-feather="package" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">Products Purchased</div>
+                        <div id="stat-products-purchased"
+                            class="stat-number mt-1 text-xl sm:text-2xl font-bold leading-snug tracking-wide px-1 min-w-0">
+                            356</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-1 pb-8 px-0 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="tabs-bar md:rounded-none border-b">
+            <div class="flex gap-4 px-4">
+                <button class="tab-link tab-link-active" data-tab="favorit">Koleksi Favorit</button>
+                <button class="tab-link" data-tab="alamat">Alamat Pengiriman</button>
+                <button class="tab-link" data-tab="pengaturan">Pengaturan Akun</button>
+            </div>
+        </div>
+
+        <div id="tab-content" class="card p-6">
+            <div data-panel="favorit" class="space-y-4">
+                <div id="favorites-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+                <div id="favorites-empty"
+                    class="col-span-full flex items-center justify-center py-16 text-center hidden">
+                    <div>
+                        <div
+                            class="mx-auto w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-secondary">
+                            <i data-feather="heart" class="w-6 h-6"></i>
+                        </div>
+                        <p class="mt-4 text-gray-600">Produk yang Anda sukai akan muncul di sini.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div data-panel="alamat" class="hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm text-gray-600">Kelola alamat pengiriman Anda</div>
+                    <button id="add-address-btn" class="btn btn-primary px-4 h-12 touch-target">Tambah Alamat</button>
+                </div>
+                <div id="addresses-list" class="grid sm:grid-cols-2 gap-3"></div>
+                <div id="addresses-empty"
+                    class="col-span-full flex items-center justify-center py-10 text-center hidden">
+                    <div>
+                        <div
+                            class="mx-auto w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-secondary">
+                            <i data-feather="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        <p class="mt-4 text-gray-600">Belum ada alamat yang disimpan.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div data-panel="pengaturan" class="hidden">
+                <div class="grid gap-4">
+                    <div class="card p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Email</div>
+                                <div class="text-gray-600" id="setting-email">sarahj@example.com</div>
+                            </div>
+                            <button class="btn btn-outline px-4 py-2">Ubah</button>
+                        </div>
+                    </div>
+                    <div class="card p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Kata Sandi</div>
+                                <div class="text-gray-600">Terakhir diubah: 2 bulan lalu</div>
+                            </div>
+                            <button class="btn btn-outline px-4 py-2">Ubah</button>
+                        </div>
+                    </div>
+                    <div class="card p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Notifikasi</div>
+                                <div class="text-gray-600">Promosi, status pesanan</div>
+                            </div>
+                            <button class="btn btn-outline px-4 py-2">Kelola</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+    <script src="js/footer.js"></script>
+    <div id="editProfileModal" class="fixed inset-0 bg-black/40 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl w-full max-w-lg shadow-xl">
+                <div class="p-6 border-b">
+                    <div class="text-lg font-semibold">Edit Profil</div>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-600">Nama Lengkap</label>
+                        <input id="edit-name" type="text"
+                            class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none"
+                            placeholder="Nama">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Email</label>
+                        <input id="edit-email" type="email"
+                            class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none"
+                            placeholder="email@contoh.com">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div id="save-status" class="text-sm text-gray-500"></div>
+                        <div class="flex gap-2">
+                            <button id="close-edit" class="btn btn-outline px-5 py-2">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addressModal" class="fixed inset-0 bg-black/40 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl w-full max-w-lg shadow-xl">
+                <div class="p-6 border-b">
+                    <div class="text-lg font-semibold" id="addressModalTitle">Tambah Alamat</div>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-sm text-gray-600">Nama Penerima</label>
+                            <input id="address-receiver" type="text"
+                                class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none"
+                                placeholder="Nama">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">No. Telepon</label>
+                            <input id="address-phone" type="tel" inputmode="tel" autocomplete="tel"
+                                pattern="^\+?\d{9,15}$" maxlength="15"
+                                class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none"
+                                placeholder="08xxxxxxxxxx">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Alamat</label>
+                        <textarea id="address-line"
+                            class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none"
+                            rows="3" autocomplete="street-address"></textarea>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-sm text-gray-600">Kota</label>
+                            <input id="address-city" type="text" autocomplete="address-level2"
+                                class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Provinsi</label>
+                            <input id="address-province" type="text" autocomplete="address-level1"
+                                class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Kode Pos</label>
+                            <input id="address-postal" type="text" inputmode="numeric" pattern="\d{5}" maxlength="5"
+                                autocomplete="postal-code"
+                                class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-secondary focus:outline-none">
+                        </div>
+                    </div>
+                    <label class="flex items-center gap-2">
+                        <input id="address-default" type="checkbox" class="rounded">
+                        <span class="text-sm">Jadikan Alamat Default</span>
+                    </label>
+                    <div class="flex items-center justify-between">
+                        <div id="address-save-status" class="text-sm text-gray-500"></div>
+                        <div class="flex gap-2">
+                            <button id="address-cancel" class="btn btn-outline px-5 py-2">Tutup</button>
+                            <button id="address-save" class="btn btn-primary px-5 py-2">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+        import { refreshSession } from './js/auth-utils.js';
+
+        const currencyID = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+        const tabs = Array.from(document.querySelectorAll('.tab-link'));
+        const panels = Array.from(document.querySelectorAll('[data-panel]'));
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabs.forEach(b => b.classList.remove('tab-link-active'));
+                btn.classList.add('tab-link-active');
+                const target = btn.getAttribute('data-tab');
+                panels.forEach(p => { p.classList.toggle('hidden', p.getAttribute('data-panel') !== target); });
+            });
+        });
+
+        if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
+
+        let currentUserId = null;
+        let debounceTimer = null;
+        let editingAddressId = null;
+        let isSavingAddress = false;
+        let favChannel = null;
+
+        function initials(name) {
+            if (!name) return 'U';
+            const parts = name.trim().split(/\s+/);
+            const letters = (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
+            return letters.toUpperCase();
+        }
+
+        function renderAvatar(name, url) {
+            const container = document.getElementById('profile-avatar');
+            container.innerHTML = '';
+            if (url) {
+                const img = new Image();
+                img.src = url;
+                img.alt = 'Avatar';
+                img.className = 'w-full h-full object-cover';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                container.classList.remove('avatar-fallback');
+                container.appendChild(img);
+            } else {
+                container.classList.add('avatar-fallback');
+                container.textContent = initials(name);
+            }
+        }
+
+        function setCover(url) {
+            const cover = document.getElementById('profile-cover');
+            if (url) cover.style.backgroundImage = `url('${url}')`;
+            cover.style.backgroundSize = 'cover';
+            cover.style.backgroundPosition = 'center';
+        }
+
+        async function loadProfile() {
+            const user = await refreshSession(true);
+            if (!user) return;
+            currentUserId = user.id;
+            const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            const p = profileData || {};
+            const name = p.full_name || user.user_metadata?.full_name || user.email;
+            const email = p.email || user.email;
+            const status = p.member_status || 'Member';
+            const joinedAt = p.joined_at || user.created_at || new Date().toISOString();
+            const lastLogin = p.last_login || user.last_sign_in_at || new Date().toISOString();
+            const avatarUrl = p.avatar_url || user.user_metadata?.avatar_url || '';
+            const coverUrl = p.cover_url || '';
+            document.getElementById('profile-username').textContent = name;
+            document.getElementById('profile-email').textContent = email;
+            document.getElementById('profile-status').textContent = status;
+            document.getElementById('setting-email').textContent = email;
+            document.getElementById('profile-joined').textContent = 'Bergabung: ' + new Date(joinedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('profile-last-login').textContent = 'Login terakhir: ' + new Date(lastLogin).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            renderAvatar(name, avatarUrl);
+            setCover(coverUrl);
+
+            const { count: totalOrders } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+            document.getElementById('stat-total-orders').textContent = totalOrders || 0;
+            const { count: completedOrders } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed');
+            document.getElementById('stat-completed-orders').textContent = completedOrders || 0;
+            const { data: spendingData } = await supabase
+                .from('orders')
+                .select('total_amount')
+                .eq('user_id', user.id)
+                .eq('status', 'completed');
+            const totalSpending = (spendingData || []).reduce((s, r) => s + (r.total_amount || 0), 0);
+            document.getElementById('stat-total-spending').textContent = currencyID.format(Math.round(totalSpending));
+
+            const { data: orderIds } = await supabase.from('orders').select('id').eq('user_id', user.id);
+            const ids = (orderIds || []).map(o => o.id);
+            let totalQty = 0;
+            if (ids.length) {
+                const { data: itemsAgg } = await supabase.from('order_items').select('quantity, order_id').in('order_id', ids);
+                totalQty = (itemsAgg || []).reduce((s, r) => s + (r.quantity || 0), 0);
+            }
+            document.getElementById('stat-products-purchased').textContent = totalQty;
+            await loadFavorites();
+            await loadAddresses();
+            if (favChannel) try { favChannel.unsubscribe(); } catch (_) { }
+            favChannel = supabase
+                .channel('fav-' + currentUserId)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'product_likes', filter: `user_id=eq.${currentUserId}` }, () => { loadFavorites(); })
+                .subscribe();
+        }
+
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+        async function autoSave(field, value) {
+            if (!currentUserId) return;
+            document.getElementById('save-status').textContent = 'Menyimpan...';
+            const payload = {};
+            payload[field] = value;
+            await supabase.from('profiles').update(payload).eq('id', currentUserId);
+            if (field === 'full_name') { await supabase.auth.updateUser({ data: { full_name: value } }); }
+            if (field === 'email' && isValidEmail(value)) { try { await supabase.auth.updateUser({ email: value }); } catch (_) { } }
+            document.getElementById('save-status').textContent = 'Tersimpan';
+            setTimeout(() => { document.getElementById('save-status').textContent = ''; }, 1500);
+        }
+
+        function openEditModal() {
+            const name = document.getElementById('profile-username').textContent;
+            const email = document.getElementById('profile-email').textContent;
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-email').value = email;
+            document.getElementById('editProfileModal').classList.remove('hidden');
+        }
+        function closeEditModal() { document.getElementById('editProfileModal').classList.add('hidden'); }
+
+        async function loadFavorites() {
+            const grid = document.getElementById('favorites-grid');
+            const empty = document.getElementById('favorites-empty');
+            grid.innerHTML = '';
+            const { data } = await supabase
+                .from('product_likes')
+                .select('id, product:products(id,name,price,image_url), liked_at')
+                .eq('user_id', currentUserId)
+                .order('liked_at', { ascending: false });
+            const items = (data || []).filter(d => d.product);
+            if (!items.length) { empty.classList.remove('hidden'); feather.replace(); return; }
+            empty.classList.add('hidden');
+            items.forEach(({ id, product }) => {
+                const card = document.createElement('div');
+                card.className = 'card p-3 shadow-sm hover:shadow-md transition';
+                card.innerHTML = `
+                    <div class="flex flex-col h-full group">
+                        <div class="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100">
+                            <img src="${product.image_url || ''}" alt="${product.name}" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async">
+                            <!-- Hover Actions -->
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                                <button class="fav-buy-btn w-10 h-10 rounded-full bg-white text-gray-900 flex items-center justify-center shadow-lg hover:bg-secondary hover:text-white transition-colors transform hover:scale-110" 
+                                        title="Tambah ke Keranjang"
+                                        data-product-id="${product.id}" 
+                                        data-product-name="${product.name}" 
+                                        data-product-price="${product.price || 0}" 
+                                        data-product-image="${product.image_url || ''}">
+                                    <i data-feather="shopping-cart" class="w-5 h-5"></i>
+                                </button>
+                                <button aria-label="Unlike" title="Hapus dari Favorit" data-like-id="${id}" data-product-id="${product.id}" class="w-10 h-10 rounded-full bg-white text-red-500 flex items-center justify-center shadow-lg hover:bg-red-50 transition-colors transform hover:scale-110">
+                                    <i data-feather="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-col flex-1">
+                            <div class="font-medium text-gray-900 line-clamp-2 text-sm sm:text-base leading-snug mb-1" title="${product.name}">${product.name}</div>
+                            <div class="text-gray-900 font-bold text-sm sm:text-base">${currencyID.format(product.price || 0)}</div>
+                        </div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+            grid.querySelectorAll('.fav-buy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const product = {
+                        id: btn.getAttribute('data-product-id'),
+                        name: btn.getAttribute('data-product-name'),
+                        price: Number(btn.getAttribute('data-product-price')) || 0,
+                        image_url: btn.getAttribute('data-product-image') || ''
+                    };
+                    if (typeof window.addToCart === 'function') {
+                        window.addToCart(product);
+                        if (typeof window.openCart === 'function') window.openCart();
+                    }
+                });
+            });
+            grid.querySelectorAll('button[data-like-id]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const likeId = btn.getAttribute('data-like-id');
+                    await supabase.from('product_likes').delete().eq('id', likeId).eq('user_id', currentUserId);
+                    await loadFavorites();
+                });
+            });
+            if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
+        }
+
+        function openAddressModal(isEdit = false, data = null) {
+            editingAddressId = isEdit && data ? data.id : null;
+            document.getElementById('addressModalTitle').textContent = isEdit ? 'Edit Alamat' : 'Tambah Alamat';
+            const r = document.getElementById('address-receiver');
+            const ph = document.getElementById('address-phone');
+            const ln = document.getElementById('address-line');
+            const ct = document.getElementById('address-city');
+            const pv = document.getElementById('address-province');
+            const pc = document.getElementById('address-postal');
+            const df = document.getElementById('address-default');
+            if (r) r.value = data?.receiver_name || '';
+            if (ph) ph.value = data?.phone_number || '';
+            if (ln) ln.value = data?.address_line || '';
+            if (ct) ct.value = data?.city || '';
+            if (pv) pv.value = data?.province || '';
+            if (pc) pc.value = data?.postal_code || '';
+            if (df) df.checked = !!data?.is_default;
+            document.getElementById('addressModal').classList.remove('hidden');
+        }
+        function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); document.getElementById('address-save-status').textContent = ''; }
+
+        async function loadAddresses() {
+            const list = document.getElementById('addresses-list');
+            const empty = document.getElementById('addresses-empty');
+            list.innerHTML = '';
+            const { data } = await supabase
+                .from('saved_addresses')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .order('is_default', { ascending: false });
+            const items = data || [];
+            if (!items.length) { empty.classList.remove('hidden'); feather.replace(); return; }
+            empty.classList.add('hidden');
+            items.forEach(addr => {
+                const card = document.createElement('div');
+                card.className = 'card p-5';
+                card.setAttribute('data-address-id', addr.id);
+                const badge = addr.is_default ? '<span class="ml-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Alamat Utama</span>' : '';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="wrap-anywhere">
+                            <div class="text-sm font-semibold">${addr.receiver_name || 'Penerima'} ${badge}</div>
+                            <div class="mt-1 text-gray-600">${addr.phone_number || ''}</div>
+                            <div class="mt-2 text-gray-600">${addr.address_line || ''}</div>
+                            <div class="mt-1 text-gray-600">${addr.city || ''}, ${addr.province || ''} ${addr.postal_code || ''}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline px-3 py-1" data-edit-id="${addr.id}">Edit</button>
+                            <button class="btn btn-primary px-3 py-1" data-del-id="${addr.id}">Hapus</button>
+                        </div>
+                    </div>`;
+                list.appendChild(card);
+            });
+            list.querySelectorAll('button[data-edit-id]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-edit-id');
+                    const addr = (items || []).find(a => String(a.id) === String(id));
+                    openAddressModal(true, addr);
+                });
+            });
+            list.querySelectorAll('button[data-del-id]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-del-id');
+                    await supabase.from('saved_addresses').delete().eq('id', id).eq('user_id', currentUserId);
+                    await loadAddresses();
+                });
+            });
+            if (typeof feather !== 'undefined') { try { feather.replace(); } catch (_) { } }
+        }
+
+        function showToast(message, type = 'success') {
+            let t = document.getElementById('profile-toast');
+            if (!t) { t = document.createElement('div'); t.id = 'profile-toast'; document.body.appendChild(t); }
+            t.className = 'toast ' + (type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white');
+            t.textContent = message;
+            setTimeout(() => { t.classList.add('toast-show'); }, 50);
+            setTimeout(() => { t.classList.remove('toast-show'); }, 2500);
+        }
+
+        function sanitizePhone(input) {
+            let v = input.replace(/[^\d+]/g, '');
+            if (v.startsWith('+')) v = '+' + v.slice(1).replace(/\D/g, '');
+            else v = v.replace(/\D/g, '');
+            return v;
+        }
+
+        async function saveAddress() {
+            if (isSavingAddress) return;
+            isSavingAddress = true;
+            const saveBtn = document.getElementById('address-save');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.classList.add('opacity-60'); }
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) backBtn.addEventListener('click', () => { try { history.back(); } catch (_) { window.location.href = 'index.html'; } });
+            const receiver = document.getElementById('address-receiver').value.trim();
+            let phone = document.getElementById('address-phone').value.trim();
+            phone = sanitizePhone(phone);
+            const line = document.getElementById('address-line').value.trim();
+            const city = document.getElementById('address-city').value.trim();
+            const province = document.getElementById('address-province').value.trim();
+            const postal = document.getElementById('address-postal').value.trim();
+            const isDefault = document.getElementById('address-default').checked;
+            if (!receiver || !phone || !line || !city || !province || !postal) { document.getElementById('address-save-status').textContent = 'Lengkapi data alamat'; isSavingAddress = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); } return; }
+            if (!/^\+?\d{9,15}$/.test(phone)) { document.getElementById('address-save-status').textContent = 'Nomor telepon tidak valid'; isSavingAddress = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); } return; }
+            if (!/^\d{5}$/.test(postal)) { document.getElementById('address-save-status').textContent = 'Kode pos harus 5 digit'; isSavingAddress = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); } return; }
+            document.getElementById('address-save-status').textContent = 'Menyimpan...';
+            if (isDefault) { await supabase.from('saved_addresses').update({ is_default: false }).eq('user_id', currentUserId); }
+            if (editingAddressId) {
+                const { error } = await supabase.from('saved_addresses').update({ receiver_name: receiver, phone_number: phone, address_line: line, city, province, postal_code: postal, is_default: isDefault }).eq('id', editingAddressId).eq('user_id', currentUserId);
+                if (error) { document.getElementById('address-save-status').textContent = 'Gagal menyimpan'; showToast('Gagal menyimpan alamat', 'error'); isSavingAddress = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); } return; }
+            } else {
+                const { data, error } = await supabase.from('saved_addresses').insert({ user_id: currentUserId, receiver_name: receiver, phone_number: phone, address_line: line, city, province, postal_code: postal, is_default: isDefault }).select('id');
+                if (error) { document.getElementById('address-save-status').textContent = 'Gagal menyimpan'; showToast('Gagal menyimpan alamat', 'error'); isSavingAddress = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); } return; }
+                if (data && data[0]) editingAddressId = data[0].id;
+            }
+            document.getElementById('address-save-status').textContent = 'Tersimpan';
+            setTimeout(() => { closeAddressModal(); }, 800);
+            await loadAddresses();
+            showToast('Alamat berhasil disimpan', 'success');
+            if (editingAddressId) {
+                const card = document.querySelector(`[data-address-id="${editingAddressId}"]`);
+                if (card) { card.classList.add('saved-highlight'); setTimeout(() => card.classList.remove('saved-highlight'), 1000); }
+            }
+            isSavingAddress = false;
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('opacity-60'); }
+        }
+
+        document.getElementById('add-address-btn').addEventListener('click', () => openAddressModal(false));
+        document.getElementById('address-cancel').addEventListener('click', closeAddressModal);
+        document.getElementById('addressModal').addEventListener('click', (e) => { if (e.target.id === 'addressModal') closeAddressModal(); });
+        document.getElementById('address-save').addEventListener('click', saveAddress);
+
+        document.getElementById('edit-profile-btn').addEventListener('click', openEditModal);
+        document.getElementById('close-edit').addEventListener('click', closeEditModal);
+        document.getElementById('editProfileModal').addEventListener('click', (e) => { if (e.target.id === 'editProfileModal') closeEditModal(); });
+        const mb = document.getElementById('mobile-back');
+        if (mb) mb.addEventListener('click', () => { try { history.back(); } catch (_) { window.location.href = 'index.html'; } });
+
+        document.getElementById('edit-name').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            document.getElementById('profile-username').textContent = val || 'Tanpa Nama';
+            renderAvatar(val, null);
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => autoSave('full_name', val), 800);
+        });
+        document.getElementById('edit-email').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            document.getElementById('profile-email').textContent = val;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => { if (isValidEmail(val)) autoSave('email', val); else document.getElementById('save-status').textContent = 'Email tidak valid'; }, 800);
+        });
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

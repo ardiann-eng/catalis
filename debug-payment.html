@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Payment History</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .section {
+            background: #000;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .title {
+            color: #ffff00;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .result {
+            white-space: pre-wrap;
+            background: #0a0a0a;
+            padding: 10px;
+            border-left: 3px solid #00ff00;
+            margin: 10px 0;
+        }
+        .error {
+            color: #ff0000;
+            border-left-color: #ff0000;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .warning {
+            color: #ffaa00;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .info {
+            color: #00ccff;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color: #ffff00;">🔍 Payment History Debugger</h1>
+
+    <div class="section">
+        <div class="title">🔐 Authentication Status</div>
+        <button onclick="checkAuth()">Check Auth</button>
+        <div id="auth-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <div class="title">📋 Orders</div>
+        <button onclick="checkOrders()">Check Orders</button>
+        <div id="orders-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <div class="title">💳 Payment History</div>
+        <button onclick="checkPaymentHistory()">Check Payment History</button>
+        <div id="payment-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <div class="title">🔧 Fix & Test</div>
+        <button onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+        <div id="diagnostic-result" class="result"></div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = "https://anzsbqqippijhemwxkqh.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuenNicXFpcHBpamhlbXd4a3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDM1MTQsImV4cCI6MjA3Njc3OTUxNH0.6l1Bt9_5_5ohFeH8IN6mP9jU0pFUToHMmV1NwQEeP-Q";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function checkAuth() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = '<span class="info">Checking authentication...</span>';
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+                    return null;
+                }
+
+                if (!session) {
+                    result.innerHTML = '<span class="warning">⚠️  No active session. Please login first.</span>';
+                    return null;
+                }
+
+                result.innerHTML = `<span class="success">✅ Authenticated!</span>
+User ID: ${session.user.id}
+Email: ${session.user.email}`;
+
+                return session.user;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+                return null;
+            }
+        }
+
+        async function checkOrders() {
+            const result = document.getElementById('orders-result');
+            result.innerHTML = '<span class="info">Fetching orders...</span>';
+
+            try {
+                const user = await checkAuth();
+                if (!user) return;
+
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+                    return;
+                }
+
+                if (!orders || orders.length === 0) {
+                    result.innerHTML = '<span class="warning">⚠️  No orders found for this user</span>';
+                    return;
+                }
+
+                let output = `<span class="success">✅ Found ${orders.length} order(s):</span>\n\n`;
+                orders.forEach((order, i) => {
+                    output += `Order ${i + 1}:
+  ID (UUID): ${order.id}
+  Order Number: ${order.order_number}
+  Status: ${order.status}
+  Total: Rp ${order.total_amount?.toLocaleString('id-ID')}
+  Created: ${new Date(order.created_at).toLocaleString('id-ID')}
+\n`;
+                });
+
+                result.innerHTML = output;
+                return orders;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+
+        async function checkPaymentHistory() {
+            const result = document.getElementById('payment-result');
+            result.innerHTML = '<span class="info">Fetching payment history...</span>';
+
+            try {
+                const user = await checkAuth();
+                if (!user) return;
+
+                // Get orders first
+                const { data: orders, error: orderError } = await supabase
+                    .from('orders')
+                    .select('id, order_number')
+                    .eq('user_id', user.id);
+
+                if (orderError) {
+                    result.innerHTML = `<span class="error">❌ ERROR fetching orders: ${orderError.message}</span>`;
+                    return;
+                }
+
+                if (!orders || orders.length === 0) {
+                    result.innerHTML = '<span class="warning">⚠️  No orders found. Cannot check payment history.</span>';
+                    return;
+                }
+
+                const orderIds = orders.map(o => o.id);
+
+                // Get payment history
+                const { data: payments, error: paymentError } = await supabase
+                    .from('payment_history')
+                    .select('*')
+                    .in('order_id', orderIds)
+                    .order('created_at', { ascending: false });
+
+                if (paymentError) {
+                    result.innerHTML = `<span class="error">❌ ERROR fetching payment history: ${paymentError.message}</span>`;
+                    return;
+                }
+
+                if (!payments || payments.length === 0) {
+                    result.innerHTML = `<span class="error">❌ NO PAYMENT HISTORY FOUND!</span>
+
+This is the bug! Payment history should exist but doesn't.
+
+Possible reasons:
+1. Frontend savePaymentHistory() failed silently
+2. Backend webhook not called by Midtrans
+3. Database RLS policy blocking insert
+4. Foreign key constraint error (our recent fix)
+
+Orders without payment history:
+${orders.map((o, i) => `${i + 1}. ${o.order_number} (UUID: ${o.id})`).join('\n')}`;
+                    return;
+                }
+
+                let output = `<span class="success">✅ Found ${payments.length} payment record(s):</span>\n\n`;
+                payments.forEach((payment, i) => {
+                    const order = orders.find(o => o.id === payment.order_id);
+                    output += `Payment ${i + 1}:
+  Order Number: ${order?.order_number || 'N/A'}
+  Order ID: ${payment.order_id}
+  Method: ${payment.payment_method}
+  Amount: Rp ${payment.amount?.toLocaleString('id-ID')}
+  Status: ${payment.status}
+  Transaction ID: ${payment.transaction_id}
+  Created: ${new Date(payment.created_at).toLocaleString('id-ID')}
+\n`;
+                });
+
+                result.innerHTML = output;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR: ${error.message}\n\nStack: ${error.stack}</span>`;
+            }
+        }
+
+        async function runFullDiagnostic() {
+            const result = document.getElementById('diagnostic-result');
+            result.innerHTML = '<span class="info">Running full diagnostic...</span>';
+
+            let diagnostic = '=== FULL DIAGNOSTIC REPORT ===\n\n';
+
+            try {
+                // 1. Check Auth
+                diagnostic += '1️⃣  Checking Authentication...\n';
+                const user = await checkAuth();
+                if (!user) {
+                    result.innerHTML = diagnostic + '<span class="error">❌ FAILED: Not authenticated</span>';
+                    return;
+                }
+                diagnostic += '   ✅ Authenticated\n\n';
+
+                // 2. Check Orders
+                diagnostic += '2️⃣  Checking Orders...\n';
+                const { data: orders, error: orderError } = await supabase
+                    .from('orders')
+                    .select('id, order_number, status, created_at')
+                    .eq('user_id', user.id);
+
+                if (orderError) {
+                    diagnostic += `   ❌ ERROR: ${orderError.message}\n\n`;
+                } else if (!orders || orders.length === 0) {
+                    diagnostic += '   ⚠️  No orders found\n\n';
+                } else {
+                    diagnostic += `   ✅ Found ${orders.length} order(s)\n\n`;
+                }
+
+                // 3. Check Payment History
+                diagnostic += '3️⃣  Checking Payment History...\n';
+                if (orders && orders.length > 0) {
+                    const orderIds = orders.map(o => o.id);
+                    const { data: payments, error: paymentError } = await supabase
+                        .from('payment_history')
+                        .select('*')
+                        .in('order_id', orderIds);
+
+                    if (paymentError) {
+                        diagnostic += `   ❌ ERROR: ${paymentError.message}\n\n`;
+                    } else if (!payments || payments.length === 0) {
+                        diagnostic += '   ❌ NO PAYMENT HISTORY FOUND!\n\n';
+                        diagnostic += '   🔍 Analysis:\n';
+                        diagnostic += '   - Orders exist but no payment records\n';
+                        diagnostic += '   - This confirms the bug exists\n';
+                        diagnostic += '   - Frontend or webhook is not saving payment history\n\n';
+                    } else {
+                        diagnostic += `   ✅ Found ${payments.length} payment record(s)\n\n`;
+
+                        // Match orders with payments
+                        orders.forEach(order => {
+                            const hasPayment = payments.some(p => p.order_id === order.id);
+                            diagnostic += `   Order ${order.order_number}: ${hasPayment ? '✅ Has payment' : '❌ No payment'}\n`;
+                        });
+                        diagnostic += '\n';
+                    }
+                } else {
+                    diagnostic += '   ⚠️  Skipped (no orders)\n\n';
+                }
+
+                // 4. Recommendations
+                diagnostic += '4️⃣  Recommendations:\n';
+                if (orders && orders.length > 0) {
+                    const orderIds = orders.map(o => o.id);
+                    const { data: payments } = await supabase
+                        .from('payment_history')
+                        .select('order_id')
+                        .in('order_id', orderIds);
+
+                    if (!payments || payments.length === 0) {
+                        diagnostic += '   📝 Actions needed:\n';
+                        diagnostic += '   1. Make a new test payment\n';
+                        diagnostic += '   2. Check browser console for errors\n';
+                        diagnostic += '   3. Check backend logs for webhook calls\n';
+                        diagnostic += '   4. Verify Midtrans sandbox is configured\n';
+                    } else {
+                        diagnostic += '   ✅ Payment history is working!\n';
+                        diagnostic += '   📱 Check profile.html UI to see payment details\n';
+                    }
+                }
+
+                result.innerHTML = `<span class="success">${diagnostic}</span>`;
+
+            } catch (error) {
+                result.innerHTML = diagnostic + `<span class="error">\n\n❌ FATAL ERROR: ${error.message}\n\nStack:\n${error.stack}</span>`;
+            }
+        }
+
+        // Auto-run on load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Payment History Debugger loaded');
+            console.log('Click buttons to run diagnostic tests');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalist Creative | Marketplace</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Midtrans Snap -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-QZNRNJ4ROIoY8PAn"></script>
+    <!-- Auth dan Navbar JS -->
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <!-- Cart JS -->
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <!-- Marketplace JS -->
+    <script type="module" src="js/marketplace.js"></script>
+    <!-- Midtrans JS -->
+    <script type="module" src="js/midtrans.js"></script>
+    <!-- Validasi Session -->
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+        import { refreshSession, isLoggedIn } from './js/auth-utils.js';
+        import { startMidtransPayment } from './js/midtrans.js';
+
+        // Periksa session saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            await refreshSession();
+
+            // Setup event listener untuk tombol checkout
+            document.getElementById('checkout-button')?.addEventListener('click', () => {
+                document.getElementById('checkout-modal').style.display = 'block';
+            });
+
+            // Setup event listener untuk tombol close modal
+            document.getElementById('close-checkout')?.addEventListener('click', () => {
+                document.getElementById('checkout-modal').style.display = 'none';
+            });
+
+            // Validasi realtime checkout
+            const nameEl = document.getElementById('customer-name');
+            const emailEl = document.getElementById('customer-email');
+            const phoneEl = document.getElementById('customer-phone');
+            const payBtn = document.getElementById('pay-now-button');
+
+            const showError = (id, show) => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', !show);
+            };
+            const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
+            const isPhone = (v) => (/^[0-9+()\-\s]{8,}$/.test(v || ''));
+            const validate = () => {
+                const nameOk = !!(nameEl?.value && nameEl.value.trim().length >= 2);
+                const emailOk = isEmail(emailEl?.value);
+                const phoneOk = isPhone(phoneEl?.value);
+                showError('customer-name-error', !nameOk);
+                showError('customer-email-error', !emailOk);
+                showError('customer-phone-error', !phoneOk);
+                if (payBtn) payBtn.disabled = !(nameOk && emailOk && phoneOk);
+                return nameOk && emailOk && phoneOk;
+            };
+            [nameEl, emailEl, phoneEl].forEach(el => {
+                el?.addEventListener('input', validate);
+            });
+            validate();
+
+            // Setup event listener untuk tombol bayar
+            document.getElementById('pay-now-button')?.addEventListener('click', async () => {
+                const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+                if (cartItems.length === 0) {
+                    alert('Keranjang belanja Anda kosong!');
+                    return;
+                }
+                if (!validate()) {
+                    alert('Mohon isi data pelanggan dengan benar');
+                    return;
+                }
+
+                const userData = await getUserData();
+
+                // Siapkan data order
+                const orderData = {
+                    customerId: userData?.id,
+                    customerName: userData?.full_name || document.getElementById('customer-name').value,
+                    customerEmail: userData?.email || document.getElementById('customer-email').value,
+                    customerPhone: document.getElementById('customer-phone').value,
+                    items: cartItems,
+                    totalAmount: cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+                };
+
+                // Mulai proses pembayaran dengan Midtrans
+                const result = await startMidtransPayment(orderData);
+                if (result.success) {
+                    // Pembayaran berhasil dimulai
+                    document.getElementById('checkout-modal').style.display = 'none';
+                } else {
+                    alert('Gagal memulai pembayaran: ' + result.error);
+                }
+            });
+        });
+
+        // Fungsi untuk mendapatkan data user
+        async function getUserData() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return null;
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching user profile:', error);
+                return null;
+            }
+
+            return data;
+        }
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+        .gradient-text {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #facc15 0%, #d946ef 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #d946ef;
+            transition: width .3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Minimalist Bookstore Card Style */
+        .nft-card {
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: none;
+            border: none;
+            background: #ffffff;
+        }
+
+        .nft-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Portrait Image Container - Ukuran Sama untuk Semua Produk */
+        .nft-card .aspect-square {
+            aspect-ratio: 1 / 1 !important;
+            /* Square - Kotak Sempurna */
+            background: #f8f8f8;
+            padding: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nft-card .aspect-square img {
+            object-fit: contain !important;
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        /* Clean Typography */
+        .product-title {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #1a1a1a;
+            font-weight: 400;
+        }
+
+        /* Price Styling - Dark and Clear */
+        .nft-card .text-primary {
+            color: #1a1a1a !important;
+            font-weight: 700;
+        }
+
+        /* Category Badge - Catalis Theme */
+        .category-badge {
+            background: linear-gradient(135deg, #facc15 0%, #d946ef 100%);
+            color: #ffffff;
+            border: none;
+            font-size: 10px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(217, 70, 239, 0.2);
+        }
+
+        /* Button Styles - Solid Color (No Gradient) */
+        .add-to-cart-btn {
+            background: #d946ef !important;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            height: 40px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(217, 70, 239, 0.25);
+            color: #ffffff !important;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(217, 70, 239, 0.35) !important;
+            background: #c026d3 !important;
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Filter Buttons */
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #d946ef;
+            color: #d946ef;
+        }
+
+        .filter-btn.active {
+            background-color: #d946ef;
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 10px 15px -5px rgba(217, 70, 239, 0.25);
+        }
+
+        /* Hero Background */
+        .hero-art-bg {
+            position: relative;
+            background: radial-gradient(circle at 20% 20%, rgba(217, 70, 239, 0.08) 0, transparent 50%),
+                radial-gradient(circle at 80% 30%, rgba(250, 204, 21, 0.12) 0, transparent 50%);
+        }
+
+        .hero-art-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Cpath d='M50 300 C150 250 250 350 350 300 C450 250 550 350 650 300' stroke='%23d946ef' stroke-opacity='0.08' stroke-width='24' fill='none' stroke-linecap='round'/%3E%3Cpath d='M0 400 C120 360 240 440 360 400 C480 360 600 440 720 400' stroke='%23facc15' stroke-opacity='0.06' stroke-width='18' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 1% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 95vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @media (min-width: 640px) {
+            .modal-content {
+                margin: 2% auto;
+                border-radius: 20px;
+                width: 90%;
+                max-height: 90vh;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            z-index: 1001;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 640px) {
+            .close {
+                right: 20px;
+                top: 20px;
+                font-size: 28px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .close:hover {
+            color: #000;
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .price-chart {
+            height: 200px;
+        }
+
+        @media (min-width: 640px) {
+            .price-chart {
+                height: 300px;
+            }
+        }
+
+        .action-button {
+            transition: all 0.3s ease;
+        }
+
+        .checkout-modal {
+            display: none;
+            position: fixed;
+            z-index: 1100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .checkout-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .pay-button {
+            background: linear-gradient(135deg, #facc15 0%, #d946ef 100%);
+            color: white;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-white font-sans text-gray-800">
+    <!-- Container untuk navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Container untuk cart sidebar -->
+    <div id="cart-sidebar-container"></div>
+
+    <!-- Shopping Cart Container -->
+    <div id="cart-container"></div>
+
+    <!-- Spacer untuk navbar fixed -->
+    <div class="h-20"></div>
+
+    <!-- Marketplace Hero -->
+    <section class="hero-art-bg pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
+        <div class="grid md:grid-cols-2 gap-10 sm:gap-12 items-center mb-10 sm:mb-12">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-display font-bold mb-5 leading-tight text-gray-900">
+                    Jelajahi <span class="gradient-text">Produk Pilihan</span> Kami</h1>
+                <p class="text-gray-700 max-w-2xl text-base sm:text-lg">Temukan berbagai produk berkualitas untuk
+                    memenuhi kebutuhan Anda. Belanja mudah, aman, dan nyaman.</p>
+                <div class="mt-6 flex justify-center md:justify-start">
+                    <a href="#product-grid"
+                        class="inline-flex items-center gradient-bg hover:opacity-95 text-white font-semibold rounded-full px-6 sm:px-8 py-3 shadow-md transition">Belanja
+                        Sekarang</a>
+                </div>
+            </div>
+            <div class="relative order-first md:order-last">
+                <div
+                    class="absolute -top-2 sm:-top-4 -left-2 sm:-left-4 w-20 sm:w-32 h-20 sm:h-32 bg-primary rounded-2xl opacity-20 -z-10">
+                </div>
+                <div
+                    class="absolute -bottom-2 sm:-bottom-4 -right-2 sm:-right-4 w-20 sm:w-32 h-20 sm:h-32 bg-secondary rounded-2xl opacity-20 -z-10">
+                </div>
+                <img src="hero2.png" alt="Marketplace Hero"
+                    class="rounded-2xl shadow-xl w-full h-auto max-h-64 sm:max-h-none object-cover">
+            </div>
+        </div>
+
+        <!-- Shopping Cart dan Purchase History Buttons -->
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div id="category-filters" class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button
+                    class="filter-btn active px-4 sm:px-5 py-2.5 rounded-full border border-gray-300 bg-white shadow-sm text-sm sm:text-base font-medium transition-all"
+                    data-category="all">Semua</button>
+                <button
+                    class="filter-btn px-4 sm:px-5 py-2.5 rounded-full border border-gray-300 bg-white shadow-sm text-sm sm:text-base font-medium transition-all"
+                    data-category="Buku">Buku</button>
+                <button
+                    class="filter-btn px-4 sm:px-5 py-2.5 rounded-full border border-gray-300 bg-white shadow-sm text-sm sm:text-base font-medium transition-all"
+                    data-category="Lukisan">Lukisan</button>
+            </div>
+            <div class="w-full sm:w-auto">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Cari produk..."
+                        class="bg-white border border-gray-300 rounded-full px-6 py-3 pl-12 w-full sm:w-96 shadow-sm focus:ring-2 focus:ring-primary text-sm sm:text-base">
+                    <i data-feather="search" class="absolute left-4 top-3.5 text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <div class="flex items-center w-full sm:w-auto">
+                <span class="mr-2 text-sm sm:text-base">Sort by:</span>
+                <select id="sort-select"
+                    class="bg-white border border-gray-300 rounded-full px-4 py-2 shadow-sm focus:ring-2 focus:ring-primary text-sm sm:text-base flex-1 sm:flex-none">
+                    <option value="recent">Recently Added</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name-asc">Name: A to Z</option>
+                    <option value="name-desc">Name: Z to A</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="pb-24 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
+        <div id="product-grid"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
+            <!-- Skeleton Loading -->
+            <div id="skeleton-grid" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                <!-- Skeleton Card (ulangi 8 kali untuk simulasi grid penuh) -->
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <!-- Duplikat skeleton card untuk mengisi grid -->
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="nft-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <div class="w-full h-56 md:h-64 bg-gray-200 animate-pulse"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                        <div class="mt-4 h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase History Sidebar -->
+        <div id="history-sidebar"
+            class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Riwayat Pembelian</h2>
+                    <button onclick="toggleHistory()" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="history-items" class="flex-1 overflow-y-auto p-6">
+                <div id="empty-history" class="text-center py-12">
+                    <i data-feather="clock" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Belum ada riwayat pembelian</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div id="checkout-modal" class="modal">
+            <div class="modal-content max-w-2xl">
+                <span class="close" onclick="closeCheckout()">&times;</span>
+                <div class="p-8">
+                    <h2 class="text-3xl font-bold mb-6">Checkout</h2>
+
+                    <!-- Order Summary -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Ringkasan Pesanan</h3>
+                        <div id="checkout-items" class="space-y-4 mb-4">
+                            <!-- Items will be populated here -->
+                        </div>
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center text-xl font-bold">
+                                <span>Total:</span>
+                                <span id="checkout-total" class="text-primary">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="mb-8">
+                        <h3 class="text-lg sm:text-xl font-semibold mb-4">Metode Pembayaran</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="crypto" class="mr-3" checked>
+                                <i data-feather="dollar-sign" class="w-5 h-5 mr-3"></i>
+                                <span>Cryptocurrency (SOL)</span>
+                            </label>
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="credit" class="mr-3">
+                                <i data-feather="credit-card" class="w-5 h-5 mr-3"></i>
+                                <span>Kartu Kredit</span>
+                            </label>
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="bank" class="mr-3">
+                                <i data-feather="home" class="w-5 h-5 mr-3"></i>
+                                <span>Transfer Bank</span>
+                            </label>
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="ewallet" class="mr-3">
+                                <i data-feather="smartphone" class="w-5 h-5 mr-3"></i>
+                                <span>E-Wallet</span>
+                            </label>
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
+                                onclick="selectQRIS()">
+                                <input type="radio" name="payment" value="qris" class="mr-3">
+                                <i data-feather="grid" class="w-5 h-5 mr-3"></i>
+                                <span>QRIS (Quick Response Code Indonesian Standard)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info (Mobile Friendly) -->
+                    <div class="mb-8">
+                        <h3 class="text-lg sm:text-xl font-semibold mb-4">Informasi Pelanggan</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600">Nama</label>
+                                <input id="customer-name" type="text" inputmode="text" autocomplete="name"
+                                    class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary"
+                                    placeholder="Nama lengkap">
+                                <p id="customer-name-error" class="text-xs text-red-600 mt-1 hidden">Nama wajib diisi
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600">Email</label>
+                                <input id="customer-email" type="email" inputmode="email" autocomplete="email"
+                                    class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary"
+                                    placeholder="email@contoh.com">
+                                <p id="customer-email-error" class="text-xs text-red-600 mt-1 hidden">Email tidak valid
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600">Nomor Telepon</label>
+                                <input id="customer-phone" type="tel" inputmode="tel" autocomplete="tel"
+                                    class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary"
+                                    placeholder="08xxxxxxx">
+                                <p id="customer-phone-error" class="text-xs text-red-600 mt-1 hidden">Nomor telepon
+                                    tidak valid</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div id="payment-details" class="mb-8">
+                        <!-- QRIS Payment Section -->
+                        <div id="qris-section" class="hidden">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                                <h4 class="text-lg font-semibold mb-4 text-center">Pembayaran QRIS</h4>
+
+                                <!-- QR Code Display -->
+                                <div class="text-center mb-6">
+                                    <div id="qr-code-container" class="inline-block p-4 bg-white rounded-lg shadow-md">
+                                        <div id="qr-code-placeholder"
+                                            class="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                                            <div class="text-center">
+                                                <i data-feather="loader" class="w-8 h-8 mx-auto mb-2 animate-spin"></i>
+                                                <p class="text-sm text-gray-500">Generating QR Code...</p>
+                                            </div>
+                                        </div>
+                                        <canvas id="qr-code-canvas" class="hidden w-48 h-48"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Instructions -->
+                                <div class="text-center mb-6">
+                                    <h5 class="font-semibold mb-2">Cara Pembayaran:</h5>
+                                    <ol class="text-sm text-gray-600 text-left max-w-md mx-auto space-y-1">
+                                        <li>1. Buka aplikasi pembayaran yang mendukung QRIS</li>
+                                        <li>2. Pilih menu "Scan QR" atau "Bayar"</li>
+                                        <li>3. Arahkan kamera ke kode QR di atas</li>
+                                        <li>4. Konfirmasi pembayaran di aplikasi Anda</li>
+                                        <li>5. Tunggu notifikasi pembayaran berhasil</li>
+                                    </ol>
+                                </div>
+
+                                <!-- Payment Status -->
+                                <div id="qris-status" class="text-center">
+                                    <div id="payment-waiting" class="flex items-center justify-center space-x-2">
+                                        <i data-feather="clock" class="w-5 h-5 text-blue-500"></i>
+                                        <span class="text-blue-600 font-medium">Menunggu pembayaran...</span>
+                                    </div>
+                                    <div id="payment-success" class="hidden flex items-center justify-center space-x-2">
+                                        <i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>
+                                        <span class="text-green-600 font-medium">Pembayaran berhasil!</span>
+                                    </div>
+                                    <div id="payment-failed" class="hidden flex items-center justify-center space-x-2">
+                                        <i data-feather="x-circle" class="w-5 h-5 text-red-500"></i>
+                                        <span class="text-red-600 font-medium">Pembayaran gagal atau dibatalkan</span>
+                                    </div>
+                                </div>
+
+                                <!-- Transaction Info -->
+                                <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between text-sm">
+                                        <span>ID Transaksi:</span>
+                                        <span id="transaction-id" class="font-mono">-</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mt-1">
+                                        <span>Waktu Kadaluarsa:</span>
+                                        <span id="expiry-time" class="font-mono">-</span>
+                                    </div>
+                                </div>
+
+                                <!-- Timer -->
+                                <div class="mt-4 text-center">
+                                    <div id="payment-timer" class="text-lg font-bold text-orange-600">
+                                        <span id="timer-minutes">15</span>:<span id="timer-seconds">00</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Waktu tersisa untuk menyelesaikan pembayaran</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <button onclick="closeCheckout()"
+                            class="w-full sm:flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg transition duration-300">
+                            Batal
+                        </button>
+                        <button id="pay-now-button" onclick="processPayment()"
+                            class="w-full sm:flex-1 bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition duration-300">
+                            Bayar Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/footer.js"></script>
+
+        <!-- Cart Toggle Bar (Mobile) -->
+        <div id="cart-toggle-bar" class="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-center p-3"
+            style="padding-bottom: calc(env(safe-area-inset-bottom) + 8px);">
+            <button id="cart-toggle-btn"
+                class="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-lg border border-gray-200 text-gray-800 transition-all active:scale-[0.98]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span class="text-sm font-semibold">Keranjang</span>
+                <span id="cart-toggle-count"
+                    class="ml-2 bg-secondary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+            </button>
+        </div>
+
+        <!-- Modal Detail Produk 1 -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal1')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="catalis (1).jpg" alt="Digital Dreams #124"
+                            class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #124
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Digital Dreams #124</h2>
+                            <p class="text-gray-600 mb-4">Karya seni digital yang memukau dengan perpaduan warna-warna
+                                cerah dan bentuk abstrak yang menciptakan suasana mimpi yang surreal.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="catalis (2).jpg" alt="Artist" class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@Fauziyyah</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">1920 x 1080 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, JPG</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">3/10</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart1"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">2.5 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $62.50 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">3.2 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft1', 'Digital Dreams #124', 2.5, 'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft1', 2.5)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft1')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacer for mobile cart toggle to avoid overlapping footer -->
+        <div class="md:hidden h-16"></div>
+
+        <!-- Modal Detail Produk 2 -->
+        <div id="modal2" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal2')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="catalis (2).jpg" alt="Abstract Thoughts #42"
+                            class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #42
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Abstract Thoughts #42</h2>
+                            <p class="text-gray-600 mb-4">Eksplorasi visual dari pemikiran abstrak yang dituangkan dalam
+                                bentuk geometris dan warna-warna kontras yang menciptakan kedalaman emosi.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Artist"
+                                    class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@Fauziyyah</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">2048 x 2048 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, SVG</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">7/10</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart2"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">1.8 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $45.00 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">2.4 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft2', 'Abstract Thoughts #42', 1.8, 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft2', 1.8)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft2')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 3 -->
+        <div id="modal3" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal3')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="catalis (3).jpg" alt="Cosmic Journey #89"
+                            class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #89
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Cosmic Journey #89</h2>
+                            <p class="text-gray-600 mb-4">Perjalanan kosmik yang menggambarkan keindahan alam semesta
+                                dengan detail yang memukau dan warna-warna galaksi yang menawan.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="https://randomuser.me/api/portraits/men/15.jpg" alt="Artist"
+                                    class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@Fauziyyah</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">3000 x 3000 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, GIF</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">1/1</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart3"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">3.2 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $80.00 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">4.1 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft3', 'Cosmic Journey #88', 3.2, 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1635&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft3', 3.2)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft3')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 4 -->
+        <div id="modal4" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal4')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                            alt="Neon Dreams #156" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #156
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Neon Dreams #156</h2>
+                            <p class="text-gray-600 mb-4">Mimpi neon yang menggabungkan elemen futuristik dengan
+                                sentuhan artistik modern, menciptakan visual yang memukau mata.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Artist"
+                                    class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@neonmaster</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">2560 x 1440 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, MP4</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">5/10</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart4"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">1.9 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $47.50 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">2.8 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft4', 'Neon Nights #156', 1.9, 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft4', 4.7)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft4')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 5 -->
+        <div id="modal5" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal5')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80"
+                            alt="Surreal Visions #89" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #89
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Surreal Visions #89</h2>
+                            <p class="text-gray-600 mb-4">Karya seni digital yang menggabungkan elemen surreal dengan
+                                visi futuristik, menciptakan pengalaman visual yang memukau dan penuh imajinasi.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Artist"
+                                    class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@dreamweaver</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">1920 x 1080 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, JPG</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">9/10</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart5"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">2.1 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $52.50 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">2.8 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft5', 'Surreal Visions #89', 2.1, 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft5', 2.1)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft5')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 6 -->
+        <div id="modal6" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal6')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80"
+                            alt="Pixel Universe #33" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #33
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Pixel Universe #33</h2>
+                            <p class="text-gray-600 mb-4">By @pixelmaster</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-2xl font-bold text-primary">1.5 SOL</span>
+                                <span class="text-sm text-gray-500">4/10 minted</span>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="font-bold mb-3">Price History</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <canvas id="priceChart6" width="300" height="150"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Aksi -->
+                        <div class="space-y-3">
+                            <button
+                                class="w-full bg-secondary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition"
+                                onclick="addToCart('6', 'Pixel Universe #33', '1.5', 'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80')">
+                                <i data-feather="shopping-cart" class="w-5 h-5 inline mr-2"></i>
+                                Checkout
+                            </button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                    <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 7 -->
+        <div id="modal7" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal7')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                            alt="Digital Essence #67" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #67
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Digital Essence #67</h2>
+                            <p class="text-gray-600 mb-4">By @essencecreator</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-2xl font-bold text-primary">3.8 SOL</span>
+                                <span class="text-sm text-gray-500">2/10 minted</span>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="font-bold mb-3">Price History</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <canvas id="priceChart7" width="300" height="150"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Aksi -->
+                        <div class="space-y-3">
+                            <button
+                                class="w-full bg-secondary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition"
+                                onclick="addToCart('7', 'Digital Essence #67', '3.8', 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                                <i data-feather="shopping-cart" class="w-5 h-5 inline mr-2"></i>
+                                Checkout
+                            </button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                    <i data-feather="message-circle" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-lg transition">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Produk 8 -->
+        <div id="modal8" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal8')">&times;</span>
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Gambar Produk -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                            alt="Cosmic Harmony #91" class="w-full h-96 md:h-full object-cover rounded-l-2xl">
+                        <div class="absolute top-4 left-4 bg-primary text-dark px-3 py-1 rounded-full font-bold">
+                            #91
+                        </div>
+                    </div>
+
+                    <!-- Detail Produk -->
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold mb-2">Cosmic Harmony #91</h2>
+                            <p class="text-gray-600 mb-4">Karya seni digital yang menggambarkan harmoni kosmik dengan
+                                perpaduan warna-warna galaksi yang memukau, menciptakan keseimbangan sempurna antara
+                                chaos dan order.</p>
+                            <div class="flex items-center mb-4">
+                                <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Artist"
+                                    class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">@spaceartist</p>
+                                    <p class="text-sm text-gray-500">Verified Artist</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Karya -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Ukuran</p>
+                                <p class="font-semibold">2048 x 2048 px</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Format</p>
+                                <p class="font-semibold">PNG, SVG</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Minted</p>
+                                <p class="font-semibold">1/1</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">Blockchain</p>
+                                <p class="font-semibold">Solana</p>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Harga -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">Riwayat Harga</h3>
+                            <div class="price-chart">
+                                <canvas id="priceChart8"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Harga dan Tombol Aksi -->
+                        <div class="border-t pt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <p class="text-sm text-gray-500">Harga Saat Ini</p>
+                                    <p class="text-3xl font-bold text-primary">5.2 SOL</p>
+                                    <p class="text-sm text-gray-500">≈ $130.00 USD</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Harga Tertinggi</p>
+                                    <p class="text-lg font-semibold">6.8 SOL</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <button
+                                    class="action-button bg-primary hover:bg-yellow-500 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="addToCart('nft8', 'Cosmic Harmony #91', 5.2, 'https://images.unsplash.com/photo-1639762681485-074b2f050789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')">
+                                    <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>
+                                    Checkout
+                                </button>
+                                <button
+                                    class="action-button bg-secondary hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition"
+                                    onclick="bidNFT('nft8', 5.2)">
+                                    <i data-feather="tag" class="w-4 h-4 inline mr-2"></i>
+                                    Tawar
+                                </button>
+                                <button
+                                    class="action-button bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 rounded-lg transition"
+                                    onclick="saveNFT('nft8')">
+                                    <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script>
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+
+            // Shopping Cart Functionality
+            let cart = [];
+            let purchaseHistory = [];
+
+            // Load cart and purchase history from localStorage
+            document.addEventListener('DOMContentLoaded', function () {
+                cart = JSON.parse(localStorage.getItem('cart')) || [];
+                purchaseHistory = JSON.parse(localStorage.getItem('purchaseHistory')) || [];
+                updateCartCount();
+                updateCartDisplay();
+            });
+
+            function updateCartCount() {
+                const cartCount = document.getElementById('cart-count');
+                if (cart.length > 0) {
+                    cartCount.textContent = cart.length;
+                    cartCount.classList.remove('hidden');
+                } else {
+                    cartCount.classList.add('hidden');
+                }
+            }
+
+            function addToCart(id, name, price, image) {
+                // Pastikan parameter diterima dengan benar
+                console.log("Adding to cart:", id, name, price, image);
+
+                // Pastikan cart sudah diinisialisasi
+                if (!Array.isArray(cart)) {
+                    cart = [];
+                }
+
+                const existingItem = cart.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id: id,
+                        name: name,
+                        price: parseFloat(price),
+                        image: image,
+                        quantity: 1
+                    });
+                }
+
+                // Simpan ke localStorage dan update tampilan
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                updateCartDisplay();
+
+                // Show success message
+                showNotification('Item berhasil ditambahkan ke keranjang!', 'success');
+            }
+
+            function removeFromCart(id) {
+                cart = cart.filter(item => item.id !== id);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                updateCartDisplay();
+            }
+
+            function updateQuantity(id, change) {
+                const item = cart.find(item => item.id === id);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        removeFromCart(id);
+                    } else {
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        updateCartDisplay();
+                    }
+                }
+            }
+
+            function updateCartDisplay() {
+                const cartItems = document.getElementById('cart-items');
+                const cartFooter = document.getElementById('cart-footer');
+                const emptyCart = document.getElementById('empty-cart');
+
+                if (cart.length === 0) {
+                    emptyCart.style.display = 'block';
+                    cartFooter.classList.add('hidden');
+                    cartItems.innerHTML = '';
+                    return;
+                }
+
+                emptyCart.style.display = 'none';
+                cartFooter.classList.remove('hidden');
+
+                let total = 0;
+                cartItems.innerHTML = cart.map(item => {
+                    total += item.price * item.quantity;
+                    const itemTotalIdr = convertSolToIdr(item.price * item.quantity);
+                    const priceIdr = convertSolToIdr(item.price);
+
+                    return `
+                    <div class="flex flex-col p-4 border-b">
+                        <div class="flex items-center space-x-4 mb-2">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <div class="text-primary font-bold">
+                                    <div>${item.price} SOL</div>
+                                    ${priceIdr > 0 ? `<div class="text-xs text-gray-600">${formatIDR(priceIdr)}</div>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700">
+                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="updateQuantity('${item.id}', -1)" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center">-</button>
+                                <span class="w-8 text-center">${item.quantity}</span>
+                                <button onclick="updateQuantity('${item.id}', 1)" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center">+</button>
+                            </div>
+                            <div class="font-medium text-right">
+                                <div>Total: ${(item.price * item.quantity).toFixed(1)} SOL</div>
+                                ${itemTotalIdr > 0 ? `<div class="text-xs text-gray-600">${formatIDR(itemTotalIdr)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+
+                updateCartTotal();
+                feather.replace();
+            }
+
+            function updateCartTotal() {
+                let total = 0;
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+                });
+
+                const totalIdr = convertSolToIdr(total);
+                const cartTotalElement = document.getElementById('cart-total');
+
+                if (cartTotalElement) {
+                    if (totalIdr > 0) {
+                        cartTotalElement.innerHTML = `
+                        <div class="text-2xl font-bold text-primary">${total.toFixed(1)} SOL</div>
+                        <div class="text-lg text-gray-600">${formatIDR(totalIdr)}</div>
+                    `;
+                    } else {
+                        cartTotalElement.innerHTML = `<div class="text-2xl font-bold text-primary">${total.toFixed(1)} SOL</div>`;
+                    }
+                }
+
+                // Update cart count badge
+                updateCartCount();
+            }
+
+            function toggleCart() {
+                const cartSidebar = document.getElementById('cart-sidebar');
+                const historySidebar = document.getElementById('history-sidebar');
+
+                // Close history sidebar if open
+                historySidebar.classList.add('translate-x-full');
+
+                // Toggle cart sidebar
+                cartSidebar.classList.toggle('translate-x-full');
+                updateCartDisplay();
+            }
+
+            function updateCartCount() {
+                const cartCount = document.getElementById('cart-count');
+                if (!cartCount) return;
+
+                let count = 0;
+                cart.forEach(item => {
+                    count += item.quantity;
+                });
+
+                if (count > 0) {
+                    cartCount.textContent = count;
+                    cartCount.classList.remove('hidden');
+                } else {
+                    cartCount.classList.add('hidden');
+                }
+            }
+
+            function toggleHistory() {
+                const cartSidebar = document.getElementById('cart-sidebar');
+                const historySidebar = document.getElementById('history-sidebar');
+
+                // Close cart sidebar if open
+                cartSidebar.classList.add('translate-x-full');
+
+                // Toggle history sidebar
+                historySidebar.classList.toggle('translate-x-full');
+                updateHistoryDisplay();
+            }
+
+            function updateHistoryDisplay() {
+                const historyItems = document.getElementById('history-items');
+                const emptyHistory = document.getElementById('empty-history');
+
+                if (purchaseHistory.length === 0) {
+                    emptyHistory.style.display = 'block';
+                    return;
+                }
+
+                emptyHistory.style.display = 'none';
+
+                historyItems.innerHTML = purchaseHistory.map(order => {
+                    const statusColor = order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800';
+
+                    const statusText = order.status === 'completed' ? 'Selesai' :
+                        order.status === 'processing' ? 'Diproses' :
+                            order.status === 'shipped' ? 'Dikirim' :
+                                'Pending';
+
+                    return `
+                     <div class="border-b pb-4 mb-4">
+                         <div class="flex justify-between items-start mb-2">
+                             <div>
+                                 <h4 class="font-semibold">Order #${order.id}</h4>
+                                 <p class="text-sm text-gray-500">${new Date(order.date).toLocaleDateString('id-ID')}</p>
+                                 <p class="text-xs text-gray-400">Metode: ${getPaymentMethodName(order.paymentMethod)}</p>
+                             </div>
+                             <span class="text-primary font-bold">${order.total} SOL</span>
+                         </div>
+                         <div class="space-y-2">
+                             ${order.items.map(item => `
+                                 <div class="flex items-center space-x-3">
+                                     <img src="${item.image}" alt="${item.name}" class="w-10 h-10 object-cover rounded">
+                                     <div class="flex-1">
+                                         <p class="text-sm font-medium">${item.name}</p>
+                                         <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
+                                     </div>
+                                 </div>
+                             `).join('')}
+                         </div>
+                         <div class="mt-3 flex justify-between items-center">
+                             <span class="inline-block px-2 py-1 text-xs rounded-full ${statusColor}">
+                                 ${statusText}
+                             </span>
+                             <div class="flex space-x-2">
+                                 <button onclick="trackOrder('${order.id}')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                                     Lacak
+                                 </button>
+                                 ${order.status === 'completed' ? `
+                                     <button onclick="reorderItems('${order.id}')" class="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                                         Pesan Lagi
+                                     </button>
+                                 ` : ''}
+                             </div>
+                         </div>
+                     </div>
+                 `;
+                }).join('');
+            }
+
+            function getPaymentMethodName(method) {
+                const methods = {
+                    'crypto': 'Cryptocurrency',
+                    'credit': 'Kartu Kredit',
+                    'bank': 'Transfer Bank',
+                    'ewallet': 'E-Wallet'
+                };
+                return methods[method] || method;
+            }
+
+            function trackOrder(orderId) {
+                const order = purchaseHistory.find(o => o.id === orderId);
+                if (order) {
+                    const trackingSteps = [
+                        { status: 'Order Confirmed', completed: true, date: order.date },
+                        { status: 'Processing', completed: order.status !== 'pending', date: order.date },
+                        { status: 'Shipped', completed: order.status === 'shipped' || order.status === 'completed', date: order.status === 'shipped' || order.status === 'completed' ? order.date : null },
+                        { status: 'Delivered', completed: order.status === 'completed', date: order.status === 'completed' ? order.date : null }
+                    ];
+
+                    let trackingHtml = `
+                     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                         <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                             <div class="flex justify-between items-center mb-4">
+                                 <h3 class="text-lg font-semibold">Lacak Pesanan #${orderId}</h3>
+                                 <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700">
+                                     <i data-feather="x" class="w-5 h-5"></i>
+                                 </button>
+                             </div>
+                             <div class="space-y-4">
+                                 ${trackingSteps.map((step, index) => `
+                                     <div class="flex items-center space-x-3">
+                                         <div class="w-4 h-4 rounded-full ${step.completed ? 'bg-green-500' : 'bg-gray-300'}"></div>
+                                         <div class="flex-1">
+                                             <p class="font-medium ${step.completed ? 'text-green-600' : 'text-gray-500'}">${step.status}</p>
+                                             ${step.date ? `<p class="text-xs text-gray-400">${new Date(step.date).toLocaleDateString('id-ID')}</p>` : ''}
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
+                     </div>
+                 `;
+
+                    document.body.insertAdjacentHTML('beforeend', trackingHtml);
+                    feather.replace();
+                }
+            }
+
+            function reorderItems(orderId) {
+                const order = purchaseHistory.find(o => o.id === orderId);
+                if (order) {
+                    order.items.forEach(item => {
+                        addToCart(item.id, item.name, item.price, item.image);
+                    });
+                    showNotification('Item berhasil ditambahkan ke keranjang!', 'success');
+                }
+            }
+
+            function proceedToCheckout() {
+                if (cart.length === 0) return;
+
+                const checkoutModal = document.getElementById('checkout-modal');
+                const checkoutItems = document.getElementById('checkout-items');
+                const checkoutTotal = document.getElementById('checkout-total');
+
+                let total = 0;
+                checkoutItems.innerHTML = cart.map(item => {
+                    total += item.price * item.quantity;
+                    const itemTotal = item.price * item.quantity;
+                    const itemTotalIdr = convertSolToIdr(itemTotal);
+                    const priceIdr = convertSolToIdr(item.price);
+
+                    return `
+                    <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded">
+                        <div class="flex-1">
+                            <h5 class="font-medium">${item.name}</h5>
+                            <div class="text-sm text-gray-500">
+                                <div>Qty: ${item.quantity} × ${item.price} SOL</div>
+                                ${priceIdr > 0 ? `<div>Qty: ${item.quantity} × ${formatIDR(priceIdr)}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="font-bold text-right">
+                            <div>${itemTotal.toFixed(1)} SOL</div>
+                            ${itemTotalIdr > 0 ? `<div class="text-sm text-gray-600">${formatIDR(itemTotalIdr)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                }).join('');
+
+                const totalIdr = convertSolToIdr(total);
+                if (totalIdr > 0) {
+                    checkoutTotal.innerHTML = `
+                    <div>${total.toFixed(1)} SOL</div>
+                    <div class="text-lg text-gray-600">${formatIDR(totalIdr)}</div>
+                `;
+                } else {
+                    checkoutTotal.textContent = `${total.toFixed(1)} SOL`;
+                }
+
+                checkoutModal.style.display = 'block';
+
+                // Close cart sidebar
+                document.getElementById('cart-sidebar').classList.add('translate-x-full');
+            }
+
+            function closeCheckout() {
+                document.getElementById('checkout-modal').style.display = 'none';
+            }
+
+            function processPayment() {
+                const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+                // Simulate payment processing
+                showNotification('Memproses pembayaran...', 'info');
+
+                setTimeout(() => {
+                    // Create order
+                    const order = {
+                        id: Date.now().toString(),
+                        date: new Date().toISOString(),
+                        items: [...cart],
+                        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(1),
+                        paymentMethod: paymentMethod,
+                        status: 'completed'
+                    };
+
+                    // Add to purchase history
+                    purchaseHistory.unshift(order);
+                    localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+
+                    // Clear cart
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+
+                    // Close checkout modal
+                    closeCheckout();
+
+                    // Show success message
+                    showNotification('Pembayaran berhasil! Terima kasih atas pembelian Anda.', 'success');
+
+                }, 2000);
+            }
+
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500 text-white' :
+                    type === 'error' ? 'bg-red-500 text-white' :
+                        'bg-blue-500 text-white'
+                    }`;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            // Initialize cart count on page load
+            updateCartCount();
+
+            // Initialize exchange rates and update prices on page load
+            document.addEventListener('DOMContentLoaded', async function () {
+                await updateExchangeRates();
+
+                // Update exchange rates every 5 minutes
+                setInterval(updateExchangeRates, 5 * 60 * 1000);
+            });
+
+            // Initialize when page is loaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', async function () {
+                    await updateExchangeRates();
+                });
+            } else {
+                updateExchangeRates();
+            }
+
+            // QRIS Payment System
+            let currentQRISTransaction = null;
+            let qrisTimer = null;
+            let paymentPolling = null;
+
+            function selectQRIS() {
+                const qrisSection = document.getElementById('qris-section');
+                qrisSection.classList.remove('hidden');
+
+                // Generate QR code when QRIS is selected
+                generateQRISCode();
+            }
+
+            function generateQRISCode() {
+                const transactionId = 'TXN' + Date.now();
+                const amount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const expiryTime = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+
+                currentQRISTransaction = {
+                    id: transactionId,
+                    amount: amount,
+                    expiryTime: expiryTime,
+                    status: 'pending'
+                };
+
+                // Update transaction info
+                document.getElementById('transaction-id').textContent = transactionId;
+                document.getElementById('expiry-time').textContent = expiryTime.toLocaleTimeString('id-ID');
+
+                // Generate QR Code using QR.js library (simulated)
+                generateQRCode(transactionId, amount);
+
+                // Start timer
+                startPaymentTimer();
+
+                // Start polling for payment status
+                startPaymentPolling();
+            }
+
+            function generateQRCode(transactionId, amount) {
+                // Simulate QR code generation
+                const qrData = `00020101021226580014ID.CO.QRIS.WWW0118ID${transactionId}0214${amount.toFixed(2)}5204539953033605802ID5925CATALIST CREATIVE STORE6007JAKARTA61051234562070703A016304`;
+
+                setTimeout(() => {
+                    const placeholder = document.getElementById('qr-code-placeholder');
+                    const canvas = document.getElementById('qr-code-canvas');
+
+                    // Hide placeholder and show canvas
+                    placeholder.classList.add('hidden');
+                    canvas.classList.remove('hidden');
+
+                    // Draw QR code pattern (simplified representation)
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#000000';
+
+                    // Draw a simple QR-like pattern
+                    const size = 192; // 48 * 4
+                    const moduleSize = 8;
+                    const modules = size / moduleSize;
+
+                    // Clear canvas
+                    ctx.clearRect(0, 0, size, size);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.fillStyle = '#000000';
+
+                    // Generate pseudo-random pattern based on transaction data
+                    const seed = transactionId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+                    let random = seed;
+
+                    for (let i = 0; i < modules; i++) {
+                        for (let j = 0; j < modules; j++) {
+                            random = (random * 9301 + 49297) % 233280;
+                            if (random / 233280 > 0.5) {
+                                ctx.fillRect(i * moduleSize, j * moduleSize, moduleSize, moduleSize);
+                            }
+                        }
+                    }
+
+                    // Draw finder patterns (corners)
+                    drawFinderPattern(ctx, 0, 0, moduleSize);
+                    drawFinderPattern(ctx, (modules - 7) * moduleSize, 0, moduleSize);
+                    drawFinderPattern(ctx, 0, (modules - 7) * moduleSize, moduleSize);
+
+                    feather.replace();
+                }, 1500);
+            }
+
+            function drawFinderPattern(ctx, x, y, moduleSize) {
+                // Draw 7x7 finder pattern
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(x, y, 7 * moduleSize, 7 * moduleSize);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(x + moduleSize, y + moduleSize, 5 * moduleSize, 5 * moduleSize);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(x + 2 * moduleSize, y + 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+            }
+
+            function startPaymentTimer() {
+                let timeLeft = 15 * 60; // 15 minutes in seconds
+
+                qrisTimer = setInterval(() => {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+
+                    document.getElementById('timer-minutes').textContent = minutes.toString().padStart(2, '0');
+                    document.getElementById('timer-seconds').textContent = seconds.toString().padStart(2, '0');
+
+                    timeLeft--;
+
+                    if (timeLeft < 0) {
+                        clearInterval(qrisTimer);
+                        handlePaymentTimeout();
+                    }
+                }, 1000);
+            }
+
+            function startPaymentPolling() {
+                paymentPolling = setInterval(() => {
+                    checkPaymentStatus();
+                }, 3000); // Check every 3 seconds
+            }
+
+            function checkPaymentStatus() {
+                if (!currentQRISTransaction) return;
+
+                try {
+                    // Validate transaction is still active
+                    if (currentQRISTransaction.status !== 'pending') {
+                        clearInterval(paymentPolling);
+                        return;
+                    }
+
+                    // Check if transaction has expired
+                    if (new Date() > currentQRISTransaction.expiryTime) {
+                        handlePaymentTimeout();
+                        return;
+                    }
+
+                    // Simulate payment status check with security validation
+                    // In real implementation, this would call your payment gateway API with proper authentication
+                    const random = Math.random();
+
+                    // Enhanced security: validate transaction integrity
+                    if (!validateTransactionIntegrity()) {
+                        handlePaymentError('Transaction integrity check failed');
+                        return;
+                    }
+
+                    // Simulate 10% chance of payment success after 10 seconds
+                    if (Date.now() - parseInt(currentQRISTransaction.id.replace('TXN', '')) > 10000 && random < 0.1) {
+                        // Additional security check before confirming payment
+                        if (validatePaymentSecurity()) {
+                            handlePaymentSuccess();
+                        } else {
+                            handlePaymentError('Payment security validation failed');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking payment status:', error);
+                    handlePaymentError('System error occurred during payment verification');
+                }
+            }
+
+            function validateTransactionIntegrity() {
+                // Validate transaction data integrity
+                if (!currentQRISTransaction || !currentQRISTransaction.id || !currentQRISTransaction.amount) {
+                    return false;
+                }
+
+                // Check if transaction ID format is valid
+                const idPattern = /^TXN\d{13}$/;
+                if (!idPattern.test(currentQRISTransaction.id)) {
+                    return false;
+                }
+
+                // Validate amount is positive and reasonable
+                if (currentQRISTransaction.amount <= 0 || currentQRISTransaction.amount > 100000000) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            function validatePaymentSecurity() {
+                // Additional security validations
+                try {
+                    // Check if cart still has items
+                    if (!cart || cart.length === 0) {
+                        return false;
+                    }
+
+                    // Verify amount matches current cart total
+                    const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    if (Math.abs(currentTotal - currentQRISTransaction.amount) > 0.01) {
+                        return false;
+                    }
+
+                    // Check for suspicious activity (multiple rapid transactions)
+                    const recentTransactions = JSON.parse(localStorage.getItem('recentQRISTransactions') || '[]');
+                    const now = Date.now();
+                    const recentCount = recentTransactions.filter(t => now - t < 60000).length; // Last minute
+
+                    if (recentCount > 5) {
+                        return false; // Too many transactions in short time
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('Security validation error:', error);
+                    return false;
+                }
+            }
+
+            function handlePaymentError(errorMessage) {
+                clearInterval(qrisTimer);
+                clearInterval(paymentPolling);
+
+                // Log error securely (without sensitive data)
+                console.error('QRIS Payment Error:', {
+                    transactionId: currentQRISTransaction?.id,
+                    timestamp: new Date().toISOString(),
+                    error: errorMessage
+                });
+
+                // Update UI
+                document.getElementById('payment-waiting').classList.add('hidden');
+                document.getElementById('payment-failed').classList.remove('hidden');
+
+                // Show user-friendly error message
+                showNotification('Terjadi kesalahan dalam proses pembayaran. Silakan coba lagi.', 'error');
+
+                // Reset transaction state
+                currentQRISTransaction = null;
+            }
+
+            function handlePaymentSuccess() {
+                clearInterval(qrisTimer);
+                clearInterval(paymentPolling);
+
+                // Update UI
+                document.getElementById('payment-waiting').classList.add('hidden');
+                document.getElementById('payment-success').classList.remove('hidden');
+
+                // Show enhanced success notification
+                showQRISNotification('Pembayaran QRIS berhasil dikonfirmasi!', 'success');
+
+                // Process the order
+                setTimeout(() => {
+                    processQRISOrder();
+                }, 2000);
+            }
+
+            function handlePaymentTimeout() {
+                clearInterval(paymentPolling);
+
+                // Update UI
+                document.getElementById('payment-waiting').classList.add('hidden');
+                document.getElementById('payment-failed').classList.remove('hidden');
+
+                showQRISNotification('Waktu pembayaran habis. Silakan coba lagi.', 'error');
+            }
+
+            function processQRISOrder() {
+                try {
+                    // Final security validation before processing order
+                    if (!validateTransactionIntegrity() || !validatePaymentSecurity()) {
+                        handlePaymentError('Final validation failed');
+                        return;
+                    }
+
+                    // Record transaction for security tracking
+                    recordQRISTransaction();
+
+                    // Create order with enhanced security
+                    const order = {
+                        id: currentQRISTransaction.id,
+                        date: new Date().toISOString(),
+                        items: [...cart],
+                        total: currentQRISTransaction.amount.toFixed(1),
+                        paymentMethod: 'qris',
+                        status: 'completed',
+                        securityHash: generateOrderHash(currentQRISTransaction.id, currentQRISTransaction.amount)
+                    };
+
+                    // Add to purchase history
+                    purchaseHistory.unshift(order);
+                    localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+
+                    // Clear cart
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+
+                    // Close checkout modal
+                    closeCheckout();
+
+                    // Reset QRIS state
+                    currentQRISTransaction = null;
+                    document.getElementById('qris-section').classList.add('hidden');
+
+                    // Send confirmation notification
+                    showNotification('Pesanan berhasil diproses! Terima kasih atas pembelian Anda.', 'success');
+
+                } catch (error) {
+                    console.error('Error processing QRIS order:', error);
+                    handlePaymentError('Order processing failed');
+                }
+            }
+
+            function recordQRISTransaction() {
+                // Record transaction timestamp for security monitoring
+                const recentTransactions = JSON.parse(localStorage.getItem('recentQRISTransactions') || '[]');
+                recentTransactions.push(Date.now());
+
+                // Keep only last 10 transactions
+                if (recentTransactions.length > 10) {
+                    recentTransactions.splice(0, recentTransactions.length - 10);
+                }
+
+                localStorage.setItem('recentQRISTransactions', JSON.stringify(recentTransactions));
+            }
+
+            function generateOrderHash(transactionId, amount) {
+                // Simple hash generation for order verification (in production, use proper cryptographic hash)
+                const data = transactionId + amount.toString() + Date.now().toString();
+                let hash = 0;
+                for (let i = 0; i < data.length; i++) {
+                    const char = data.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32-bit integer
+                }
+                return Math.abs(hash).toString(16);
+            }
+
+            // Enhanced notification system for QRIS payments
+            function showQRISNotification(message, type, duration = 5000) {
+                // Create enhanced notification with QRIS branding
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+
+                // Set notification style based on type
+                switch (type) {
+                    case 'success':
+                        notification.className += ' bg-green-500 text-white';
+                        break;
+                    case 'error':
+                        notification.className += ' bg-red-500 text-white';
+                        break;
+                    case 'info':
+                        notification.className += ' bg-blue-500 text-white';
+                        break;
+                    default:
+                        notification.className += ' bg-gray-500 text-white';
+                }
+
+                notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <i data-feather="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">QRIS Payment</p>
+                        <p class="text-sm opacity-90">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 opacity-70 hover:opacity-100">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+
+                document.body.appendChild(notification);
+                feather.replace();
+
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100);
+
+                // Auto remove
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }, duration);
+            }
+
+            // Update payment method name function
+            function getPaymentMethodName(method) {
+                const methods = {
+                    'crypto': 'Cryptocurrency',
+                    'credit': 'Kartu Kredit',
+                    'bank': 'Transfer Bank',
+                    'ewallet': 'E-Wallet',
+                    'qris': 'QRIS'
+                };
+                return methods[method] || method;
+            }
+
+            // Update process payment to handle QRIS
+            function processPayment() {
+                const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+                if (paymentMethod === 'qris') {
+                    // QRIS payment is handled separately
+                    return;
+                }
+
+                // Simulate payment processing for other methods
+                showNotification('Memproses pembayaran...', 'info');
+
+                setTimeout(() => {
+                    // Create order
+                    const order = {
+                        id: Date.now().toString(),
+                        date: new Date().toISOString(),
+                        items: [...cart],
+                        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(1),
+                        paymentMethod: paymentMethod,
+                        status: 'completed'
+                    };
+
+                    // Add to purchase history
+                    purchaseHistory.unshift(order);
+                    localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+
+                    // Clear cart
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+
+                    // Close checkout modal
+                    closeCheckout();
+
+                    // Show success message
+                    showNotification('Pembayaran berhasil! Terima kasih atas pembelian Anda.', 'success');
+
+                }, 2000);
+            }
+
+            // Add event listeners for payment method selection
+            document.addEventListener('DOMContentLoaded', function () {
+                const paymentRadios = document.querySelectorAll('input[name="payment"]');
+                paymentRadios.forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        const qrisSection = document.getElementById('qris-section');
+                        if (this.value === 'qris') {
+                            qrisSection.classList.remove('hidden');
+                            generateQRISCode();
+                        } else {
+                            qrisSection.classList.add('hidden');
+                            // Clear QRIS timers if switching away
+                            if (qrisTimer) clearInterval(qrisTimer);
+                            if (paymentPolling) clearInterval(paymentPolling);
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('menu-toggle').addEventListener('click', function () {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.toggle('hidden');
+                feather.replace();
+            });
+
+            // Filter button functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            feather.replace();
+
+            // Initialize price charts
+            initializePriceCharts();
+
+            // Phantom Wallet Integration
+            let walletConnected = false;
+            let walletPublicKey = null;
+            let connection = null;
+
+            // Initialize Solana connection
+            if (typeof solanaWeb3 !== 'undefined') {
+                connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com');
+            }
+
+            // Connect Wallet Function
+            async function connectWallet() {
+                try {
+                    // Check if Phantom wallet is installed
+                    if (!window.solana || !window.solana.isPhantom) {
+                        showNotification('Phantom wallet tidak terdeteksi! Silakan install Phantom wallet terlebih dahulu.', 'error');
+                        setTimeout(() => {
+                            window.open('https://phantom.app/', '_blank');
+                        }, 2000);
+                        return;
+                    }
+
+                    // Check if already connecting
+                    if (walletConnected) {
+                        showNotification('Wallet sudah terhubung!', 'info');
+                        return;
+                    }
+
+                    // Show connecting notification
+                    showNotification('Menghubungkan ke Phantom wallet...', 'info');
+
+                    // Connect to Phantom with timeout
+                    const connectPromise = window.solana.connect();
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Connection timeout')), 30000)
+                    );
+
+                    const response = await Promise.race([connectPromise, timeoutPromise]);
+
+                    // Validate response
+                    if (!response || !response.publicKey) {
+                        throw new Error('Invalid response from wallet');
+                    }
+
+                    walletPublicKey = response.publicKey.toString();
+                    walletConnected = true;
+
+                    // Validate public key format
+                    if (!isValidSolanaAddress(walletPublicKey)) {
+                        throw new Error('Invalid wallet address format');
+                    }
+
+                    // Update UI
+                    updateWalletUI();
+
+                    // Get wallet balance
+                    await updateWalletBalance();
+
+                    console.log('Wallet connected:', walletPublicKey);
+                    showNotification('Wallet berhasil terhubung!', 'success');
+
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    walletConnected = false;
+                    walletPublicKey = null;
+                    updateWalletUI();
+
+                    let errorMessage = 'Gagal menghubungkan wallet: ';
+                    if (error.message.includes('User rejected')) {
+                        errorMessage += 'Koneksi ditolak oleh pengguna';
+                    } else if (error.message.includes('timeout')) {
+                        errorMessage += 'Koneksi timeout, silakan coba lagi';
+                    } else if (error.message.includes('Invalid')) {
+                        errorMessage += 'Format wallet tidak valid';
+                    } else {
+                        errorMessage += error.message;
+                    }
+
+                    showNotification(errorMessage, 'error');
+                }
+            }
+
+            // Disconnect Wallet Function
+            async function disconnectWallet() {
+                try {
+                    if (window.solana && window.solana.isPhantom) {
+                        await window.solana.disconnect();
+                    }
+
+                    walletConnected = false;
+                    walletPublicKey = null;
+
+                    // Update UI
+                    updateWalletUI();
+
+                    console.log('Wallet disconnected');
+                    showNotification('Wallet berhasil diputuskan!', 'info');
+
+                } catch (error) {
+                    console.error('Error disconnecting wallet:', error);
+                    showNotification('Gagal memutuskan wallet: ' + error.message, 'error');
+                }
+            }
+
+            // Update Wallet UI
+            function updateWalletUI() {
+                const connectBtn = document.getElementById('connect-wallet-btn');
+                const walletInfo = document.getElementById('wallet-info');
+                const mobileConnectBtn = document.getElementById('mobile-connect-wallet-btn');
+                const mobileWalletInfo = document.getElementById('mobile-wallet-info');
+
+                if (walletConnected && walletPublicKey) {
+                    // Desktop UI
+                    connectBtn.classList.add('hidden');
+                    walletInfo.classList.remove('hidden');
+
+                    // Mobile UI
+                    mobileConnectBtn.classList.add('hidden');
+                    mobileWalletInfo.classList.remove('hidden');
+
+                    // Update wallet address display (shortened)
+                    const shortAddress = walletPublicKey.slice(0, 4) + '...' + walletPublicKey.slice(-4);
+                    document.getElementById('wallet-address').textContent = shortAddress;
+                    document.getElementById('mobile-wallet-address').textContent = shortAddress;
+
+                } else {
+                    // Desktop UI
+                    connectBtn.classList.remove('hidden');
+                    walletInfo.classList.add('hidden');
+
+                    // Mobile UI
+                    mobileConnectBtn.classList.remove('hidden');
+                    mobileWalletInfo.classList.add('hidden');
+
+                    // Reset displays
+                    document.getElementById('wallet-balance').textContent = '0 SOL';
+                    document.getElementById('wallet-address').textContent = 'Not Connected';
+                    document.getElementById('mobile-wallet-balance').textContent = '0 SOL';
+                    document.getElementById('mobile-wallet-address').textContent = 'Not Connected';
+                }
+
+                // Refresh feather icons
+                feather.replace();
+            }
+
+            // Update Wallet Balance
+            async function updateWalletBalance() {
+                if (!walletConnected || !walletPublicKey || !connection) return;
+
+                try {
+                    const publicKey = new solanaWeb3.PublicKey(walletPublicKey);
+                    const balance = await connection.getBalance(publicKey);
+                    const solBalance = (balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4);
+
+                    document.getElementById('wallet-balance').textContent = solBalance + ' SOL';
+                    document.getElementById('mobile-wallet-balance').textContent = solBalance + ' SOL';
+
+                } catch (error) {
+                    console.error('Error getting wallet balance:', error);
+                    document.getElementById('wallet-balance').textContent = 'Error';
+                    document.getElementById('mobile-wallet-balance').textContent = 'Error';
+                }
+            }
+
+            // Show Notification
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+
+                // Set notification style based on type
+                switch (type) {
+                    case 'success':
+                        notification.className += ' bg-green-500 text-white';
+                        break;
+                    case 'error':
+                        notification.className += ' bg-red-500 text-white';
+                        break;
+                    case 'info':
+                        notification.className += ' bg-blue-500 text-white';
+                        break;
+                    default:
+                        notification.className += ' bg-gray-500 text-white';
+                }
+
+                notification.innerHTML = `
+                <div class="flex items-center">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+
+                document.body.appendChild(notification);
+                feather.replace();
+
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }, 5000);
+            }
+
+            // Event Listeners for Wallet Buttons
+            document.getElementById('connect-wallet-btn').addEventListener('click', connectWallet);
+            document.getElementById('disconnect-wallet-btn').addEventListener('click', disconnectWallet);
+            document.getElementById('mobile-connect-wallet-btn').addEventListener('click', connectWallet);
+            document.getElementById('mobile-disconnect-wallet-btn').addEventListener('click', disconnectWallet);
+
+            // Check if wallet is already connected on page load
+            window.addEventListener('load', async () => {
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect({ onlyIfTrusted: true });
+                        if (response.publicKey) {
+                            walletPublicKey = response.publicKey.toString();
+                            walletConnected = true;
+                            updateWalletUI();
+                            await updateWalletBalance();
+                        }
+                    } catch (error) {
+                        // User hasn't approved connection yet
+                        console.log('Wallet not auto-connected');
+                    }
+                }
+            });
+
+            // Validate Solana Address
+            function isValidSolanaAddress(address) {
+                try {
+                    new solanaWeb3.PublicKey(address);
+                    return address.length >= 32 && address.length <= 44;
+                } catch {
+                    return false;
+                }
+            }
+
+            // Check wallet balance before transaction
+            async function checkSufficientBalance(requiredSOL) {
+                if (!walletConnected || !walletPublicKey || !connection) {
+                    return false;
+                }
+
+                try {
+                    const publicKey = new solanaWeb3.PublicKey(walletPublicKey);
+                    const balance = await connection.getBalance(publicKey);
+                    const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+
+                    // Add 0.01 SOL buffer for transaction fees
+                    return solBalance >= (requiredSOL + 0.01);
+                } catch (error) {
+                    console.error('Error checking balance:', error);
+                    return false;
+                }
+            }
+
+            // Buy NFT Function
+            async function buyNFT(nftId, priceInSOL) {
+                // Input validation
+                if (!nftId || typeof priceInSOL !== 'number' || priceInSOL <= 0) {
+                    showNotification('Parameter transaksi tidak valid!', 'error');
+                    return;
+                }
+
+                // Check if wallet is connected
+                if (!walletConnected || !walletPublicKey) {
+                    showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                    return;
+                }
+
+                // Check connection
+                if (!connection) {
+                    showNotification('Koneksi ke jaringan Solana tidak tersedia!', 'error');
+                    return;
+                }
+
+                try {
+                    // Show loading notification
+                    showNotification('Memeriksa saldo wallet...', 'info');
+
+                    // Check sufficient balance
+                    const hasSufficientBalance = await checkSufficientBalance(priceInSOL);
+                    if (!hasSufficientBalance) {
+                        showNotification(`Saldo tidak mencukupi! Diperlukan minimal ${priceInSOL + 0.01} SOL (termasuk biaya transaksi).`, 'error');
+                        return;
+                    }
+
+                    // Show processing notification
+                    showNotification('Memproses transaksi...', 'info');
+
+                    // Create transaction with validation
+                    const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+
+                    // For demo, we'll create a simple transfer transaction to a marketplace wallet
+                    // In production, this would be replaced with actual NFT purchase logic
+                    const marketplaceWallet = new solanaWeb3.PublicKey('11111111111111111111111111111112'); // System program for demo
+
+                    const transaction = new solanaWeb3.Transaction().add(
+                        solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: fromPubkey,
+                            toPubkey: marketplaceWallet,
+                            lamports: Math.floor(priceInSOL * solanaWeb3.LAMPORTS_PER_SOL)
+                        })
+                    );
+
+                    // Get recent blockhash with retry
+                    let blockhash;
+                    let retries = 3;
+                    while (retries > 0) {
+                        try {
+                            const result = await connection.getRecentBlockhash('confirmed');
+                            blockhash = result.blockhash;
+                            break;
+                        } catch (error) {
+                            retries--;
+                            if (retries === 0) throw error;
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    }
+
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = fromPubkey;
+
+                    // Sign transaction with timeout
+                    const signPromise = window.solana.signTransaction(transaction);
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Signing timeout')), 60000)
+                    );
+
+                    const signedTransaction = await Promise.race([signPromise, timeoutPromise]);
+
+                    // Send transaction with confirmation
+                    const signature = await connection.sendRawTransaction(
+                        signedTransaction.serialize(),
+                        {
+                            skipPreflight: false,
+                            preflightCommitment: 'confirmed'
+                        }
+                    );
+
+                    // Wait for confirmation with timeout
+                    showNotification('Menunggu konfirmasi transaksi...', 'info');
+
+                    const confirmPromise = connection.confirmTransaction(signature, 'confirmed');
+                    const confirmTimeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Confirmation timeout')), 120000)
+                    );
+
+                    await Promise.race([confirmPromise, confirmTimeoutPromise]);
+
+                    // Update wallet balance
+                    await updateWalletBalance();
+
+                    // Show success notification
+                    showNotification(`NFT ${nftId.toUpperCase()} berhasil dibeli! Signature: ${signature.slice(0, 8)}...`, 'success');
+
+                    // Close modal
+                    const openModal = document.querySelector('.modal[style*="block"]');
+                    if (openModal) {
+                        openModal.style.display = 'none';
+                    }
+
+                    console.log('Transaction successful:', signature);
+
+                } catch (error) {
+                    console.error('Transaction failed:', error);
+
+                    let errorMessage = 'Transaksi gagal: ';
+                    if (error.message.includes('User rejected') || error.message.includes('User cancelled')) {
+                        errorMessage += 'Transaksi dibatalkan oleh pengguna';
+                    } else if (error.message.includes('insufficient funds') || error.message.includes('Insufficient')) {
+                        errorMessage += 'Saldo tidak mencukupi';
+                    } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+                        errorMessage += 'Transaksi timeout, silakan coba lagi';
+                    } else if (error.message.includes('blockhash')) {
+                        errorMessage += 'Gagal mendapatkan blockhash, silakan coba lagi';
+                    } else if (error.message.includes('network')) {
+                        errorMessage += 'Masalah jaringan, silakan coba lagi';
+                    } else {
+                        errorMessage += error.message || 'Kesalahan tidak diketahui';
+                    }
+
+                    showNotification(errorMessage, 'error');
+                }
+            }
+
+            // Bid on NFT Function with validation
+            async function bidNFT(nftId, bidAmount) {
+                // Input validation
+                if (!nftId || typeof bidAmount !== 'number' || bidAmount <= 0) {
+                    showNotification('Parameter bid tidak valid!', 'error');
+                    return;
+                }
+
+                if (!walletConnected || !walletPublicKey) {
+                    showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                    return;
+                }
+
+                // Validate wallet address
+                if (!isValidSolanaAddress(walletPublicKey)) {
+                    showNotification('Alamat wallet tidak valid!', 'error');
+                    return;
+                }
+
+                // Rate limiting check
+                if (!transactionRateLimit.canProceed()) {
+                    const remaining = transactionRateLimit.getRemainingTime();
+                    showNotification(`Harap tunggu ${remaining} detik sebelum melakukan transaksi lagi!`, 'error');
+                    return;
+                }
+
+                try {
+                    // Check sufficient balance for bid
+                    const hasSufficientBalance = await checkSufficientBalance(bidAmount);
+                    if (!hasSufficientBalance) {
+                        showNotification(`Saldo tidak mencukupi untuk bid ${bidAmount} SOL!`, 'error');
+                        return;
+                    }
+
+                    // Validate transaction parameters
+                    const validation = validateTransactionParams({
+                        nftId: nftId,
+                        amount: bidAmount,
+                        walletAddress: walletPublicKey
+                    });
+
+                    if (!validation.valid) {
+                        showNotification(validation.error, 'error');
+                        return;
+                    }
+
+                    // Simulate bid validation (in real app, this would check against current highest bid)
+                    if (bidAmount < 0.1) {
+                        showNotification('Bid minimum adalah 0.1 SOL!', 'error');
+                        return;
+                    }
+
+                    // Store bid in localStorage (placeholder for real bid system)
+                    const bidData = {
+                        nftId: nftId,
+                        bidAmount: bidAmount,
+                        walletAddress: walletPublicKey,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const existingBids = JSON.parse(localStorage.getItem('userBids') || '[]');
+                    existingBids.push(bidData);
+                    localStorage.setItem('userBids', JSON.stringify(existingBids));
+
+                    showNotification(`Bid ${bidAmount} SOL untuk NFT ${nftId.toUpperCase()} berhasil ditempatkan!`, 'success');
+                    console.log(`Bid placed for ${nftId} with amount ${bidAmount} SOL`);
+
+                } catch (error) {
+                    console.error('Bid failed:', error);
+                    showNotification('Gagal menempatkan bid: ' + (error.message || 'Kesalahan tidak diketahui'), 'error');
+                }
+            }
+
+            // Save NFT Function with validation
+            function saveNFT(nftId) {
+                // Input validation
+                if (!nftId || typeof nftId !== 'string') {
+                    showNotification('ID NFT tidak valid!', 'error');
+                    return;
+                }
+
+                if (!walletConnected || !walletPublicKey) {
+                    showNotification('Silakan hubungkan wallet Phantom terlebih dahulu!', 'error');
+                    return;
+                }
+
+                // Validate wallet address
+                if (!isValidSolanaAddress(walletPublicKey)) {
+                    showNotification('Alamat wallet tidak valid!', 'error');
+                    return;
+                }
+
+                try {
+                    // Get existing saved NFTs
+                    const savedNFTs = JSON.parse(localStorage.getItem('savedNFTs') || '[]');
+
+                    // Check if NFT is already saved
+                    const isAlreadySaved = savedNFTs.some(item =>
+                        item.nftId === nftId && item.walletAddress === walletPublicKey
+                    );
+
+                    if (isAlreadySaved) {
+                        showNotification(`NFT ${nftId.toUpperCase()} sudah ada di wishlist!`, 'info');
+                        return;
+                    }
+
+                    // Add NFT to saved list
+                    const saveData = {
+                        nftId: nftId,
+                        walletAddress: walletPublicKey,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    savedNFTs.push(saveData);
+                    localStorage.setItem('savedNFTs', JSON.stringify(savedNFTs));
+
+                    showNotification(`NFT ${nftId.toUpperCase()} berhasil disimpan ke wishlist!`, 'success');
+                    console.log(`NFT ${nftId} saved to wishlist`);
+
+                } catch (error) {
+                    console.error('Save failed:', error);
+                    showNotification('Gagal menyimpan NFT: ' + (error.message || 'Kesalahan tidak diketahui'), 'error');
+                }
+            }
+
+            // Security function to validate transaction parameters
+            function validateTransactionParams(params) {
+                const { nftId, amount, walletAddress } = params;
+
+                // Check required parameters
+                if (!nftId || !amount || !walletAddress) {
+                    return { valid: false, error: 'Parameter transaksi tidak lengkap' };
+                }
+
+                // Validate NFT ID format
+                if (typeof nftId !== 'string' || nftId.length < 2) {
+                    return { valid: false, error: 'Format ID NFT tidak valid' };
+                }
+
+                // Validate amount
+                if (typeof amount !== 'number' || amount <= 0 || amount > 1000) {
+                    return { valid: false, error: 'Jumlah transaksi tidak valid (0-1000 SOL)' };
+                }
+
+                // Validate wallet address
+                if (!isValidSolanaAddress(walletAddress)) {
+                    return { valid: false, error: 'Alamat wallet tidak valid' };
+                }
+
+                return { valid: true };
+            }
+
+            // Rate limiting for transactions
+            const transactionRateLimit = {
+                lastTransaction: 0,
+                minInterval: 5000, // 5 seconds between transactions
+
+                canProceed() {
+                    const now = Date.now();
+                    if (now - this.lastTransaction < this.minInterval) {
+                        return false;
+                    }
+                    this.lastTransaction = now;
+                    return true;
+                },
+
+                getRemainingTime() {
+                    const now = Date.now();
+                    const remaining = this.minInterval - (now - this.lastTransaction);
+                    return Math.max(0, Math.ceil(remaining / 1000));
+                }
+            };
+
+            // Modal functions
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+            }
+
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function (event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('show');
+                    setTimeout(() => {
+                        event.target.style.display = 'none';
+                    }, 300);
+                }
+            }
+
+            // Currency conversion functions
+            let solToUsdRate = 0;
+            let usdToIdrRate = 0;
+            let lastRateUpdate = 0;
+            const RATE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+            // Fetch SOL to USD rate from CoinGecko API
+            async function fetchSolToUsdRate() {
+                try {
+                    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+                    const data = await response.json();
+                    return data.solana.usd;
+                } catch (error) {
+                    console.error('Error fetching SOL to USD rate:', error);
+                    // Fallback rate if API fails
+                    return 20; // Approximate SOL price in USD
+                }
+            }
+
+            // Fetch USD to IDR rate from Exchange Rate API
+            async function fetchUsdToIdrRate() {
+                try {
+                    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                    const data = await response.json();
+                    return data.rates.IDR;
+                } catch (error) {
+                    console.error('Error fetching USD to IDR rate:', error);
+                    // Fallback rate if API fails
+                    return 15000; // Approximate USD to IDR rate
+                }
+            }
+
+            // Update exchange rates with caching
+            async function updateExchangeRates() {
+                const now = Date.now();
+                if (now - lastRateUpdate < RATE_CACHE_DURATION && solToUsdRate > 0 && usdToIdrRate > 0) {
+                    return; // Use cached rates
+                }
+
+                try {
+                    const [solUsd, usdIdr] = await Promise.all([
+                        fetchSolToUsdRate(),
+                        fetchUsdToIdrRate()
+                    ]);
+
+                    solToUsdRate = solUsd;
+                    usdToIdrRate = usdIdr;
+                    lastRateUpdate = now;
+
+                    console.log(`Exchange rates updated: 1 SOL = $${solUsd} USD = Rp ${(solUsd * usdIdr).toLocaleString('id-ID')} IDR`);
+
+                    // Update all price displays
+                    updateAllPriceDisplays();
+
+                } catch (error) {
+                    console.error('Error updating exchange rates:', error);
+                }
+            }
+            <!-- Footer -->
+            <script src="js/footer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "catalis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node midtrans-callback.js",
+    "dev": "nodemon midtrans-callback.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.76.1",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "midtrans-client": "^1.4.3"
+  }
+}

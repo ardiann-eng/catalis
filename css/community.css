@@ -1,0 +1,314 @@
+/* community page styles */
+.feed-card {
+  background: #ffffff;
+  border: 1px solid #eef2ff;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #111827;
+  line-height: 1.6;
+}
+
+.reply-thread {
+  margin-top: 12px;
+  padding-left: 12px;
+  border-left: 3px solid #d946ef;
+  display: grid;
+  gap: 8px;
+}
+
+.reply-card {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1f2937;
+  line-height: 1.55;
+}
+
+.feed-container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.input-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.like-btn .heart path {
+  stroke: #d946ef;
+  fill: transparent;
+  transition: all .2s ease;
+}
+
+.like-btn[data-liked="true"] .heart path {
+  fill: #d946ef;
+}
+
+.copy-btn,
+.reply-btn,
+.like-btn {
+  cursor: pointer;
+}
+
+.delete-btn {
+  cursor: pointer;
+}
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #111827;
+  color: #fff;
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all .3s ease;
+  z-index: 50;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.2);
+  padding: 20px;
+  width: 90%;
+  max-width: 360px;
+}
+
+.modal-title {
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+.modal-text {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 8px 12px;
+  border-radius: 9999px;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 9999px;
+}
+
+/* Fade-out animation for delete */
+.fade-out {
+  animation: fadeOut .3s ease forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0)
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(4px)
+  }
+}
+
+.card-pop {
+  animation: cardPop .6s ease;
+}
+
+@keyframes cardPop {
+  0% {
+    transform: scale(.98);
+    opacity: .0;
+  }
+
+  60% {
+    transform: scale(1.01);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Success badge (check) overlay */
+.success-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #facc15;
+  color: #1e1b4b;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.35);
+  animation: popInOut .9s ease forwards;
+}
+
+@keyframes popInOut {
+  0% {
+    transform: scale(.7);
+    opacity: 0;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.9);
+    opacity: 0;
+  }
+}
+
+/* Highlight flash on card border */
+.highlight-flash {
+  animation: highlightFlash 1.2s ease;
+}
+
+@keyframes highlightFlash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 70, 239, 0.0);
+  }
+
+  30% {
+    box-shadow: 0 0 0 4px rgba(217, 70, 239, 0.25);
+  }
+
+  80% {
+    box-shadow: 0 0 0 2px rgba(217, 70, 239, 0.15);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 70, 239, 0.0);
+  }
+}
+
+/* Like bump animation */
+.like-bump {
+  animation: likeBump .6s ease;
+}
+
+@keyframes likeBump {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.18);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Floating +1 bubble for likes */
+.float-plus {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d946ef;
+  animation: floatUp .9s ease forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    transform: translateY(-14px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-18px);
+    opacity: 0;
+  }
+}
+
+/* Reply success flash */
+.reply-success {
+  animation: replyFlash .8s ease;
+}
+
+@keyframes replyFlash {
+  0% {
+    border-color: #d946ef;
+    box-shadow: 0 0 0 0 rgba(217, 70, 239, 0.0);
+  }
+
+  40% {
+    border-color: #d946ef;
+    box-shadow: 0 0 0 4px rgba(217, 70, 239, 0.2);
+  }
+
+  100% {
+    border-color: #f3f4f6;
+    box-shadow: none;
+  }
+}
+
+.feed-container {
+  scroll-behavior: smooth;
+}
+
+#message-input {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #111827;
+}

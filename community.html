@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - Catalist Creative</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <link rel="stylesheet" href="css/community.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #facc15 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .feed-card {
+            border: 1px solid #eef2ff;
+            box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+        }
+
+        .copy-btn {
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: #1f2937;
+            color: #fff;
+            padding: .5rem .75rem;
+            border-radius: .5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all .3s ease;
+            z-index: 50;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="bg-white font-sans text-gray-800">
+    <div id="navbar-container"></div>
+    <div id="cart-sidebar-container"></div>
+    <div class="h-20"></div>
+
+    <section class="pt-8 pb-16 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
+        <div class="mb-8">
+            <h1 class="text-3xl sm:text-4xl font-display font-bold gradient-text">Community</h1>
+            <p class="text-gray-600 mt-2">Berbagi dan terhubung dengan komunitas Catalist Creative.</p>
+        </div>
+
+        <div class="input-card bg-white border border-gray-100 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
+            <div class="flex items-start gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+                    U</div>
+                <div class="flex-1">
+                    <textarea id="message-input"
+                        class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+                        rows="3" placeholder="Tulis sesuatu..."></textarea>
+                    <div class="mt-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button id="emoji-btn"
+                                class="h-10 w-10 rounded-xl bg-gray-100 text-dark flex items-center justify-center"
+                                title="Emot"><i data-feather="smile" class="w-5 h-5"></i></button>
+                            <button id="bold-btn"
+                                class="h-10 w-10 rounded-xl bg-gray-100 text-dark flex items-center justify-center"
+                                title="Bold"><i data-feather="bold" class="w-5 h-5"></i></button>
+                            <button id="italic-btn"
+                                class="h-10 w-10 rounded-xl bg-gray-100 text-dark flex items-center justify-center"
+                                title="Italic"><i data-feather="italic" class="w-5 h-5"></i></button>
+                        </div>
+                        <button id="send-btn"
+                            class="inline-flex items-center gap-2 bg-secondary hover:bg-pink-600 text-white font-semibold px-5 py-2.5 rounded-full transition">
+                            <i data-feather="send" class="w-4 h-4"></i>
+                            <span>Kirim</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6">
+            <div id="feed" class="col-span-12 md:col-span-8 space-y-4"></div>
+            <aside class="col-span-12 md:col-span-4 space-y-6">
+                <div class="bg-white rounded-2xl shadow border border-gray-100 p-4 sm:p-5">
+                    <div class="font-semibold text-gray-900 mb-3">Trending Topic</div>
+                    <div class="space-y-2">
+                        <a
+                            class="block px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-dark">#DesignSystem</a>
+                        <a class="block px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-dark">#AIArt</a>
+                        <a
+                            class="block px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-dark">#NFTTips</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow border border-gray-100 p-4 sm:p-5">
+                    <div class="font-semibold text-gray-900 mb-3">Aturan Komunitas</div>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>Hormati sesama</li>
+                        <li>Konten relevan</li>
+                        <li>Hindari spam</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <div id="delete-modal" class="modal hidden">
+        <div class="modal-card">
+            <div class="modal-title">Hapus pesan ini?</div>
+            <div class="modal-text">Tindakan tidak dapat dibatalkan.</div>
+            <div class="modal-actions">
+                <button id="delete-cancel" class="btn-cancel">Cancel</button>
+                <button id="delete-confirm" class="btn-danger">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <div id="toast" class="toast">Tersalin</div>
+
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="js/footer.js"></script>
+    <script type="module" src="community.js"></script>
+</body>
+
+</html>

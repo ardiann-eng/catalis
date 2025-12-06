@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Catalis</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#facc15',
+                        secondary: '#d946ef',
+                        dark: '#1e1b4b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+        .gradient-text { background: linear-gradient(90deg, #facc15 0%, #d946ef 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .gradient-bg { background: linear-gradient(135deg, #facc15 0%, #d946ef 100%); }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .animated-bg { min-height: 100vh; background: #ffffff; }
+        .login-card { transition: transform 0.3s ease; }
+        .login-card:hover { transform: translateY(-4px); }
+        .blob { position: absolute; width: var(--size); height: var(--size); left: var(--x); top: var(--y); border-radius: 50%; background: radial-gradient(circle at 30% 30%, var(--h1), var(--h2)); filter: blur(50px); opacity: 0.28; mix-blend-mode: screen; will-change: transform; transform: translate3d(0,0,0); }
+        .success-overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,0.65); backdrop-filter: blur(8px); z-index: 50; }
+        .success-card { background: #ffffff; border-radius: 20px; box-shadow: 0 20px 40px rgba(17,24,39,.18); width: 340px; padding: 24px; position: relative; overflow: hidden; border: 2px solid transparent; background-clip: padding-box; }
+        .success-card::before { content: ""; position: absolute; inset: -2px; border-radius: 22px; padding: 2px; background: linear-gradient(135deg, #facc15, #d946ef); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+        .success-icon { width: 64px; height: 64px; border-radius: 9999px; display: grid; place-items: center; background: linear-gradient(135deg, #facc15, #d946ef); color: #1e1b4b; font-weight: 800; font-size: 32px; margin: 0 auto 12px; box-shadow: 0 12px 24px rgba(217,70,239,0.3); animation: iconPop .5s ease forwards; }
+        .success-title { text-align: center; font-weight: 700; color: #0f172a; font-size: 20px; letter-spacing: .2px; }
+        .success-sub { text-align: center; color: #475569; font-size: 14px; margin-top: 4px; }
+        .success-progress { height: 6px; background: #f1f5f9; border-radius: 9999px; overflow: hidden; margin-top: 16px; }
+        .success-bar { height: 100%; width: 0%; background: linear-gradient(135deg, #facc15, #d946ef); transition: width 1.2s ease; }
+        @keyframes iconPop { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth-utils.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <!-- Validasi Session -->
+    <script type="module">
+        import { checkPageAuth } from './js/auth-utils.js';
+        
+        // Periksa apakah pengguna sudah login, jika sudah redirect ke index
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkPageAuth(false, true);
+        });
+    </script>
+</head>
+<body class="animated-bg font-sans text-gray-800">
+    <!-- Container untuk navbar -->
+    <div id="navbar-container"></div>
+    <div id="bg-blobs" class="fixed inset-0 -z-10 pointer-events-none">
+        <div class="blob" style="--size:32vw; --x:20%; --y:30%; --h1:#facc15; --h2:#d946ef;"></div>
+        <div class="blob" style="--size:28vw; --x:70%; --y:40%; --h1:#0ea5e9; --h2:#06b6d4;"></div>
+        <div class="blob" style="--size:24vw; --x:50%; --y:70%; --h1:#1e1b4b; --h2:#d946ef;"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
+        <div class="max-w-md w-full bg-white/95 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 card-hover backdrop-blur-sm login-card">
+            <div class="px-6 py-8 sm:px-10">
+                <div class="text-center mb-8">
+                    <img src="logo.png" alt="Catalis Logo" class="h-16 mx-auto mb-4">
+                    <h2 class="text-3xl font-display font-bold gradient-text">Masuk ke Akun</h2>
+                </div>
+                
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <div class="relative">
+                            <i data-feather="mail" class="absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="email" id="email" name="email" required 
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all duration-200"
+                                placeholder="Masukkan email Anda">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div class="relative">
+                            <i data-feather="lock" class="absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="password" id="password" name="password" required 
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all duration-200"
+                                placeholder="Masukkan password Anda">
+                        </div>
+                        <div class="mt-2 text-right">
+                            <a href="#" id="forgot-password" class="text-sm text-secondary hover:text-purple-700">Lupa Password?</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" id="login-button" 
+                            class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-xl hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center">
+                            Masuk
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-6">
+                    <p class="text-gray-600">
+                        Belum punya akun? 
+                        <a href="register.html" class="text-secondary font-medium hover:text-purple-700 transition-colors duration-200">
+                            Daftar sekarang
+                        </a>
+                    </p>
+                    <div class="mt-4">
+                        <button class="w-full border border-gray-300 rounded-xl py-3 px-4 text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Masuk dengan Google (segera tersedia)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-success-overlay" class="success-overlay hidden">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <div class="success-title">Selamat Datang ke Catalis</div>
+            <div class="success-sub">Login berhasil. Mengalihkan ke beranda...</div>
+            <div class="success-progress"><div class="success-bar"></div></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            const form = document.getElementById('login-form');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const loginButton = document.getElementById('login-button');
+            const errorMessage = document.getElementById('error-message');
+            const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            const validatePassword = (v) => v && v.length >= 6;
+            const setValid = (el, valid) => { el.classList.remove('ring-2','ring-red-500','ring-green-500'); if (valid === true) el.classList.add('ring-2','ring-green-500'); if (valid === false) el.classList.add('ring-2','ring-red-500'); };
+            email.addEventListener('input', () => setValid(email, validateEmail(email.value.trim())));
+            password.addEventListener('input', () => setValid(password, validatePassword(password.value)));
+            form.addEventListener('submit', function() { loginButton.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...'; loginButton.disabled = true; setTimeout(() => { if (document.body.contains(errorMessage) && errorMessage.style.display === 'block') { loginButton.disabled = false; loginButton.textContent = 'Masuk'; } }, 2000); });
+            const blobs = Array.from(document.querySelectorAll('.blob')).map(b => ({ el: b, x: window.innerWidth * 0.5, y: window.innerHeight * 0.5 }));
+            let targetX = window.innerWidth * 0.5; let targetY = window.innerHeight * 0.5; const lerp = (a,b,t) => a + (b - a) * t;
+            const loop = () => { blobs.forEach((b, i) => { b.x = lerp(b.x, targetX, 0.08 - i*0.02); b.y = lerp(b.y, targetY, 0.08 - i*0.02); b.el.style.transform = `translate3d(${b.x - window.innerWidth*0.5}px, ${b.y - window.innerHeight*0.5}px, 0)`; }); requestAnimationFrame(loop); };
+            loop();
+            window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; }, { passive: true });
+            window.addEventListener('login-success', () => { 
+                const overlay = document.getElementById('login-success-overlay'); 
+                overlay.classList.remove('hidden'); 
+                const bar = overlay.querySelector('.success-bar'); 
+                if (bar) { bar.style.width = '0%'; requestAnimationFrame(() => { bar.style.width = '100%'; }); }
+                setTimeout(() => { overlay.classList.add('hidden'); }, 1300); 
+            });
+        });
+    </script>
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+        const link = document.getElementById('forgot-password');
+        const email = document.getElementById('email');
+        const errorMessage = document.getElementById('error-message');
+        if (link) {
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const value = email.value.trim();
+                if (!value) { errorMessage.textContent = 'Masukkan email untuk reset password'; errorMessage.style.display = 'block'; return; }
+                const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: window.location.origin + '/reset.html' });
+                if (error) { errorMessage.textContent = error.message || 'Gagal mengirim tautan reset'; errorMessage.style.display = 'block'; } else { errorMessage.textContent = 'Tautan reset telah dikirim ke email Anda'; errorMessage.style.display = 'block'; }
+            });
+        }
+    </script>
+</body>
+</html>
